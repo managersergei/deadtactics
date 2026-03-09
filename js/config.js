@@ -48,3 +48,31 @@ const ZOMBIE_STATS = {
 // Задержка между действиями зомби в мс (анимационная пауза)
 const ZOMBIE_ACTION_DELAY = 550;
 const ZOMBIE_TURN_END_DELAY = 200;
+
+// Конфигурация уровней (3 уровня)
+const LEVELS = {
+  1: {
+    id: 1,
+    name: 'Скверы города',
+    description: 'Первая встреча с зомби. Несколько слабых врагов на открытом месте.',
+    enemyCount: 2,
+    baseReward: 10,
+    difficulty: 1
+  },
+  2: {
+    id: 2,
+    name: 'Метро',
+    description: 'Подземные ходы метро. Враги становятся сильнее.',
+    enemyCount: 3,
+    baseReward: 10,
+    difficulty: 2
+  },
+  3: {
+    id: 3,
+    name: 'Подземелье',
+    description: 'Глубокие катакомбы под городом. Финальное испытание.',
+    enemyCount: 4,
+    baseReward: 10,
+    difficulty: 3
+  }
+};

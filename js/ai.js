@@ -81,6 +81,7 @@ function zombieMove(z, target) {
 // Зомби атакует игрока: урон + заражение
 function zombieAttack(z, target) {
   target.hp -= z.atkDmg;
+  recordDamageTaken(z.atkDmg);
   const wasPoison = target.poisoned;
   target.poisoned = true;
   playBite();
