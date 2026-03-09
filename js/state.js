@@ -8,6 +8,7 @@ let selected = null;      // выбранный юнит игрока (null ес
 let phase = 'placement';  // 'placement' | 'player' | 'zombie' | 'over'
 let placedCount = 0;      // сколько юнитов расставлено
 let turnNum = 1;          // номер текущего хода
+let turnsSurvived = 0;    // сколько ходов выжило
 
 // Подсвеченные клетки { move: Set<"x,y">, attack: Set<"x,y"> }
 let highlights = { move: new Set(), attack: new Set() };
@@ -23,6 +24,11 @@ function resetState() {
   phase = 'placement';
   placedCount = 0;
   turnNum = 1;
+  turnsSurvived = 0;
   highlights = { move: new Set(), attack: new Set() };
   _uid = 0;
 }
+
+// ──────────────────────────────────────────────────────────
+// Состояние экранов и выбора (для системы экранов)
+let selectedSquadUnitId = null;  // выбранный юнит в отряде для просмотра деталей
