@@ -43,6 +43,14 @@ function handlePlayer(c, r) {
 
   // Выбрать своего юнита
   if (clicked && clicked.kind === 'player') {
+    // Отмена выбора при повторном клике на того же юнита
+    if (selected && clicked.id === selected.id) {
+      selected = null;
+      clearHL();
+      render();
+      return;
+    }
+
     selected = clicked;
     recalcHighlights();
     render();
