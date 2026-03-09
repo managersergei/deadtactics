@@ -48,18 +48,35 @@
 <!-- ЭКРАН 2: КАРТА МИРА -->
 <!-- ═══════════════════════════════════════════════════ -->
 <div id="screen-map" style="display: none; padding: 2rem;">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-    <div>
-      <h2>🗺 КАРТА МИРА</h2>
-      <div id="map-player-info" style="color: var(--text); font-size: 14px; margin-top: 0.5rem;">
-        <!-- имя + золото -->
-      </div>
+  <!-- Панель статуса -->
+  <div id="top-bar" class="top-bar">
+    <div class="top-bar-item">
+      <span class="top-bar-icon">👤</span>
+      <span id="top-bar-name">—</span>
     </div>
+    <div class="top-bar-item">
+      <span class="top-bar-icon">★</span>
+      <span>Лидер</span>
+      <span id="top-bar-level">1</span>
+    </div>
+    <div class="top-bar-item">
+      <span class="top-bar-icon">💰</span>
+      <span id="top-bar-gold">0</span>
+    </div>
+  </div>
+
+  <!-- Заголовок и кнопка -->
+  <div style="display: flex; justify-content: space-between; align-items: center; margin: 2rem 0;">
+    <h2>🗺 КАРТА МИРА</h2>
     <button onclick="goToSquad()" style="padding: 10px 20px; background: var(--green); color: var(--bg); border: none; font-weight: bold; cursor: pointer;">👥 МОЙ ОТРЯД</button>
   </div>
 
-  <div id="map-levels" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; padding: 2rem 0;">
-    <!-- уровни будут добавлены здесь -->
+  <!-- Контейнер карты с маркерами -->
+  <div id="map-container" class="map-container">
+    <div id="map-route" class="map-route"></div>
+    <div id="map-levels" class="map-levels">
+      <!-- маркеры уровней будут добавлены через JS -->
+    </div>
   </div>
 </div>
 

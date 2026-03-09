@@ -94,64 +94,74 @@ function _sidebarZombie(td, ps, ui, btn) {
 // ── ЭКРАН КАРТЫ ──────────────────────────────────────────
 
 function renderMapScreen() {
-  const playerInfo = document.getElementById('map-player-info');
-  if (playerInfo) {
-    playerInfo.innerHTML = `💰 ${gameData.player.gold} монет | ${gameData.player.name}`;
-  }
+  // Обновить панель статуса
+  const nameEl = document.getElementById('top-bar-name');
+  const levelEl = document.getElementById('top-bar-level');
+  const goldEl = document.getElementById('top-bar-gold');
+  
+  if (nameEl) nameEl.textContent = gameData.player.name || '—';
+  if (levelEl) levelEl.textContent = gameData.player.level || 1;
+  if (goldEl) goldEl.textContent = gameData.player.gold || 0;
 
   const levelsContainer = document.getElementById('map-levels');
   if (!levelsContainer) return;
   levelsContainer.innerHTML = '';
+
+  // Найти текущий активный уровень (первый доступный)
+  let currentLevel = 0;
+  for (let i = 1; i <= 3; i++) {
+    if (gameData.levelProgress[i]?.status === 'available' && !gameData.levelProgress[i]?.completed) {
+      currentLevel = i;
+      break;
+    }
+  }
 
   for (let i = 1; i <= 3; i++) {
     const levelInfo = getLevelInfo(i);
     const isCompleted = levelInfo.completed;
     const isAvailable = levelInfo.status === 'available';
     const isLocked = levelInfo.status === 'locked';
+    const isCurrent = isAvailable && !isCompleted && i === currentLevel;
 
-    const card = document.createElement('div');
-    card.className = `level-card ${isCompleted ? 'completed' : isAvailable ? 'available' : 'locked'}`;
+    const marker = document.createElement('div');
+    // Классы: marker + state + (current для анимации)
+    let classes = 'level-marker';
+    if (isCompleted) classes += ' completed';
+    else if (isCurrent) classes += ' available current';
+    else if (isAvailable) classes += ' available';
+    else classes += ' locked';
+    marker.className = classes;
 
-    if (isAvailable) {
-      card.onclick = () => {
-        gameData.currentLevel = i;
-        goToLevelStart(i);
-      };
-    }
-
+    // Содержимое маркера
+    let markerContent = '';
     if (isCompleted) {
-      card.innerHTML = `
-        <div class="flex-between" style="margin-bottom: 0.5rem;">
-          <span class="level-completed-icon text-completed">✓</span>
-          <h3 class="text-completed" style="margin: 0;">Уровень ${i}</h3>
-        </div>
-        <p class="level-desc">${levelInfo.name}</p>
-        <p class="text-secondary" style="font-size: 12px; margin: 0;">Пройден</p>
+      markerContent = `
+        <span class="level-marker-number">✓</span>
+        <span class="level-marker-name">${levelInfo.name}</span>
       `;
-    } else if (isAvailable) {
-      card.innerHTML = `
-        <h3 class="text-completed" style="margin: 0 0 0.5rem 0;">Уровень ${i}</h3>
-        <p class="level-desc">${levelInfo.name}</p>
-        <p style="font-size: 12px; margin: 0.5rem 0;">📍 ${levelInfo.description}</p>
-        <p class="level-enemy-count text-completed">🧟 Враг: ${levelInfo.enemyCount}</p>
-        <p class="level-reward" style="color: var(--yellow);">💰 Награда: ${levelInfo.reward} монет</p>
+    } else if (isLocked) {
+      markerContent = `
+        <span class="level-marker-number">🔒</span>
+        <span class="level-marker-name">—</span>
       `;
-      card.onclick = () => {
+    } else {
+      markerContent = `
+        <span class="level-marker-number">${i}</span>
+        <span class="level-marker-name">${levelInfo.name}</span>
+      `;
+    }
+    
+    marker.innerHTML = markerContent;
+
+    // Клик только по доступным уровням
+    if (isAvailable) {
+      marker.onclick = () => {
         gameData.currentLevel = i;
         goToLevelStart(i);
       };
-    } else {
-      card.innerHTML = `
-        <div class="flex-center">
-          <span class="level-locked-icon">🔒</span>
-          <h3 class="text-locked" style="margin: 0;">Уровень ${i}</h3>
-        </div>
-        <p class="level-desc text-locked">${levelInfo.name}</p>
-        <p class="text-locked" style="font-size: 12px; margin: 0;">Закрыто</p>
-      `;
     }
 
-    levelsContainer.appendChild(card);
+    levelsContainer.appendChild(marker);
   }
 }
 

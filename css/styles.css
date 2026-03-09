@@ -479,3 +479,157 @@ button.danger:hover:not(:disabled) {
 .unit-emoji { font-size: 48px; margin: 0.5rem 0; }
 .unit-name { color: var(--green); font-weight: bold; margin: 0.5rem 0; }
 .unit-stats { color: var(--text); font-size: 12px; }
+
+/* ═══════════════════════════════════════════════════════
+   КАРТА МИРА — НОВЫЙ ДИЗАЙН
+   ═══════════════════════════════════════════════════════ */
+
+/* Панель статуса сверху */
+.top-bar {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  padding: 1rem 2rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.top-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.top-bar-icon {
+  font-size: 18px;
+}
+
+#top-bar-name {
+  color: var(--green);
+  font-weight: bold;
+}
+
+#top-bar-level {
+  color: var(--yellow);
+  font-weight: bold;
+}
+
+#top-bar-gold {
+  color: var(--yellow);
+  font-weight: bold;
+}
+
+/* Контейнер карты с фоном */
+.map-container {
+  position: relative;
+  min-height: 300px;
+  padding: 2rem;
+  background: 
+    linear-gradient(90deg, rgba(31,77,20,0.1) 1px, transparent 1px),
+    linear-gradient(rgba(31,77,20,0.1) 1px, transparent 1px),
+    radial-gradient(ellipse at center, rgba(57,255,20,0.05) 0%, transparent 70%);
+  background-size: 40px 40px, 40px 40px, 100% 100%;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+}
+
+/* Линия маршрута */
+.map-route {
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--border) 0px,
+    var(--border) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+/* Контейнер маркеров уровней */
+.map-levels {
+  position: relative;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 100%;
+  z-index: 2;
+}
+
+/* Маркер уровня */
+.level-marker {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 3px solid var(--border);
+  background: var(--panel);
+}
+
+/* Маркер — доступный (текущий) */
+.level-marker.available {
+  border-color: var(--green);
+  box-shadow: 0 0 20px rgba(57,255,20,0.3);
+}
+
+.level-marker.available:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 30px rgba(57,255,20,0.5);
+}
+
+/* Маркер — пройденный */
+.level-marker.completed {
+  border-color: #4a7a4a;
+  background: #0a2a0a;
+  opacity: 0.8;
+}
+
+/* Маркер — заблокированный */
+.level-marker.locked {
+  border-color: var(--border);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.level-marker-number {
+  font-family: 'Oswald', sans-serif;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.level-marker-name {
+  font-size: 10px;
+  color: var(--text);
+  margin-top: 4px;
+  text-align: center;
+}
+
+/* Анимация мигания для текущего уровня */
+@keyframes pulse-current {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(57,255,20,0.3);
+    border-color: var(--green);
+  }
+  50% { 
+    box-shadow: 0 0 40px rgba(57,255,20,0.6);
+    border-color: var(--green);
+  }
+}
+
+.level-marker.current {
+  animation: pulse-current 1.5s ease-in-out infinite;
+}
