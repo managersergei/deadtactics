@@ -14,7 +14,7 @@ dead-tactics/
 ├── css/
 │   └── styles.css    ← всё визуальное, CSS-переменные, анимации
 └── js/
-    ├── config.js     ← константы (COLS, ROWS, параметры юнитов)
+    ├── config.js     ← константы (COLS, ROWS, параметры юнитов, WEAPONS)
     ├── state.js      ← глобальный стейт игры (units, phase, selected)
     ├── units.js      ← фабрики юнитов (mkPlayer, mkZombie)
     ├── helpers.js    ← чистые утилиты (manhattan, unitAt, reachable)
@@ -75,8 +75,11 @@ highlights    — { move: Set<"x,y">, attack: Set<"x,y"> }
 | hp / maxHp     | 5       | 3     |
 | moveRange      | 5       | 3     |
 | atkRange       | 4       | 1     |
-| atkDmg         | 1       | 1     |
+| weapon         | pistol  | —     |
+| atkDmg         | —       | 1     |
 | poison (укус)  | —       | +1HP/ход |
+
+Оружие игрока: WEAPONS = { pistol: { baseDmg: 1, critDmg: 2, critChance: 0.10 } }
 
 Менять баланс → только в config.js, не хардкодить числа в логике.
 
