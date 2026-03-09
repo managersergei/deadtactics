@@ -13,6 +13,16 @@ let turnsSurvived = 0;    // сколько ходов выжило
 // Подсвеченные клетки { move: Set<"x,y">, attack: Set<"x,y"> }
 let highlights = { move: new Set(), attack: new Set() };
 
+// Временная статистика боя — перемещается в глобальный state
+let stats = {
+  zombiesKilled: 0,
+  damageDealt: 0,
+  damageTaken: 0,
+  poisonDamageTaken: 0,
+  turnsSurvived: 0,
+  battlesPlayed: 0,
+};
+
 // Счётчик для уникальных ID юнитов
 let _uid = 0;
 function uid() { return ++_uid; }
@@ -27,6 +37,15 @@ function resetState() {
   turnsSurvived = 0;
   highlights = { move: new Set(), attack: new Set() };
   _uid = 0;
+  // сброс статистики боя
+  stats = {
+    zombiesKilled: 0,
+    damageDealt: 0,
+    damageTaken: 0,
+    poisonDamageTaken: 0,
+    turnsSurvived: 0,
+    battlesPlayed: 0,
+  };
 }
 
 // ──────────────────────────────────────────────────────────
