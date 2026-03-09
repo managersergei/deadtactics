@@ -314,6 +314,11 @@ function showEndOverlay(win) {
   let levelReward = 0;
   if (win && gameData.currentLevel) {
     levelReward = completeLevel(gameData.currentLevel, stats);
+    
+    // Синхронизировать статистику боя с отрядом
+    gameData.squad.forEach(unit => {
+      updateUnitStats(unit.id, stats);
+    });
   }
 
   overlay.innerHTML = `

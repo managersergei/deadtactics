@@ -222,6 +222,18 @@ function startGame() {
   goToMap();
 }
 
+// Начать бой на уровне
+function startBattle(levelNum) {
+  gameData.currentLevel = levelNum;
+  resetState();
+  resetStats();
+  clearLog();
+  buildGrid();
+  log('=== БОЙ НАЧИНАЕТСЯ ===', 'win');
+  log('Расставь своего юнита', 'sys');
+  render();
+}
+
 // ── Инициализация ────────────────────────────────────────
 
 // Инициализировать при загрузке страницы
