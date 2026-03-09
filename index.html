@@ -13,87 +13,160 @@
   <p>ZOMBIE APOCALYPSE · TURN-BASED STRATEGY</p>
 </header>
 
-<div id="game-container">
-
-  <!-- ПОЛЕ БОЯ -->
-  <div id="grid-wrap">
-    <div id="grid"></div>
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- ЭКРАН 1: СТАРТ -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="screen-start" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2rem; padding: 2rem;">
+  <div style="text-align: center;">
+    <div class="overlay-title green">☣ DEAD TACTICS</div>
+    <p style="color:#3a6a34;letter-spacing:2px;font-size:13px;margin-top:1rem">
+      ZOMBIE APOCALYPSE · TURN-BASED STRATEGY
+    </p>
   </div>
 
-  <!-- САЙДБАР -->
-  <div id="side-panel">
-
-    <div class="panel-box">
-      <div class="panel-label">Статус</div>
-      <div id="turn-display" class="placement">РАССТАНОВКА</div>
-      <div id="phase-sub">Размести юнита 1/2</div>
+  <div class="overlay-box" style="max-width: 600px;">
+    <div style="text-align: center; color: var(--text); line-height: 1.6; margin-bottom: 1rem;">
+      <p><b>Собери отряд выживших</b> и противостань волнам зомби-апокалипсиса. Прокачивай боевые навыки, покупай оружие и доказывай, что человечество ещё не потеряно.</p>
+      <p style="margin-top: 1rem; color: #5a8a54;">Стратегия • Тактика • Выживание</p>
     </div>
+  </div>
 
-    <div class="panel-box">
-      <div class="panel-label">Юнит</div>
-      <div id="unit-info">
-        <span style="color:#2a5a24">— выбери юнита —</span>
+  <button onclick="goToMap()" style="padding: 12px 32px; font-size: 16px; cursor: pointer; background: var(--green); color: var(--bg); border: none; font-weight: bold; border-radius: 4px;">▶ НАЧАТЬ ИГРУ</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- ЭКРАН 2: КАРТА МИРА -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="screen-map" style="display: none; padding: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+      <h2>🗺 КАРТА МИРА</h2>
+      <div id="map-player-info" style="color: var(--text); font-size: 14px; margin-top: 0.5rem;">
+        <!-- имя + золото -->
       </div>
     </div>
+    <button onclick="goToSquad()" style="padding: 10px 20px; background: var(--green); color: var(--bg); border: none; font-weight: bold; cursor: pointer;">👥 МОЙ ОТРЯД</button>
+  </div>
 
-    <button id="btn-end-turn" disabled>⏭ ЗАВЕРШИТЬ ХОД</button>
-    <button id="btn-restart" class="danger">↺ РЕСТАРТ</button>
-
-    <div class="panel-box">
-      <div class="panel-label">Лог боя</div>
-      <div id="log"></div>
-    </div>
-
-    <div class="panel-box" id="legend">
-      <div class="panel-label">Справка</div>
-      🧍 <span>Выживший:</span> 5HP · движ.5 · дальн.4<br>
-      🧟 <span>Зомби:</span> 3HP · движ.3 · яд+1HP/ход<br>
-      <span style="color:#1a4d8a">■</span> Синее = можно идти<br>
-      <span style="color:#7a1a1a">■</span> Красное = цель атаки<br>
-      ⚠ Переместился = нет атаки
-    </div>
-
+  <div id="map-levels" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+    <!-- уровни будут добавлены здесь -->
   </div>
 </div>
 
-<!-- СТАРТОВЫЙ ОВЕРЛЕЙ -->
-<div id="overlay">
-  <div class="overlay-title green">☣ DEAD TACTICS</div>
-  <p style="color:#3a6a34;letter-spacing:2px;font-size:12px;margin-bottom:10px">
-    ZOMBIE APOCALYPSE · TURN-BASED STRATEGY
-  </p>
-
-  <div class="overlay-box">
-    <div class="row">
-      <span class="emoji">🧍</span>
-      <div>
-        <b>Выживший</b> — 5HP, бросает камни<br>
-        дальность 4, движение 5 клеток
-      </div>
-    </div>
-    <div class="row" style="margin-top:8px">
-      <span class="emoji">🧟</span>
-      <div>
-        <b>Зомби</b> — 3HP, кусает + заражает<br>
-        движение 3 клетки, урон от яда каждый ход
-      </div>
-    </div>
-    <div class="note">
-      ⚠ Если переместился — атаковать нельзя<br>
-      🎯 Расставь юнитов в левой части поля
-    </div>
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- ЭКРАН 3: ОТРЯД -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="screen-squad" style="display: none; padding: 2rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2>👥 МОЙ ОТРЯД</h2>
+    <button onclick="goToMap()" style="padding: 10px 20px; background: var(--border); color: var(--text); border: none; cursor: pointer;">← НА КАРТУ</button>
   </div>
 
-  <button id="overlay-btn" onclick="startGame()">▶ НАЧАТЬ</button>
+  <div style="display: flex; gap: 2rem; margin-bottom: 2rem;">
+    <div style="flex: 2;">
+      <h3>Состав отряда</h3>
+      <div id="squad-units" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 1rem;">
+        <!-- карточки юнитов -->
+      </div>
+    </div>
+    <div style="flex: 1; border-left: 1px solid var(--border); padding-left: 2rem;">
+      <h3>📊 Магазин (скоро)</h3>
+      <p style="color: var(--text); opacity: 0.6;">Пока недоступен</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- ЭКРАН 4: ДЕТАЛИ ЮНИТА (ПОПАП) -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="screen-unit-detail" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+  <div style="background: var(--panel); border: 2px solid var(--border); padding: 2rem; border-radius: 8px; max-width: 700px; width: 90%;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <h2 id="unit-detail-name">Юнит</h2>
+      <button onclick="selectedSquadUnitId = null; showScreen('screen-squad'); renderSquadScreen();" style="background: none; border: none; color: var(--text); font-size: 20px; cursor: pointer;">✕</button>
+    </div>
+
+    <div id="unit-detail-content" style="display: flex; flex-direction: column; gap: 1rem;">
+      <!-- содержимое будет заполнено JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- ЭКРАН 5: ПЕРЕД БОЕМ -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="screen-level-start" style="display: none; padding: 2rem; text-align: center;">
+  <h2 id="level-start-title">Уровень</h2>
+  <p id="level-start-desc" style="font-size: 16px; color: var(--text); margin: 1rem 0;">Описание</p>
+
+  <div class="overlay-box" style="margin: 2rem auto; max-width: 400px;">
+    <div id="level-start-stats"></div>
+  </div>
+
+  <div style="display: flex; gap: 1rem; justify-content: center;">
+    <button onclick="goToMap()" style="padding: 10px 20px; background: var(--border); color: var(--text); border: none; cursor: pointer;">← НАЗАД</button>
+    <button onclick="goToBattle(gameData.currentLevel)" style="padding: 10px 20px; background: var(--red); color: white; border: none; font-weight: bold; cursor: pointer;">⚔ В БОЙ</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- ЭКРАН 6: БОЙ (ТЕКУЩАЯ МЕХАНИКА) -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="screen-battle" style="display: none;">
+  <div id="game-container">
+
+    <!-- ПОЛЕ БОЯ -->
+    <div id="grid-wrap">
+      <div id="grid"></div>
+    </div>
+
+    <!-- САЙДБАР -->
+    <div id="side-panel">
+
+      <div class="panel-box">
+        <div class="panel-label">Статус</div>
+        <div id="turn-display" class="placement">РАССТАНОВКА</div>
+        <div id="phase-sub">Размести юнита 1/2</div>
+      </div>
+
+      <div class="panel-box">
+        <div class="panel-label">Юнит</div>
+        <div id="unit-info">
+          <span style="color:#2a5a24">— выбери юнита —</span>
+        </div>
+      </div>
+
+      <button id="btn-end-turn" disabled>⏭ ЗАВЕРШИТЬ ХОД</button>
+      <button id="btn-restart" class="danger">↺ РЕСТАРТ</button>
+
+      <div class="panel-box">
+        <div class="panel-label">Лог боя</div>
+        <div id="log"></div>
+      </div>
+
+      <div class="panel-box" id="legend">
+        <div class="panel-label">Справка</div>
+        🧍 <span>Выживший:</span> 5HP · движ.5 · дальн.4<br>
+        🧟 <span>Зомби:</span> 3HP · движ.3 · яд+1HP/ход<br>
+        <span style="color:#1a4d8a">■</span> Синее = можно идти<br>
+        <span style="color:#7a1a1a">■</span> Красное = цель атаки
+      </div>
+
+    </div>
+  </div>
 </div>
 
 <!-- СКРИПТЫ: порядок важен! -->
 <script src="js/config.js"></script>
 <script src="js/state.js"></script>
+<script src="js/data.js"></script>
+<script src="js/screens.js"></script>
 <script src="js/units.js"></script>
 <script src="js/helpers.js"></script>
+<script src="js/stats.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/render.js"></script>
+<script src="js/audio.js"></script>
 <script src="js/ai.js"></script>
 <script src="js/game.js"></script>
 

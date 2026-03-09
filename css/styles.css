@@ -414,25 +414,68 @@ button.danger:hover:not(:disabled) {
   margin-top: 6px;
 }
 
-/* ── АНИМАЦИИ ── */
-@keyframes pulse-green {
-  0%, 100% { border-color: #1a4d2a; }
-  50% { border-color: #2ecc71; }
+/* ── ДОПОЛНИТЕЛЬНЫЕ КЛАССЫ ДЛЯ UI ── */
+
+.text-muted { color: #2a5a24; }
+.text-player { color: #4a9ae4; }
+.text-zombie { color: #7a4a4a; }
+.text-poison { color: var(--purple); }
+.text-completed { color: var(--green); }
+.text-locked { color: var(--border); }
+.text-secondary { color: #5a8a54; }
+
+.unit-status { font-size: 10px; margin-top: 4px; }
+
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.flex-center { display: flex; align-items: center; gap: 0.5rem; }
+
+.level-card {
+  border: 2px solid var(--border);
+  padding: 1.5rem;
+  border-radius: 8px;
+  background: rgba(100,100,100,0.1);
+  cursor: default;
+  transition: all 0.3s;
 }
 
-@keyframes flash-in {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+.level-card.available {
+  border-color: var(--green);
+  cursor: pointer;
 }
 
-.flash { animation: flash-in 0.25s ease-out; }
-
-/* Подсветка отравления */
-.poison-flash {
-  animation: poison-flash 1.5s ease-in-out;
+.level-card.available:hover {
+  background: rgba(57,255,20,0.15);
 }
 
-@keyframes poison-flash {
-  0%, 100% { opacity: 1; background-color: transparent; }
-  50% { opacity: 0.7; background-color: rgba(204, 68, 255, 0.5); }
+.level-card.completed {
+  border-color: #4a7a4a;
+  background: #0a2a0a;
 }
+
+.level-card.locked {
+  opacity: 0.5;
+}
+
+.level-completed-icon { font-size: 20px; }
+.level-locked-icon { font-size: 24px; }
+
+.level-desc { margin: 0.5rem 0; }
+.level-enemy-count { font-size: 12px; margin-top: 0.5rem; }
+.squad-unit-card {
+  border: 2px solid var(--border);
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: rgba(100,100,100,0.1);
+}
+
+.squad-unit-card:hover {
+  border-color: var(--green);
+  background: rgba(57,255,20,0.15);
+}
+
+.unit-emoji { font-size: 48px; margin: 0.5rem 0; }
+.unit-name { color: var(--green); font-weight: bold; margin: 0.5rem 0; }
+.unit-stats { color: var(--text); font-size: 12px; }

@@ -45,7 +45,7 @@ function _sidebarPlacement(td, ps, ui, btn) {
   td.className = 'placement';
   ps.textContent = `Размести юнита ${placedCount + 1}/${PLAYER_UNIT_COUNT}`;
   btn.disabled = true;
-  ui.innerHTML = '<span style="color:#2a5a24">Кликни зелёную клетку</span>';
+  ui.innerHTML = '<span class="text-muted">Кликни зелёную клетку</span>';
 }
 
 function _sidebarPlayer(td, ps, ui, btn) {
@@ -58,10 +58,10 @@ function _sidebarPlayer(td, ps, ui, btn) {
     const u = selected;
     const canMove = !u.moved;
     const canAtk  = !u.attacked;
-    const poisonBadge = u.poisoned ? ' <span style="color:var(--purple)">☠</span>' : '';
+    const poisonBadge = u.poisoned ? ' <span class="text-poison">☠</span>' : '';
 
     ui.innerHTML = `
-      <div class="name" style="color:#4a9ae4">🧍 Выживший</div>
+      <div class="name text-player">🧍 Выживший</div>
       <div class="stat-row">
         <span class="stat-label">HP</span>
         <span class="stat-val">${u.hp}/${u.maxHp}${poisonBadge}</span>
@@ -74,11 +74,11 @@ function _sidebarPlayer(td, ps, ui, btn) {
         <span class="stat-label">Атака</span>
         <span class="stat-val">${canAtk ? '✅' : '❌'}</span>
       </div>
-      <div style="color:#2a5a24;font-size:10px;margin-top:4px">
+      <div class="unit-status text-muted">
         ${u.moved ? 'Переместился' : u.attacked ? 'Атаковал' : 'Готов'}
       </div>`;
   } else {
-    ui.innerHTML = '<span style="color:#2a5a24">Кликни своего юнита</span>';
+    ui.innerHTML = '<span class="text-muted">Кликни своего юнита</span>';
   }
 }
 
@@ -87,7 +87,7 @@ function _sidebarZombie(td, ps, ui, btn) {
   td.classList.add('zombie-turn');
   ps.textContent = 'Ходят зомби...';
   btn.disabled = true;
-  ui.innerHTML = '<span style="color:#7a4a4a">🧟 Враг атакует...</span>';
+  ui.innerHTML = '<span class="text-zombie">🧟 Враг атакует...</span>';
 }
 
 // ── ЭКРАН КАРТЫ ──────────────────────────────────────────
@@ -109,37 +109,31 @@ function renderMapScreen() {
     const isLocked = levelInfo.status === 'locked';
 
     const card = document.createElement('div');
-    card.style.cssText = `
-      border: 2px solid ${isCompleted ? '#4a7a4a' : isAvailable ? 'var(--green)' : 'var(--border)'};
-      padding: 1.5rem;
-      border-radius: 8px;
-      background: ${isCompleted ? '#0a2a0a' : isAvailable ? 'rgba(57,255,20,0.1)' : 'rgba(100,100,100,0.1)'};
-      cursor: ${isAvailable ? 'pointer' : 'default'};
-      opacity: ${isLocked ? 0.5 : 1};
-      transition: all 0.3s;
-    `;
+    card.className = `level-card ${isCompleted ? 'completed' : isAvailable ? 'available' : 'locked'}`;
 
     if (isAvailable) {
-      card.style.cursor = 'pointer';
-      card.style.borderColor = 'var(--green)';
+      card.onclick = () => {
+        gameData.currentLevel = i;
+        goToLevelStart(i);
+      };
     }
 
     if (isCompleted) {
       card.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-          <span style="font-size: 20px; color: var(--green);">✓</span>
-          <h3 style="margin: 0; color: var(--green);">Уровень ${i}</h3>
+        <div class="flex-between" style="margin-bottom: 0.5rem;">
+          <span class="level-completed-icon text-completed">✓</span>
+          <h3 class="text-completed" style="margin: 0;">Уровень ${i}</h3>
         </div>
-        <p style="color: var(--text); margin: 0.5rem 0;">${levelInfo.name}</p>
-        <p style="color: #5a8a54; font-size: 12px; margin: 0;">Пройден</p>
+        <p class="level-desc">${levelInfo.name}</p>
+        <p class="text-secondary" style="font-size: 12px; margin: 0;">Пройден</p>
       `;
     } else if (isAvailable) {
       card.innerHTML = `
-        <h3 style="margin: 0 0 0.5rem 0; color: var(--green);">Уровень ${i}</h3>
-        <p style="color: var(--text); margin: 0.5rem 0;">${levelInfo.name}</p>
-        <p style="color: var(--text); font-size: 12px; margin: 0.5rem 0;">📍 ${levelInfo.description}</p>
-        <p style="color: var(--green); font-size: 12px; margin-top: 0.5rem;">🧟 Враг: ${levelInfo.enemyCount}</p>
-        <p style="color: var(--yellow); font-size: 12px; margin-top: 0.25rem;">💰 Награда: ${levelInfo.reward} монет</p>
+        <h3 class="text-completed" style="margin: 0 0 0.5rem 0;">Уровень ${i}</h3>
+        <p class="level-desc">${levelInfo.name}</p>
+        <p style="font-size: 12px; margin: 0.5rem 0;">📍 ${levelInfo.description}</p>
+        <p class="level-enemy-count text-completed">🧟 Враг: ${levelInfo.enemyCount}</p>
+        <p class="level-reward" style="color: var(--yellow);">💰 Награда: ${levelInfo.reward} монет</p>
       `;
       card.onclick = () => {
         gameData.currentLevel = i;
@@ -147,12 +141,12 @@ function renderMapScreen() {
       };
     } else {
       card.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <span style="font-size: 24px;">🔒</span>
-          <h3 style="margin: 0; color: var(--border);">Уровень ${i}</h3>
+        <div class="flex-center">
+          <span class="level-locked-icon">🔒</span>
+          <h3 class="text-locked" style="margin: 0;">Уровень ${i}</h3>
         </div>
-        <p style="color: var(--border); margin: 0.5rem 0;">${levelInfo.name}</p>
-        <p style="color: var(--border); font-size: 12px; margin: 0;">Закрыто</p>
+        <p class="level-desc text-locked">${levelInfo.name}</p>
+        <p class="text-locked" style="font-size: 12px; margin: 0;">Закрыто</p>
       `;
     }
 
@@ -170,30 +164,12 @@ function renderSquadScreen() {
 
   gameData.squad.forEach(unit => {
     const card = document.createElement('div');
-    card.style.cssText = `
-      border: 2px solid var(--border);
-      padding: 1rem;
-      border-radius: 8px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s;
-      background: rgba(100,100,100,0.1);
-    `;
-
-    card.onmouseover = () => {
-      card.style.borderColor = 'var(--green)';
-      card.style.background = 'rgba(57,255,20,0.15)';
-    };
-
-    card.onmouseout = () => {
-      card.style.borderColor = 'var(--border)';
-      card.style.background = 'rgba(100,100,100,0.1)';
-    };
+    card.className = 'squad-unit-card';
 
     card.innerHTML = `
-      <div style="font-size: 48px; margin: 0.5rem 0;">${unit.emoji}</div>
-      <div style="color: var(--green); font-weight: bold; margin: 0.5rem 0;">${unit.name}</div>
-      <div style="color: var(--text); font-size: 12px;">
+      <div class="unit-emoji">${unit.emoji}</div>
+      <div class="unit-name">${unit.name}</div>
+      <div class="unit-stats">
         ❤ HP: ${unit.hp}/${unit.maxHp}<br>
         ⚡ Боёв: ${unit.personalStats.battlesPlayed}
       </div>
@@ -332,6 +308,7 @@ function showEndOverlay(win) {
 
       <div style="background: rgba(100,100,100,0.2); padding: 1rem; border-radius: 4px; margin: 1rem 0; text-align: left;">
         <div style="margin: 0.5rem 0; color: var(--text);">Ход: <span style="color: var(--green);">${turnNum}</span></div>
+        <div style="margin: 0.5rem 0; color: var(--text);">Выжито ходов: <span style="color: var(--green);">${turnsSurvived}</span></div>
         <div style="margin: 0.5rem 0; color: var(--text);">Зомби осталось: <span style="color: var(--green);">${zAlive}</span></div>
         <div style="margin: 0.5rem 0; color: var(--text);">Потери: <span style="color: var(--green);">${playerLosses} / ${gameData.squad.length}</span></div>
         <div style="margin: 0.5rem 0; color: var(--text);">Убито: <span style="color: var(--green);">${stats.zombiesKilled}</span></div>
