@@ -4,6 +4,7 @@
 
 const SCREENS = {
   START: 'screen-start',
+  INTRO: 'screen-intro',
   MAP: 'screen-map',
   SQUAD: 'screen-squad',
   UNIT_DETAIL: 'screen-unit-detail',
@@ -55,4 +56,10 @@ function goToBattle(levelNum) {
 function goToLevelStart(levelNum) {
   showScreen(SCREENS.LEVEL_START);
   renderLevelStartScreen(levelNum);
+}
+
+// Переход на экран интро (ЛОР + имя)
+function goToIntro() {
+  showScreen(SCREENS.INTRO);
+  renderIntroScreen();
 }

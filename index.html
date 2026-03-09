@@ -8,15 +8,10 @@
 </head>
 <body>
 
-<header>
-  <h1>☣ DEAD TACTICS</h1>
-  <p>ZOMBIE APOCALYPSE · TURN-BASED STRATEGY</p>
-</header>
-
 <!-- ═══════════════════════════════════════════════════ -->
 <!-- ЭКРАН 1: СТАРТ -->
 <!-- ═══════════════════════════════════════════════════ -->
-<div id="screen-start" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2rem; padding: 2rem;">
+<div id="screen-start" class="screen" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2rem; padding: 2rem;">
   <div style="text-align: center;">
     <div class="overlay-title green">☣ DEAD TACTICS</div>
     <p style="color:#3a6a34;letter-spacing:2px;font-size:13px;margin-top:1rem">
@@ -31,7 +26,22 @@
     </div>
   </div>
 
-  <button onclick="goToMap()" style="padding: 12px 32px; font-size: 16px; cursor: pointer; background: var(--green); color: var(--bg); border: none; font-weight: bold; border-radius: 4px;">▶ НАЧАТЬ ИГРУ</button>
+  <button onclick="goToIntro()" style="padding: 12px 32px; font-size: 16px; cursor: pointer; background: var(--green); color: var(--bg); border: none; font-weight: bold; border-radius: 4px;">▶ НАЧАТЬ ИГРУ</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- ЭКРАН INTRO: ЛОР + ИМЯ -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="screen-intro" class="screen" style="display: none; flex-direction: column; align-items: center; justify-content: center; gap: 2rem; padding: 2rem; min-height: 60vh;">
+  <div id="intro-text-container" class="overlay-box" style="max-width: 600px; text-align: left; min-height: 200px;">
+    <p id="intro-text" style="color: var(--text); line-height: 1.8; font-size: 15px;"></p>
+  </div>
+  <div id="intro-input-container" style="display: none; flex-direction: column; align-items: center; gap: 1rem;">
+    <p style="color: var(--text); font-size: 14px;">На нём выгравировано:</p>
+    <input type="text" id="player-name-input" placeholder="Введи своё имя" style="padding: 10px 20px; font-size: 16px; background: var(--panel); color: var(--green); border: 2px solid var(--green); border-radius: 4px; text-align: center; font-family: 'Share Tech Mono', monospace;">
+    <button onclick="savePlayerName()" style="padding: 10px 30px; background: var(--green); color: var(--bg); border: none; font-weight: bold; cursor: pointer; border-radius: 4px;">ПОДТВЕРДИТЬ</button>
+  </div>
+  <button id="intro-next-btn" onclick="showNextIntroText()" style="padding: 10px 30px; background: var(--green); color: var(--bg); border: none; font-weight: bold; cursor: pointer; border-radius: 4px;">ДАЛЕЕ →</button>
 </div>
 
 <!-- ═══════════════════════════════════════════════════ -->
@@ -48,7 +58,7 @@
     <button onclick="goToSquad()" style="padding: 10px 20px; background: var(--green); color: var(--bg); border: none; font-weight: bold; cursor: pointer;">👥 МОЙ ОТРЯД</button>
   </div>
 
-  <div id="map-levels" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+  <div id="map-levels" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; padding: 2rem 0;">
     <!-- уровни будут добавлены здесь -->
   </div>
 </div>

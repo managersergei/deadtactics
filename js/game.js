@@ -236,6 +236,24 @@ function startBattle(levelNum) {
   render();
 }
 
+// ── ИГРОК И ИНТРО ────────────────────────────────────────
+
+function savePlayerName() {
+  const input = document.getElementById('player-name-input');
+  if (!input) return;
+  
+  const name = input.value.trim();
+  if (name) {
+    gameData.player.name = name;
+    // Также обновить имя первого юнита в отряде
+    if (gameData.squad.length > 0) {
+      gameData.squad[0].name = name;
+    }
+  }
+  
+  goToMap();
+}
+
 // ── Инициализация ────────────────────────────────────────
 
 // Инициализировать при загрузке страницы
