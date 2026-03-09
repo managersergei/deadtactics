@@ -1,0 +1,395 @@
+/* ════════════════════════════════════════════════════════
+   СТИЛИ — Dead Tactics
+   Все цвета через CSS-переменные в :root
+   Никаких inline-стилей в JS — только классы отсюда
+   ════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Oswald:wght@400;700&display=swap');
+
+/* ── ПЕРЕМЕННЫЕ ── */
+:root {
+  --green: #39ff14;
+  --green-dim: #1a7a08;
+  --green-dark: #0a3004;
+  --red: #ff2222;
+  --red-dim: #7a0808;
+  --yellow: #ffcc00;
+  --purple: #cc44ff;
+  --bg: #050a04;
+  --panel: #080f07;
+  --border: #1f4d14;
+  --text: #a8d4a0;
+  --cell-empty: #0a150a;
+  --cell-hover: #0f2510;
+}
+
+/* ── СБРОС ── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── ТЕЛО ── */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+  background-image:
+    radial-gradient(ellipse at 20% 20%, rgba(57,255,20,0.03) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(255,34,34,0.04) 0%, transparent 60%);
+}
+
+/* Эффект сканлайнов */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* ── ЗАГОЛОВОК ── */
+header {
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+header h1 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--green);
+  letter-spacing: 6px;
+  text-shadow: 0 0 20px rgba(57,255,20,0.5), 0 0 40px rgba(57,255,20,0.2);
+}
+
+header p {
+  font-size: 11px;
+  color: #3a6634;
+  letter-spacing: 3px;
+  margin-top: 2px;
+}
+
+/* ── ЛЕЙАУТ ── */
+#game-container {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 900px;
+}
+
+/* ── ГРИД ── */
+#grid-wrap { flex-shrink: 0; }
+
+#grid {
+  display: grid;
+  grid-template-columns: repeat(8, 68px);
+  grid-template-rows: repeat(6, 68px);
+  gap: 2px;
+  background: #0a1f08;
+  border: 2px solid var(--border);
+  box-shadow: 0 0 30px rgba(57,255,20,0.08), inset 0 0 30px rgba(0,0,0,0.5);
+  padding: 2px;
+}
+
+/* ── КЛЕТКИ ── */
+.cell {
+  width: 68px; height: 68px;
+  background: var(--cell-empty);
+  border: 1px solid #0f240d;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s, border-color 0.12s;
+  user-select: none;
+}
+
+.cell::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.02) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cell:hover { background: var(--cell-hover); }
+
+.cell.placement-zone {
+  background: #061a10;
+  border-color: #1a4d2a;
+  animation: pulse-green 2s infinite;
+}
+
+.cell.move-range {
+  background: #061529;
+  border-color: #1a5a9c;
+  cursor: pointer;
+}
+
+.cell.move-range:hover { background: #0a2040; border-color: #4a9ae4; }
+
+.cell.attack-range {
+  background: #1a0505;
+  border-color: #7a1a1a;
+  cursor: crosshair;
+}
+
+.cell.attack-range:hover { background: #2a0808; border-color: var(--red); }
+
+.cell.selected-unit { border-color: var(--yellow) !important; }
+
+/* ── ЮНИТЫ ── */
+.unit {
+  width: 54px; height: 54px;
+  border-radius: 6px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  position: relative;
+  border: 2px solid transparent;
+  font-size: 26px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.unit.player {
+  background: linear-gradient(135deg, #0a2540, #0f3a60);
+  border-color: #2a6aaa;
+}
+
+.unit.zombie {
+  background: linear-gradient(135deg, #2a0a04, #3a1208);
+  border-color: #7a2a14;
+}
+
+.unit.selected {
+  border-color: var(--yellow) !important;
+  box-shadow: 0 0 12px rgba(255,204,0,0.6);
+}
+
+.unit.acted {
+  opacity: 0.45;
+  filter: grayscale(0.4);
+}
+
+.unit:hover { transform: scale(1.06); }
+
+/* ── HP БАР ── */
+.hp-bar {
+  position: absolute; bottom: 2px; left: 3px; right: 3px;
+  height: 3px; background: #111; border-radius: 2px;
+}
+
+.hp-fill {
+  height: 100%; border-radius: 2px;
+  background: var(--green);
+  transition: width 0.3s;
+}
+
+.hp-fill.med { background: var(--yellow); }
+.hp-fill.low { background: var(--red); }
+
+/* Иконка яда */
+.status-icon {
+  position: absolute; top: 1px; right: 2px;
+  font-size: 10px; line-height: 1;
+}
+
+/* ── САЙДБАР ── */
+#side-panel {
+  flex: 1;
+  min-width: 200px;
+  max-width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.panel-box {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 10px 12px;
+}
+
+.panel-label {
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: #2a5a24;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+#turn-display {
+  font-family: 'Oswald', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+#turn-display.player-turn { color: #4a9ae4; }
+#turn-display.zombie-turn { color: #e67e22; }
+#turn-display.placement { color: var(--green); }
+
+#phase-sub {
+  font-size: 11px;
+  color: #4a7a44;
+  margin-top: 2px;
+}
+
+#unit-info {
+  font-size: 12px;
+  line-height: 1.8;
+  min-height: 70px;
+}
+
+#unit-info .name {
+  font-family: 'Oswald', sans-serif;
+  font-size: 15px;
+}
+
+.stat-row { display: flex; justify-content: space-between; }
+.stat-label { color: #4a7a44; }
+.stat-val { color: var(--text); }
+
+/* ── КНОПКИ ── */
+button {
+  display: block; width: 100%;
+  padding: 9px 12px;
+  background: #0a1a09;
+  color: var(--green);
+  border: 1px solid var(--green-dim);
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 1px;
+  transition: all 0.15s;
+  text-align: center;
+}
+
+button:hover:not(:disabled) {
+  background: #102210;
+  border-color: var(--green);
+  box-shadow: 0 0 10px rgba(57,255,20,0.15);
+}
+
+button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  color: #2a4a28;
+  border-color: #1a3018;
+}
+
+button.danger {
+  color: var(--red);
+  border-color: var(--red-dim);
+  background: #120404;
+}
+
+button.danger:hover:not(:disabled) {
+  background: #1e0606;
+  border-color: var(--red);
+  box-shadow: 0 0 10px rgba(255,34,34,0.15);
+}
+
+/* ── ЛОГ ── */
+#log {
+  height: 160px;
+  overflow-y: auto;
+  font-size: 10px;
+  line-height: 1.7;
+  scrollbar-width: thin;
+  scrollbar-color: #1a4018 #050a04;
+}
+
+#log::-webkit-scrollbar { width: 4px; }
+#log::-webkit-scrollbar-track { background: var(--bg); }
+#log::-webkit-scrollbar-thumb { background: #1a4018; }
+
+.log-line { padding: 0 2px; }
+.log-line.sys { color: #2a6a24; }
+.log-line.move { color: #2a6aaa; }
+.log-line.dmg { color: var(--red); }
+.log-line.poison { color: var(--purple); }
+.log-line.zombie-act { color: #e67e22; }
+.log-line.win { color: var(--green); font-weight: bold; }
+
+/* ── ЛЕГЕНДА ── */
+#legend { font-size: 10px; line-height: 2; color: #2a5a24; }
+#legend span { color: #4a8a44; }
+
+/* ── ОВЕРЛЕЙ ── */
+#overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.92);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 999;
+  backdrop-filter: blur(4px);
+}
+
+#overlay.hidden { display: none; }
+
+.overlay-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 52px;
+  font-weight: 700;
+  letter-spacing: 8px;
+  margin-bottom: 8px;
+}
+
+.overlay-title.green {
+  color: var(--green);
+  text-shadow: 0 0 30px rgba(57,255,20,0.6);
+}
+
+.overlay-title.red {
+  color: var(--red);
+  text-shadow: 0 0 30px rgba(255,34,34,0.6);
+}
+
+.overlay-box {
+  background: #080f07;
+  border: 1px solid #1f4d14;
+  border-radius: 6px;
+  padding: 20px 28px;
+  margin: 16px 0;
+  max-width: 420px;
+  width: 100%;
+  font-size: 13px;
+  line-height: 2;
+}
+
+.overlay-box .row { display: flex; gap: 8px; }
+.overlay-box .emoji { font-size: 18px; flex-shrink: 0; }
+.overlay-box b { color: var(--green); }
+.overlay-box .note { color: #5a9a54; font-size: 11px; margin-top: 8px; }
+
+#overlay-btn {
+  padding: 14px 40px;
+  font-size: 16px;
+  font-family: 'Oswald', sans-serif;
+  letter-spacing: 3px;
+  width: auto;
+  margin-top: 6px;
+}
+
+/* ── АНИМАЦИИ ── */
+@keyframes pulse-green {
+  0%, 100% { border-color: #1a4d2a; }
+  50% { border-color: #2ecc71; }
+}
+
+@keyframes flash-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.flash { animation: flash-in 0.25s ease-out; }

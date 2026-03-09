@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>☣ DEAD TACTICS</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header>
+  <h1>☣ DEAD TACTICS</h1>
+  <p>ZOMBIE APOCALYPSE · TURN-BASED STRATEGY</p>
+</header>
+
+<div id="game-container">
+
+  <!-- ПОЛЕ БОЯ -->
+  <div id="grid-wrap">
+    <div id="grid"></div>
+  </div>
+
+  <!-- САЙДБАР -->
+  <div id="side-panel">
+
+    <div class="panel-box">
+      <div class="panel-label">Статус</div>
+      <div id="turn-display" class="placement">РАССТАНОВКА</div>
+      <div id="phase-sub">Размести юнита 1/2</div>
+    </div>
+
+    <div class="panel-box">
+      <div class="panel-label">Юнит</div>
+      <div id="unit-info">
+        <span style="color:#2a5a24">— выбери юнита —</span>
+      </div>
+    </div>
+
+    <button id="btn-end-turn" disabled>⏭ ЗАВЕРШИТЬ ХОД</button>
+    <button id="btn-restart" class="danger">↺ РЕСТАРТ</button>
+
+    <div class="panel-box">
+      <div class="panel-label">Лог боя</div>
+      <div id="log"></div>
+    </div>
+
+    <div class="panel-box" id="legend">
+      <div class="panel-label">Справка</div>
+      🧍 <span>Выживший:</span> 5HP · движ.5 · дальн.4<br>
+      🧟 <span>Зомби:</span> 3HP · движ.3 · яд+1HP/ход<br>
+      <span style="color:#1a4d8a">■</span> Синее = можно идти<br>
+      <span style="color:#7a1a1a">■</span> Красное = цель атаки<br>
+      ⚠ Переместился = нет атаки
+    </div>
+
+  </div>
+</div>
+
+<!-- СТАРТОВЫЙ ОВЕРЛЕЙ -->
+<div id="overlay">
+  <div class="overlay-title green">☣ DEAD TACTICS</div>
+  <p style="color:#3a6a34;letter-spacing:2px;font-size:12px;margin-bottom:10px">
+    ZOMBIE APOCALYPSE · TURN-BASED STRATEGY
+  </p>
+
+  <div class="overlay-box">
+    <div class="row">
+      <span class="emoji">🧍</span>
+      <div>
+        <b>Выживший</b> — 5HP, бросает камни<br>
+        дальность 4, движение 5 клеток
+      </div>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <span class="emoji">🧟</span>
+      <div>
+        <b>Зомби</b> — 3HP, кусает + заражает<br>
+        движение 3 клетки, урон от яда каждый ход
+      </div>
+    </div>
+    <div class="note">
+      ⚠ Если переместился — атаковать нельзя<br>
+      🎯 Расставь юнитов в левой части поля
+    </div>
+  </div>
+
+  <button id="overlay-btn" onclick="startGame()">▶ НАЧАТЬ</button>
+</div>
+
+<!-- СКРИПТЫ: порядок важен! -->
+<script src="js/config.js"></script>
+<script src="js/state.js"></script>
+<script src="js/units.js"></script>
+<script src="js/helpers.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/render.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/game.js"></script>
+
+</body>
+</html>
