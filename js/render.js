@@ -103,6 +103,19 @@ function _buildUnitEl(u) {
   // HP-бар
   div.appendChild(_buildHpBar(u));
 
+  // Tooltip с информацией о юните
+  const tooltip = document.createElement('div');
+  tooltip.className = 'unit-tooltip';
+  
+  let tooltipHTML = `<span class="tooltip-name">${u.emoji} ${u.kind === 'player' ? 'Выживший' : 'Зомби'}</span><span class="tooltip-hp">HP: ${u.hp}/${u.maxHp}</span>`;
+  
+  if (u.kind === 'player') {
+    tooltipHTML += `<span class="tooltip-atk">Атака: дальность ${u.atkRange}, урон ${u.atkDmg}</span>`;
+  }
+  
+  tooltip.innerHTML = tooltipHTML;
+  div.appendChild(tooltip);
+
   return div;
 }
 
