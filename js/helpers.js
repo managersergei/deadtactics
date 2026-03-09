@@ -55,15 +55,14 @@ function alivePlayers() {
   return units.filter(u => u.alive && u.kind === 'player');
 }
 
-// Случайные позиции для спавна зомби
-// count — число точек; координаты x в колонках 6‑9 (включительно),
-// y от 0 до ROWS‑1. Без повторов.
+// Случайные позиции для зомби из ZOMBIE_SPAWN_POSITIONS
 function randomZombiePositions(count) {
-  const positions = new Set();
-  while (positions.size < count) {
-    const x = 6 + Math.floor(Math.random() * 4); // 6,7,8,9
-    const y = Math.floor(Math.random() * ROWS);
-    positions.add(`${x},${y}`);
-  }
-  return Array.from(positions).map(s => s.split(',').map(Number));
+  const shuffled = [...ZOMBIE_SPAWN_POSITIONS].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+}
+
+// Вычисление урона для оружия (с учётом крита)
+function calcDamage(weapon) {
+  const w = WEAPONS[weapon];
+  return Math.random() < w.critChance ? w.critDmg : w.baseDmg;
 }

@@ -7,8 +7,8 @@ const COLS = 10;
 const ROWS = 8;
 
 // Колонки доступные для расстановки игрока (левая половина)
-// при ширине 10 → первые 5 столбцов (0‑4)
-const PLACE_COLS = [0, 1, 2, 3, 4];
+// при ширине 10 → первые 2 столбцов (0‑1)
+const PLACE_COLS = [0, 1];
 
 // Сколько юнитов игрок расставляет перед боем
 const PLAYER_UNIT_COUNT = 2;
@@ -22,8 +22,16 @@ const PLAYER_STATS = {
   maxHp: 5,
   moveRange: 5,
   atkRange: 4,
-  atkDmg: 1,
   emoji: '🧍',
+};
+
+// Оружие и его параметры
+const WEAPONS = {
+  pistol: {
+    baseDmg: 1,
+    critDmg: 2,
+    critChance: 0.10,
+  },
 };
 
 // Параметры зомби

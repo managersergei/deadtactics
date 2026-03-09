@@ -13,7 +13,7 @@ function mkPlayer(x, y) {
     maxHp: PLAYER_STATS.maxHp,
     moveRange: PLAYER_STATS.moveRange,
     atkRange: PLAYER_STATS.atkRange,
-    atkDmg: PLAYER_STATS.atkDmg,
+    weapon: 'pistol',
     poisoned: false,  // заражён укусом зомби
     moved: false,     // уже переместился в этот ход
     attacked: false,  // уже атаковал в этот ход

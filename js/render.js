@@ -110,7 +110,8 @@ function _buildUnitEl(u) {
   let tooltipHTML = `<span class="tooltip-name">${u.emoji} ${u.kind === 'player' ? 'Выживший' : 'Зомби'}</span><span class="tooltip-hp">HP: ${u.hp}/${u.maxHp}</span>`;
   
   if (u.kind === 'player') {
-    tooltipHTML += `<span class="tooltip-atk">Атака: дальность ${u.atkRange}, урон ${u.atkDmg}</span>`;
+    const w = WEAPONS[u.weapon];
+    tooltipHTML += `<span class="tooltip-atk">Атака: дальность ${u.atkRange}, урон ${w.baseDmg}-${w.critDmg} (крит ${Math.round(w.critChance * 100)}%)</span>`;
   }
   
   tooltip.innerHTML = tooltipHTML;

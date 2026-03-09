@@ -111,9 +111,11 @@ function doMove(u, c, r) {
 }
 
 function doAttack(attacker, target) {
-  target.hp -= attacker.atkDmg;
+  const damage = calcDamage(attacker.weapon);
+  const isCrit = damage === WEAPONS[attacker.weapon].critDmg;
+  target.hp -= damage;
   attacker.attacked = true;
-  log(`💥 Атака → зомби [${target.x+1},${target.y+1}] — ${target.hp}/${target.maxHp}HP`, 'dmg');
+  log(`💥 Атака${isCrit ? ' (КРИТ!)' : ''} → зомби [${target.x+1},${target.y+1}] — ${target.hp}/${target.maxHp}HP`, 'dmg');
 
   if (target.hp <= 0) {
     target.alive = false;
