@@ -48,35 +48,33 @@
 <!-- ЭКРАН 2: КАРТА МИРА -->
 <!-- ═══════════════════════════════════════════════════ -->
 <div id="screen-map" style="display: none; padding: 2rem;">
-  <!-- Панель статуса -->
+  <!-- Верхняя панель: [👤 имя · ★ уровень] + [💰 золото] -->
   <div id="top-bar" class="top-bar">
-    <div class="top-bar-item">
+    <div class="top-bar-section">
       <span class="top-bar-icon">👤</span>
       <span id="top-bar-name">—</span>
-    </div>
-    <div class="top-bar-item">
+      <span class="top-bar-divider">·</span>
       <span class="top-bar-icon">★</span>
-      <span>Лидер</span>
+      <span>Уровень</span>
       <span id="top-bar-level">1</span>
     </div>
-    <div class="top-bar-item">
+    <div class="top-bar-section">
       <span class="top-bar-icon">💰</span>
       <span id="top-bar-gold">0</span>
     </div>
   </div>
 
-  <!-- Заголовок и кнопка -->
-  <div style="display: flex; justify-content: space-between; align-items: center; margin: 2rem 0;">
-    <h2>🗺 КАРТА МИРА</h2>
-    <button onclick="goToSquad()" style="padding: 10px 20px; background: var(--green); color: var(--bg); border: none; font-weight: bold; cursor: pointer;">👥 МОЙ ОТРЯД</button>
-  </div>
-
   <!-- Контейнер карты с маркерами -->
   <div id="map-container" class="map-container">
-    <div id="map-route" class="map-route"></div>
+    <svg id="map-route-svg" class="map-route-svg"></svg>
     <div id="map-levels" class="map-levels">
       <!-- маркеры уровней будут добавлены через JS -->
     </div>
+  </div>
+
+  <!-- Нижняя кнопка -->
+  <div style="margin-top: 2rem;">
+    <button onclick="goToSquad()" style="padding: 12px 24px; background: var(--green); color: var(--bg); border: none; font-weight: bold; cursor: pointer; border-radius: 4px;">👥 МОЙ ОТРЯД</button>
   </div>
 </div>
 

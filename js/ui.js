@@ -104,24 +104,49 @@ function renderMapScreen() {
   if (goldEl) goldEl.textContent = gameData.player.gold || 0;
 
   const levelsContainer = document.getElementById('map-levels');
+  const svgContainer = document.getElementById('map-route-svg');
   if (!levelsContainer) return;
   levelsContainer.innerHTML = '';
+  if (svgContainer) svgContainer.innerHTML = '';
 
   // Найти текущий активный уровень (первый доступный)
   let currentLevel = 0;
-  for (let i = 1; i <= 3; i++) {
+  for (let i = 1; i <= 10; i++) {
     if (gameData.levelProgress[i]?.status === 'available' && !gameData.levelProgress[i]?.completed) {
       currentLevel = i;
       break;
     }
   }
 
-  for (let i = 1; i <= 3; i++) {
+  // Сначала рисуем линии маршрута
+  for (let i = 1; i < 10; i++) {
+    const lvl1 = LEVELS[i];
+    const lvl2 = LEVELS[i + 1];
+    if (!lvl1 || !lvl2) continue;
+    
+    const isCompleted = gameData.levelProgress[i]?.completed;
+    
+    if (svgContainer) {
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', lvl1.position.x + '%');
+      line.setAttribute('y1', lvl1.position.y + '%');
+      line.setAttribute('x2', lvl2.position.x + '%');
+      line.setAttribute('y2', lvl2.position.y + '%');
+      if (isCompleted) line.classList.add('completed');
+      svgContainer.appendChild(line);
+    }
+  }
+
+  // Теперь создаем маркеры уровней
+  for (let i = 1; i <= 10; i++) {
     const levelInfo = getLevelInfo(i);
+    const levelConfig = LEVELS[i];
     const isCompleted = levelInfo.completed;
     const isAvailable = levelInfo.status === 'available';
     const isLocked = levelInfo.status === 'locked';
     const isCurrent = isAvailable && !isCompleted && i === currentLevel;
+
+    if (!levelConfig) continue;
 
     const marker = document.createElement('div');
     // Классы: marker + state + (current для анимации)
@@ -131,6 +156,10 @@ function renderMapScreen() {
     else if (isAvailable) classes += ' available';
     else classes += ' locked';
     marker.className = classes;
+
+    // Позиционирование на карте
+    marker.style.left = levelConfig.position.x + '%';
+    marker.style.top = levelConfig.position.y + '%';
 
     // Содержимое маркера
     let markerContent = '';

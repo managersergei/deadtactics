@@ -66,3 +66,15 @@ function calcDamage(weapon) {
   const w = WEAPONS[weapon];
   return Math.random() < w.critChance ? w.critDmg : w.baseDmg;
 }
+
+// экспорт для тестов (Node environment)
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    manhattan,
+    unitAt,
+    reachable,
+    aliveZombies,
+    alivePlayers,
+    calcDamage,
+  };
+}

@@ -484,11 +484,11 @@ button.danger:hover:not(:disabled) {
    КАРТА МИРА — НОВЫЙ ДИЗАЙН
    ═══════════════════════════════════════════════════════ */
 
-/* Панель статуса сверху */
+/* Панель статуса сверху - 2 секции */
 .top-bar {
   display: flex;
-  justify-content: center;
-  gap: 3rem;
+  justify-content: space-between;
+  align-items: center;
   padding: 1rem 2rem;
   background: var(--panel);
   border: 1px solid var(--border);
@@ -496,12 +496,25 @@ button.danger:hover:not(:disabled) {
   margin-bottom: 1rem;
 }
 
-.top-bar-item {
+.top-bar-section {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-size: 14px;
   color: var(--text);
+}
+
+.top-bar-section:first-child {
+  flex: 1;
+}
+
+.top-bar-section:last-child {
+  justify-content: flex-end;
+}
+
+.top-bar-divider {
+  margin: 0 0.5rem;
+  color: var(--border);
 }
 
 .top-bar-icon {
@@ -526,49 +539,56 @@ button.danger:hover:not(:disabled) {
 /* Контейнер карты с фоном */
 .map-container {
   position: relative;
-  min-height: 300px;
-  padding: 2rem;
+  height: 500px;
   background: 
-    linear-gradient(90deg, rgba(31,77,20,0.1) 1px, transparent 1px),
-    linear-gradient(rgba(31,77,20,0.1) 1px, transparent 1px),
-    radial-gradient(ellipse at center, rgba(57,255,20,0.05) 0%, transparent 70%);
-  background-size: 40px 40px, 40px 40px, 100% 100%;
+    linear-gradient(90deg, rgba(31,77,20,0.08) 1px, transparent 1px),
+    linear-gradient(rgba(31,77,20,0.08) 1px, transparent 1px),
+    radial-gradient(ellipse at center, rgba(57,255,20,0.03) 0%, transparent 70%);
+  background-size: 30px 30px, 30px 30px, 100% 100%;
   border: 2px solid var(--border);
   border-radius: 8px;
+  overflow: hidden;
 }
 
-/* Линия маршрута */
-.map-route {
+/* SVG для линий маршрута */
+.map-route-svg {
   position: absolute;
-  top: 50%;
-  left: 10%;
-  right: 10%;
-  height: 2px;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--border) 0px,
-    var(--border) 8px,
-    transparent 8px,
-    transparent 16px
-  );
-  transform: translateY(-50%);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
   z-index: 1;
+}
+
+.map-route-svg line {
+  stroke: var(--border);
+  stroke-width: 2;
+  stroke-dasharray: 8 6;
+  opacity: 0.6;
+}
+
+.map-route-svg line.completed {
+  stroke: #4a7a4a;
+  opacity: 0.4;
 }
 
 /* Контейнер маркеров уровней */
 .map-levels {
-  position: relative;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
   height: 100%;
   z-index: 2;
 }
 
 /* Маркер уровня */
 .level-marker {
-  width: 80px;
-  height: 80px;
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  transform: translate(-50%, -50%);
   border-radius: 50%;
   display: flex;
   flex-direction: column;
@@ -587,7 +607,7 @@ button.danger:hover:not(:disabled) {
 }
 
 .level-marker.available:hover {
-  transform: scale(1.1);
+  transform: translate(-50%, -50%) scale(1.1);
   box-shadow: 0 0 30px rgba(57,255,20,0.5);
 }
 
@@ -607,15 +627,28 @@ button.danger:hover:not(:disabled) {
 
 .level-marker-number {
   font-family: 'Oswald', sans-serif;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: bold;
+  color: var(--text);
+}
+
+.level-marker.completed .level-marker-number {
+  color: var(--green);
+}
+
+.level-marker.available .level-marker-number {
+  color: var(--green);
 }
 
 .level-marker-name {
-  font-size: 10px;
+  font-size: 9px;
   color: var(--text);
-  margin-top: 4px;
+  margin-top: 2px;
   text-align: center;
+  max-width: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Анимация мигания для текущего уровня */

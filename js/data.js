@@ -21,8 +21,15 @@ let gameData = {
   
   levelProgress: {
     1: { status: 'available', completed: false, reward: 10, enemyCount: 2 },
-    2: { status: 'locked', completed: false, reward: 10, enemyCount: 3 },
-    3: { status: 'locked', completed: false, reward: 10, enemyCount: 4 }
+    2: { status: 'locked', completed: false, reward: 12, enemyCount: 2 },
+    3: { status: 'locked', completed: false, reward: 15, enemyCount: 3 },
+    4: { status: 'locked', completed: false, reward: 15, enemyCount: 3 },
+    5: { status: 'locked', completed: false, reward: 20, enemyCount: 4 },
+    6: { status: 'locked', completed: false, reward: 20, enemyCount: 4 },
+    7: { status: 'locked', completed: false, reward: 25, enemyCount: 5 },
+    8: { status: 'locked', completed: false, reward: 30, enemyCount: 5 },
+    9: { status: 'locked', completed: false, reward: 35, enemyCount: 6 },
+    10: { status: 'locked', completed: false, reward: 50, enemyCount: 8 }
   },
   
   currentLevel: null  // выбранный уровень для боя
@@ -76,7 +83,7 @@ function completeLevel(levelNum, stats) {
     addGold(totalReward);
     
     // Открыть следующий уровень если есть
-    if (levelNum < 3 && gameData.levelProgress[levelNum + 1]) {
+    if (levelNum < 10 && gameData.levelProgress[levelNum + 1]) {
       gameData.levelProgress[levelNum + 1].status = 'available';
     }
     
