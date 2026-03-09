@@ -86,6 +86,7 @@ function _buildUnitEl(u) {
   div.className = `unit ${u.kind}`;
   if (selected && selected.id === u.id) div.classList.add('selected');
   if ((u.moved || u.attacked) && u.kind === 'player') div.classList.add('acted');
+  if (u.poisonFlash) div.classList.add('poison-flash');
 
   // Эмодзи
   const em = document.createElement('span');

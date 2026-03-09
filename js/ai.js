@@ -74,6 +74,7 @@ function zombieMove(z, target) {
   if (cx !== z.x || cy !== z.y) {
     log(`🧟 Зомби → [${cx+1},${cy+1}]`, 'zombie-act');
     z.x = cx; z.y = cy;
+    playZombieMove();
   }
 }
 
@@ -82,6 +83,7 @@ function zombieAttack(z, target) {
   target.hp -= z.atkDmg;
   const wasPoison = target.poisoned;
   target.poisoned = true;
+  playBite();
 
   if (!wasPoison) {
     log(`🧟 Укус! ☠ Выживший заражён — яд будет жечь каждый ход`, 'poison');

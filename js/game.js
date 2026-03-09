@@ -105,6 +105,7 @@ function doMove(u, c, r) {
   log(`▶ Переместился на [${c+1},${r+1}]`, 'move');
   u.x = c; u.y = r;
   u.moved = true;
+  playFootstep();
   clearHL(); // после движения атаки нет
   render();
   checkEnd();
@@ -115,6 +116,7 @@ function doAttack(attacker, target) {
   const isCrit = damage === WEAPONS[attacker.weapon].critDmg;
   target.hp -= damage;
   attacker.attacked = true;
+  playShot();
   log(`💥 Атака${isCrit ? ' (КРИТ!)' : ''} → зомби [${target.x+1},${target.y+1}] — ${target.hp}/${target.maxHp}HP`, 'dmg');
 
   if (target.hp <= 0) {
@@ -154,6 +156,9 @@ function startPlayerTurn() {
   // Урон от яда в начале хода
   alivePlayers().filter(u => u.poisoned).forEach(u => {
     u.hp -= ZOMBIE_STATS.poisonDmg;
+    playPoison();
+    u.poisonFlash = true;
+    setTimeout(() => u.poisonFlash = false, 1500);
     log(`☠ Яд: Выживший −${ZOMBIE_STATS.poisonDmg}HP → ${u.hp}/${u.maxHp}HP`, 'poison');
     if (u.hp <= 0) {
       u.alive = false;
