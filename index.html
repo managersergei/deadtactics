@@ -11,45 +11,41 @@
 <!-- ═══════════════════════════════════════════════════ -->
 <!-- ЭКРАН 1: СТАРТ -->
 <!-- ═══════════════════════════════════════════════════ -->
-<div id="screen-start" class="screen" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2rem; padding: 2rem;">
-  <div style="text-align: center;">
+<div id="screen-start" class="screen">
+  <div class="screen-start-title">
     <div class="overlay-title green">☣ DEAD TACTICS</div>
-    <p style="color:#3a6a34;letter-spacing:2px;font-size:13px;margin-top:1rem">
-      ZOMBIE APOCALYPSE · TURN-BASED STRATEGY
-    </p>
+    <p class="screen-start-subtitle">ZOMBIE APOCALYPSE · TURN-BASED STRATEGY</p>
   </div>
 
-  <div class="overlay-box" style="max-width: 600px;">
-    <div style="text-align: center; color: var(--text); line-height: 1.6; margin-bottom: 1rem;">
-      <p><b>Собери отряд выживших</b> и противостань волнам зомби-апокалипсиса. Прокачивай боевые навыки, покупай оружие и доказывай, что человечество ещё не потеряно.</p>
-      <p style="margin-top: 1rem; color: #5a8a54;">Стратегия • Тактика • Выживание</p>
-    </div>
+  <div class="overlay-box screen-start-desc">
+    <p><b>Собери отряд выживших</b> и противостань волнам зомби-апокалипсиса. Прокачивай боевые навыки, покупай оружие и доказывай, что человечество ещё не потеряно.</p>
+    <p class="screen-start-tagline">Стратегия • Тактика • Выживание</p>
   </div>
 
-  <button onclick="goToIntro()" style="padding: 12px 32px; font-size: 16px; cursor: pointer; background: var(--green); color: var(--bg); border: none; font-weight: bold; border-radius: 4px;">▶ НАЧАТЬ ИГРУ</button>
+  <button onclick="goToIntro()" class="btn-start">▶ НАЧАТЬ ИГРУ</button>
 </div>
 
 <!-- ═══════════════════════════════════════════════════ -->
 <!-- ЭКРАН INTRO: ЛОР + ИМЯ -->
 <!-- ═══════════════════════════════════════════════════ -->
-<div id="screen-intro" class="screen" style="display: none; flex-direction: column; align-items: center; justify-content: center; gap: 2rem; padding: 2rem; min-height: 60vh;">
-  <div id="intro-text-container" class="overlay-box" style="max-width: 600px; text-align: left; min-height: 200px;">
-    <p id="intro-text" style="color: var(--text); line-height: 1.8; font-size: 15px;"></p>
+<div id="screen-intro" class="screen">
+  <div id="intro-text-container" class="overlay-box intro-text-container">
+    <p id="intro-text" class="intro-text"></p>
   </div>
-  <div id="intro-input-container" style="display: none; flex-direction: column; align-items: center; gap: 1rem;">
-    <p style="color: var(--text); font-size: 14px;">На нём выгравировано:</p>
-    <input type="text" id="player-name-input" placeholder="Введи своё имя" style="padding: 10px 20px; font-size: 16px; background: var(--panel); color: var(--green); border: 2px solid var(--green); border-radius: 4px; text-align: center; font-family: 'Share Tech Mono', monospace;">
-    <button onclick="savePlayerName()" style="padding: 10px 30px; background: var(--green); color: var(--bg); border: none; font-weight: bold; cursor: pointer; border-radius: 4px;">ПОДТВЕРДИТЬ</button>
+  <div id="intro-input-container" class="intro-input-container">
+    <p class="intro-input-label">На нём выгравировано:</p>
+    <input type="text" id="player-name-input" class="intro-input" placeholder="Введи своё имя">
+    <button onclick="savePlayerName()" class="btn-confirm">ПОДТВЕРДИТЬ</button>
   </div>
-  <button id="intro-next-btn" onclick="showNextIntroText()" style="padding: 10px 30px; background: var(--green); color: var(--bg); border: none; font-weight: bold; cursor: pointer; border-radius: 4px;">ДАЛЕЕ →</button>
+  <button id="intro-next-btn" class="btn-next" onclick="showNextIntroText()">ДАЛЕЕ →</button>
 </div>
 
 <!-- ═══════════════════════════════════════════════════ -->
 <!-- ЭКРАН 2: КАРТА МИРА -->
 <!-- ═══════════════════════════════════════════════════ -->
-<div id="screen-map" style="display: none;">
+<div id="screen-map">
   <!-- Верхняя панель: [👤 имя · ★ уровень] + [💰 золото] -->
-  <div id="top-bar" class="top-bar">
+  <div id="top-bar">
     <div class="top-bar-section">
       <span class="top-bar-icon">👤</span>
       <span id="top-bar-name">—</span>
@@ -67,36 +63,36 @@
   <!-- Контейнер карты с маркерами -->
   <div id="map-container" class="map-container">
     <svg id="map-route-svg" class="map-route-svg"></svg>
-    <div id="map-levels" class="map-levels" style="width: 100%; min-height: 300px;">
+    <div id="map-levels" class="map-levels">
       <!-- маркеры уровней будут добавлены через JS -->
     </div>
   </div>
 
   <!-- Нижняя кнопка -->
-  <div style="margin-top: 2rem;">
-    <button onclick="goToSquad()" style="padding: 12px 24px; background: var(--green); color: var(--bg); border: none; font-weight: bold; cursor: pointer; border-radius: 4px;">👥 МОЙ ОТРЯД</button>
+  <div class="mt-2 text-center">
+    <button onclick="goToSquad()" class="map-squad-btn">👥 МОЙ ОТРЯД</button>
   </div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════ -->
 <!-- ЭКРАН 3: ОТРЯД -->
 <!-- ═══════════════════════════════════════════════════ -->
-<div id="screen-squad" style="display: none; padding: 2rem;">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+<div id="screen-squad">
+  <div class="squad-header">
     <h2>👥 МОЙ ОТРЯД</h2>
-    <button onclick="goToMap()" style="padding: 10px 20px; background: var(--border); color: var(--text); border: none; cursor: pointer;">← НА КАРТУ</button>
+    <button onclick="goToMap()" class="btn-back">← НА КАРТУ</button>
   </div>
 
-  <div style="display: flex; gap: 2rem; margin-bottom: 2rem;">
-    <div style="flex: 2;">
+  <div class="squad-content">
+    <div class="squad-units-container">
       <h3>Состав отряда</h3>
-      <div id="squad-units" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem; margin-top: 1rem;">
+      <div id="squad-units" class="squad-units-grid">
         <!-- карточки юнитов -->
       </div>
     </div>
-    <div style="flex: 1; border-left: 1px solid var(--border); padding-left: 2rem;">
+    <div class="squad-shop-container">
       <h3>📊 Магазин (скоро)</h3>
-      <p style="color: var(--text); opacity: 0.6;">Пока недоступен</p>
+      <p class="shop-disabled">Пока недоступен</p>
     </div>
   </div>
 </div>
@@ -104,14 +100,14 @@
 <!-- ═══════════════════════════════════════════════════ -->
 <!-- ЭКРАН 4: ДЕТАЛИ ЮНИТА (ПОПАП) -->
 <!-- ═══════════════════════════════════════════════════ -->
-<div id="screen-unit-detail" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
-  <div style="background: var(--panel); border: 2px solid var(--border); padding: 2rem; border-radius: 8px; max-width: 700px; width: 90%;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+<div id="screen-unit-detail">
+  <div class="unit-detail-panel">
+    <div class="unit-detail-header">
       <h2 id="unit-detail-name">Юнит</h2>
-      <button onclick="selectedSquadUnitId = null; showScreen('screen-squad'); renderSquadScreen();" style="background: none; border: none; color: var(--text); font-size: 20px; cursor: pointer;">✕</button>
+      <button onclick="selectedSquadUnitId = null; showScreen('screen-squad'); renderSquadScreen();" class="btn-close">✕</button>
     </div>
 
-    <div id="unit-detail-content" style="display: flex; flex-direction: column; gap: 1rem;">
+    <div id="unit-detail-content" class="unit-detail-content">
       <!-- содержимое будет заполнено JS -->
     </div>
   </div>
@@ -120,24 +116,24 @@
 <!-- ═══════════════════════════════════════════════════ -->
 <!-- ЭКРАН 5: ПЕРЕД БОЕМ -->
 <!-- ═══════════════════════════════════════════════════ -->
-<div id="screen-level-start" style="display: none; padding: 2rem; text-align: center;">
-  <h2 id="level-start-title">Уровень</h2>
-  <p id="level-start-desc" style="font-size: 16px; color: var(--text); margin: 1rem 0;">Описание</p>
+<div id="screen-level-start">
+  <h2 id="level-start-title" class="level-start-title">Уровень</h2>
+  <p id="level-start-desc" class="level-start-desc">Описание</p>
 
-  <div class="overlay-box" style="margin: 2rem auto; max-width: 400px;">
+  <div class="overlay-box level-start-stats-box">
     <div id="level-start-stats"></div>
   </div>
 
-  <div style="display: flex; gap: 1rem; justify-content: center;">
-    <button onclick="goToMap()" style="padding: 10px 20px; background: var(--border); color: var(--text); border: none; cursor: pointer;">← НАЗАД</button>
-    <button onclick="goToBattle(gameData.currentLevel)" style="padding: 10px 20px; background: var(--red); color: white; border: none; font-weight: bold; cursor: pointer;">⚔ В БОЙ</button>
+  <div class="level-start-actions">
+    <button onclick="goToMap()" class="btn-back">← НАЗАД</button>
+    <button onclick="goToBattle(gameData.currentLevel)" class="btn-fight">⚔ В БОЙ</button>
   </div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════ -->
 <!-- ЭКРАН 6: БОЙ (ТЕКУЩАЯ МЕХАНИКА) -->
 <!-- ═══════════════════════════════════════════════════ -->
-<div id="screen-battle" style="display: none;">
+<div id="screen-battle">
   <div id="game-container">
 
     <!-- ПОЛЕ БОЯ -->
@@ -157,7 +153,7 @@
       <div class="panel-box">
         <div class="panel-label">Юнит</div>
         <div id="unit-info">
-          <span style="color:#2a5a24">— выбери юнита —</span>
+          <span class="text-muted">— выбери юнита —</span>
         </div>
       </div>
 
@@ -169,12 +165,12 @@
         <div id="log"></div>
       </div>
 
-      <div class="panel-box" id="legend">
+      <div class="panel-box legend-text" id="legend">
         <div class="panel-label">Справка</div>
         🧍 <span>Выживший:</span> 5HP · движ.5 · дальн.4<br>
         🧟 <span>Зомби:</span> 3HP · движ.3 · яд+1HP/ход<br>
-        <span style="color:#1a4d8a">■</span> Синее = можно идти<br>
-        <span style="color:#7a1a1a">■</span> Красное = цель атаки
+        <span class="legend-move">■</span> Синее = можно идти<br>
+        <span class="legend-attack">■</span> Красное = цель атаки
       </div>
 
     </div>

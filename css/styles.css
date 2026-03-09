@@ -539,8 +539,7 @@ button.danger:hover:not(:disabled) {
 /* Контейнер карты с фоном */
 .map-container {
   position: relative;
-  height: 300px;
-  border: 2px solid red; /* ДИАГНОСТИКА */
+  min-height: 400px;
   background: 
     linear-gradient(90deg, rgba(31,77,20,0.08) 1px, transparent 1px),
     linear-gradient(rgba(31,77,20,0.08) 1px, transparent 1px),
@@ -577,12 +576,16 @@ button.danger:hover:not(:disabled) {
 
 /* Контейнер маркеров уровней */
 .map-levels {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: relative;
   width: 100%;
   height: 100%;
   z-index: 2;
+}
+
+.map-levels svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 /* Маркер уровня */
@@ -704,3 +707,287 @@ button.danger:hover:not(:disabled) {
   overflow: hidden;
   min-height: 0;
 }
+
+/* ═══════════════════════════════════════════════════════
+   ЭКРАНЫ — CSS КЛАССЫ ВМЕСТО INLINE STYLES
+   ═══════════════════════════════════════════════════════ */
+
+/* Экран старта */
+#screen-start {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+/* Заголовок старта */
+.screen-start-title {
+  text-align: center;
+}
+
+.screen-start-subtitle {
+  color: #3a6a34;
+  letter-spacing: 2px;
+  font-size: 13px;
+  margin-top: 1rem;
+}
+
+.screen-start-desc {
+  max-width: 600px;
+  text-align: center;
+  color: var(--text);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.screen-start-tagline {
+  margin-top: 1rem;
+  color: #5a8a54;
+}
+
+/* Кнопка старта */
+.btn-start {
+  padding: 12px 32px;
+  font-size: 16px;
+  cursor: pointer;
+  background: var(--green);
+  color: var(--bg);
+  border: none;
+  font-weight: bold;
+  border-radius: 4px;
+}
+
+/* Экран интро */
+#screen-intro {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 2rem;
+  min-height: 60vh;
+}
+
+.intro-text-container {
+  max-width: 600px;
+  text-align: left;
+  min-height: 200px;
+}
+
+.intro-text {
+  color: var(--text);
+  line-height: 1.8;
+  font-size: 15px;
+}
+
+.intro-input-container {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.intro-input-label {
+  color: var(--text);
+  font-size: 14px;
+}
+
+.intro-input {
+  padding: 10px 20px;
+  font-size: 16px;
+  background: var(--panel);
+  color: var(--green);
+  border: 2px solid var(--green);
+  border-radius: 4px;
+  text-align: center;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.btn-confirm {
+  padding: 10px 30px;
+  background: var(--green);
+  color: var(--bg);
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.btn-next {
+  padding: 10px 30px;
+  background: var(--green);
+  color: var(--bg);
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+/* Экран карты — кнопка отряда */
+.map-squad-btn {
+  padding: 12px 24px;
+  background: var(--green);
+  color: var(--bg);
+   font-weight: bold;
+  cursor: pointer;
+  border: none;
+ border-radius: 4px;
+}
+
+/* Экран отряда */
+#screen-squad {
+  display: none;
+  padding: 2rem;
+}
+
+.squad-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.btn-back {
+  padding: 10px 20px;
+  background: var(--border);
+  color: var(--text);
+  border: none;
+  cursor: pointer;
+}
+
+.squad-content {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.squad-units-container {
+  flex: 2;
+}
+
+.squad-shop-container {
+  flex: 1;
+  border-left: 1px solid var(--border);
+  padding-left: 2rem;
+}
+
+.squad-units-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.shop-disabled {
+  color: var(--text);
+  opacity: 0.6;
+}
+
+/* Экран деталей юнита */
+#screen-unit-detail {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.unit-detail-panel {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 700px;
+  width: 90%;
+}
+
+.unit-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.unit-detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Экран перед боем */
+#screen-level-start {
+  display: none;
+  padding: 2rem;
+  text-align: center;
+}
+
+.level-start-title {
+  font-size: 24px;
+  color: var(--green);
+  margin-bottom: 1rem;
+}
+
+.level-start-desc {
+  font-size: 16px;
+  color: var(--text);
+  margin: 1rem 0;
+}
+
+.level-start-stats-box {
+  margin: 2rem auto;
+  max-width: 400px;
+}
+
+.level-start-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.btn-fight {
+  padding: 10px 20px;
+  background: var(--red);
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Экран боя — legend */
+.legend-text {
+  font-size: 10px;
+  line-height: 1.8;
+}
+
+.legend-move {
+  color: #1a4d8a;
+}
+
+.legend-attack {
+  color: #7a1a1a;
+}
+
+/* Утилиты */
+.text-center { text-align: center; }
+.mt-1 { margin-top: 1rem; }
+.mt-2 { margin-top: 2rem; }
+.mb-1 { margin-bottom: 1rem; }
+.mb-2 { margin-bottom: 2rem; }
+.gap-1 { gap: 1rem; }
+.gap-2 { gap: 2rem; }
+.flex { display: flex; }
+.flex-between { display: flex; justify-content: space-between; }
+.flex-1 { flex: 1; }
+.flex-2 { flex: 2; }
