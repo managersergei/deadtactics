@@ -47,7 +47,7 @@
 <!-- ═══════════════════════════════════════════════════ -->
 <!-- ЭКРАН 2: КАРТА МИРА -->
 <!-- ═══════════════════════════════════════════════════ -->
-<div id="screen-map" style="display: none; padding: 2rem;">
+<div id="screen-map" style="display: none;">
   <!-- Верхняя панель: [👤 имя · ★ уровень] + [💰 золото] -->
   <div id="top-bar" class="top-bar">
     <div class="top-bar-section">
@@ -67,7 +67,7 @@
   <!-- Контейнер карты с маркерами -->
   <div id="map-container" class="map-container">
     <svg id="map-route-svg" class="map-route-svg"></svg>
-    <div id="map-levels" class="map-levels">
+    <div id="map-levels" class="map-levels" style="width: 100%; min-height: 300px;">
       <!-- маркеры уровней будут добавлены через JS -->
     </div>
   </div>

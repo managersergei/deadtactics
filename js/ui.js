@@ -91,107 +91,318 @@ function _sidebarZombie(td, ps, ui, btn) {
   ui.innerHTML = '<span class="text-zombie">🧟 Враг атакует...</span>';
 }
 
-// ── ЭКРАН КАРТЫ ──────────────────────────────────────────
+// ── ЭКРАН КАРТЫ (SVG-версия) ─────────────────────────────
 
 function renderMapScreen() {
-  // Обновить панель статуса
-  const nameEl = document.getElementById('top-bar-name');
+  // Обновить верхнюю панель
+  const nameEl  = document.getElementById('top-bar-name');
   const levelEl = document.getElementById('top-bar-level');
-  const goldEl = document.getElementById('top-bar-gold');
-  
-  if (nameEl) nameEl.textContent = gameData.player.name || '—';
+  const goldEl  = document.getElementById('top-bar-gold');
+  if (nameEl)  nameEl.textContent  = gameData.player.name  || '—';
   if (levelEl) levelEl.textContent = gameData.player.level || 1;
-  if (goldEl) goldEl.textContent = gameData.player.gold || 0;
+  if (goldEl)  goldEl.textContent  = gameData.player.gold  || 0;
 
-  const levelsContainer = document.getElementById('map-levels');
-  const svgContainer = document.getElementById('map-route-svg');
-  if (!levelsContainer) return;
-  levelsContainer.innerHTML = '';
-  if (svgContainer) svgContainer.innerHTML = '';
+  const container = document.getElementById('map-levels');
+  if (!container) return;
+  container.innerHTML = '';
 
-  // Найти текущий активный уровень (первый доступный)
+  // ── Координаты уровней в SVG-пространстве (800×500) ────
+  const SVG_W = 800, SVG_H = 500;
+  const positions = [
+    null,               // индекс 0 не используется
+    { x: 80,  y: 400 }, // 1
+    { x: 180, y: 300 }, // 2
+    { x: 280, y: 380 }, // 3
+    { x: 360, y: 240 }, // 4
+    { x: 460, y: 320 }, // 5
+    { x: 520, y: 180 }, // 6
+    { x: 610, y: 280 }, // 7
+    { x: 670, y: 140 }, // 8
+    { x: 740, y: 220 }, // 9
+    { x: 760, y: 80  }, // 10
+  ];
+
+  // Найти текущий доступный уровень
   let currentLevel = 0;
   for (let i = 1; i <= 10; i++) {
-    if (gameData.levelProgress[i]?.status === 'available' && !gameData.levelProgress[i]?.completed) {
+    const info = getLevelInfo(i);
+    if (info.status === 'available' && !info.completed) {
       currentLevel = i;
       break;
     }
   }
 
-  // Сначала рисуем линии маршрута
+  // ── SVG ────────────────────────────────────────────────
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', `0 0 ${SVG_W} ${SVG_H}`);
+  svg.setAttribute('width',  '100%');
+  svg.setAttribute('height', '100%');
+  svg.style.cssText = 'display:block; max-height: calc(100vh - 140px);';
+
+  // Фон сетки + туман войны + пятна крови
+  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  defs.innerHTML = `
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#0f2510" stroke-width="0.5"/>
+    </pattern>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="blood-glow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <radialGradient id="blood-spot" cx="100%" cy="100%" r="60%">
+      <stop offset="0%" stop-color="#4a0a0a" stop-opacity="0.6"/>
+      <stop offset="50%" stop-color="#2a0505" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#0a0202" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="fog" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1a3a1a" stop-opacity="0.3"/>
+      <stop offset="70%" stop-color="#0a1a0a" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#050a05" stop-opacity="0"/>
+    </radialGradient>
+  `;
+  svg.appendChild(defs);
+
+  // Заливка фоном с сеткой
+  const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  bgRect.setAttribute('width', SVG_W);
+  bgRect.setAttribute('height', SVG_H);
+  bgRect.setAttribute('fill', 'url(#grid)');
+  svg.appendChild(bgRect);
+
+  // Пятно крови в правом нижнем углу
+  const bloodSpot = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+  bloodSpot.setAttribute('cx', '750');
+  bloodSpot.setAttribute('cy', '480');
+  bloodSpot.setAttribute('rx', '200');
+  bloodSpot.setAttribute('ry', '150');
+  bloodSpot.setAttribute('fill', 'url(#blood-spot)');
+  svg.appendChild(bloodSpot);
+
+  // Туман посередине
+  const fog = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+  fog.setAttribute('cx', '400');
+  fog.setAttribute('cy', '250');
+  fog.setAttribute('rx', '250');
+  fog.setAttribute('ry', '180');
+  fog.setAttribute('fill', 'url(#fog)');
+  svg.appendChild(fog);
+
+  // Декоративные зомби на фоне
+  const zombiePositions = [
+    {x:130,y:450},{x:320,y:120},{x:500,y:420},{x:650,y:350},{x:200,y:200}
+  ];
+  zombiePositions.forEach(z => {
+    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    t.setAttribute('x', z.x);
+    t.setAttribute('y', z.y);
+    t.setAttribute('font-size', '18');
+    t.setAttribute('opacity', '0.12');
+    t.setAttribute('pointer-events', 'none');
+    t.textContent = '🧟';
+    svg.appendChild(t);
+  });
+
+  // ── Линии маршрута ─────────────────────────────────────
   for (let i = 1; i < 10; i++) {
-    const lvl1 = LEVELS[i];
-    const lvl2 = LEVELS[i + 1];
-    if (!lvl1 || !lvl2) continue;
-    
-    const isCompleted = gameData.levelProgress[i]?.completed;
-    
-    if (svgContainer) {
-      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      line.setAttribute('x1', lvl1.position.x + '%');
-      line.setAttribute('y1', lvl1.position.y + '%');
-      line.setAttribute('x2', lvl2.position.x + '%');
-      line.setAttribute('y2', lvl2.position.y + '%');
-      if (isCompleted) line.classList.add('completed');
-      svgContainer.appendChild(line);
-    }
+    const a = positions[i], b = positions[i + 1];
+    const info = getLevelInfo(i);
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', a.x); line.setAttribute('y1', a.y);
+    line.setAttribute('x2', b.x); line.setAttribute('y2', b.y);
+    line.setAttribute('stroke',           info.completed ? '#1f4d14' : '#0f2510');
+    line.setAttribute('stroke-width',     '2');
+    line.setAttribute('stroke-dasharray', '6,4');
+    line.setAttribute('pointer-events',   'none');
+    svg.appendChild(line);
   }
 
-  // Теперь создаем маркеры уровней
+  // ── Тултип (один общий) ───────────────────────────────
+  const tooltipG = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  tooltipG.setAttribute('id', 'map-tooltip');
+  tooltipG.setAttribute('opacity', '0');
+  tooltipG.setAttribute('pointer-events', 'none');
+  tooltipG.style.transition = 'opacity 0.2s';
+
+  const ttBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  ttBg.setAttribute('id', 'tt-bg');
+  ttBg.setAttribute('rx', '4');
+  ttBg.setAttribute('fill', '#080f07');
+  ttBg.setAttribute('stroke', '#1f4d14');
+  ttBg.setAttribute('stroke-width', '1');
+  tooltipG.appendChild(ttBg);
+
+  ['tt-name','tt-desc','tt-enemies','tt-reward'].forEach((id, idx) => {
+    const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    t.setAttribute('id', id);
+    t.setAttribute('font-family', "'Share Tech Mono', monospace");
+    t.setAttribute('font-size', idx === 0 ? '13' : '11');
+    t.setAttribute('fill', idx === 0 ? '#39ff14' : '#a8d4a0');
+    tooltipG.appendChild(t);
+  });
+  svg.appendChild(tooltipG);
+
+  // ── Маркеры уровней ────────────────────────────────────
   for (let i = 1; i <= 10; i++) {
-    const levelInfo = getLevelInfo(i);
-    const levelConfig = LEVELS[i];
-    const isCompleted = levelInfo.completed;
-    const isAvailable = levelInfo.status === 'available';
-    const isLocked = levelInfo.status === 'locked';
-    const isCurrent = isAvailable && !isCompleted && i === currentLevel;
+    const pos  = positions[i];
+    const info = getLevelInfo(i);
+    const cfg  = LEVELS[i];
+    if (!cfg) continue;
 
-    if (!levelConfig) continue;
+    const isCompleted = info.completed;
+    const isAvailable = info.status === 'available';
+    const isLocked    = !isAvailable && !isCompleted;
+    const isCurrent   = isAvailable && !isCompleted && i === currentLevel;
 
-    const marker = document.createElement('div');
-    // Классы: marker + state + (current для анимации)
-    let classes = 'level-marker';
-    if (isCompleted) classes += ' completed';
-    else if (isCurrent) classes += ' available current';
-    else if (isAvailable) classes += ' available';
-    else classes += ' locked';
-    marker.className = classes;
+    const color = isCompleted ? '#1f4d14'
+                : isCurrent   ? '#39ff14'
+                : isAvailable ? '#2a7a20'
+                :               '#1a2a1a';
+    const stroke = isCompleted ? '#2a6a20'
+                 : isCurrent   ? '#39ff14'
+                 : isAvailable ? '#2a7a20'
+                 :               '#0f2510';
 
-    // Позиционирование на карте
-    marker.style.left = levelConfig.position.x + '%';
-    marker.style.top = levelConfig.position.y + '%';
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.style.cursor = isAvailable ? 'pointer' : 'default';
 
-    // Содержимое маркера
-    let markerContent = '';
-    if (isCompleted) {
-      markerContent = `
-        <span class="level-marker-number">✓</span>
-        <span class="level-marker-name">${levelInfo.name}</span>
-      `;
-    } else if (isLocked) {
-      markerContent = `
-        <span class="level-marker-number">🔒</span>
-        <span class="level-marker-name">—</span>
-      `;
-    } else {
-      markerContent = `
-        <span class="level-marker-number">${i}</span>
-        <span class="level-marker-name">${levelInfo.name}</span>
-      `;
+    // Свечение для текущего уровня - БОЛЬШОЕ ПУЛЬСИРУЮЩЕЕ КОЛЬЦО
+    if (isCurrent) {
+      // Внешнее пульсирующее кольцо
+      const pulseRing = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      pulseRing.setAttribute('cx', pos.x);
+      pulseRing.setAttribute('cy', pos.y);
+      pulseRing.setAttribute('r', '32');
+      pulseRing.setAttribute('fill', 'none');
+      pulseRing.setAttribute('stroke', '#39ff14');
+      pulseRing.setAttribute('stroke-width', '2');
+      pulseRing.setAttribute('opacity', '0.6');
+      
+      // Анимация пульсации
+      const animate = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+      animate.setAttribute('attributeName', 'r');
+      animate.setAttribute('values', '32;40;32');
+      animate.setAttribute('dur', '1.5s');
+      animate.setAttribute('repeatCount', 'indefinite');
+      pulseRing.appendChild(animate);
+      
+      const animateOpacity = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
+      animateOpacity.setAttribute('attributeName', 'opacity');
+      animateOpacity.setAttribute('values', '0.6;0.2;0.6');
+      animateOpacity.setAttribute('dur', '1.5s');
+      animateOpacity.setAttribute('repeatCount', 'indefinite');
+      pulseRing.appendChild(animateOpacity);
+      
+      g.appendChild(pulseRing);
+      
+      // Красная точка в центре
+      const centerDot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      centerDot.setAttribute('cx', pos.x);
+      centerDot.setAttribute('cy', pos.y);
+      centerDot.setAttribute('r', '6');
+      centerDot.setAttribute('fill', '#ff2222');
+      centerDot.setAttribute('filter', 'url(#blood-glow)');
+      g.appendChild(centerDot);
+      
+      // Подпись "► ЗДЕСЬ"
+      const hereLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      hereLabel.setAttribute('x', pos.x);
+      hereLabel.setAttribute('y', pos.y - 30);
+      hereLabel.setAttribute('text-anchor', 'middle');
+      hereLabel.setAttribute('font-family', "'Share Tech Mono', monospace");
+      hereLabel.setAttribute('font-size', '10');
+      hereLabel.setAttribute('font-weight', 'bold');
+      hereLabel.setAttribute('fill', '#ff2222');
+      hereLabel.setAttribute('pointer-events', 'none');
+      hereLabel.textContent = '► ЗДЕСЬ';
+      g.appendChild(hereLabel);
     }
-    
-    marker.innerHTML = markerContent;
 
-    // Клик только по доступным уровням
+    // Основной круг
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', pos.x); circle.setAttribute('cy', pos.y);
+    circle.setAttribute('r', '22');
+    circle.setAttribute('fill', color);
+    circle.setAttribute('stroke', stroke);
+    circle.setAttribute('stroke-width', isCurrent ? '2.5' : '1.5');
+    g.appendChild(circle);
+
+    // Текст внутри маркера
+    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    label.setAttribute('x', pos.x); label.setAttribute('y', pos.y + 5);
+    label.setAttribute('text-anchor', 'middle');
+    label.setAttribute('font-family', "'Oswald', sans-serif");
+    label.setAttribute('font-size', '14');
+    label.setAttribute('font-weight', '700');
+    label.setAttribute('fill', isLocked ? '#2a4a28' : isCompleted ? '#39ff14' : '#ffffff');
+    label.setAttribute('pointer-events', 'none');
+    label.textContent = isCompleted ? '✓' : isLocked ? '🔒' : String(i);
+    g.appendChild(label);
+
+    // Подпись уровня снизу
+    const sublabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    sublabel.setAttribute('x', pos.x); sublabel.setAttribute('y', pos.y + 38);
+    sublabel.setAttribute('text-anchor', 'middle');
+    sublabel.setAttribute('font-family', "'Share Tech Mono', monospace");
+    sublabel.setAttribute('font-size', '9');
+    sublabel.setAttribute('fill', isLocked ? '#1a3a18' : '#4a8a44');
+    sublabel.setAttribute('pointer-events', 'none');
+    sublabel.textContent = isLocked ? '???' : cfg.name;
+    g.appendChild(sublabel);
+
+    // Hover — показать тултип
+    if (!isLocked) {
+      g.addEventListener('mouseenter', () => {
+        const tt   = document.getElementById('map-tooltip');
+        const bg   = document.getElementById('tt-bg');
+        const name = document.getElementById('tt-name');
+        const desc = document.getElementById('tt-desc');
+        const ene  = document.getElementById('tt-enemies');
+        const rew  = document.getElementById('tt-reward');
+
+        // Позиция тултипа: справа или слева от маркера
+        const tx = pos.x + 35 > SVG_W - 160 ? pos.x - 175 : pos.x + 35;
+        const ty = Math.max(10, pos.y - 55);
+
+        bg.setAttribute('x', tx); bg.setAttribute('y', ty);
+        bg.setAttribute('width', '155'); bg.setAttribute('height', '75');
+
+        name.setAttribute('x', tx + 8); name.setAttribute('y', ty + 18);
+        name.textContent = `${i}. ${cfg.name}`;
+
+        desc.setAttribute('x', tx + 8); desc.setAttribute('y', ty + 34);
+        desc.textContent = cfg.description;
+
+        ene.setAttribute('x', tx + 8); ene.setAttribute('y', ty + 50);
+        ene.textContent = `🧟 Зомби: ${cfg.enemyCount}`;
+
+        rew.setAttribute('x', tx + 8); rew.setAttribute('y', ty + 64);
+        rew.setAttribute('fill', '#ffcc00');
+        rew.textContent = `💰 Награда: ${cfg.baseReward}`;
+
+        tt.setAttribute('opacity', '1');
+      });
+
+      g.addEventListener('mouseleave', () => {
+        document.getElementById('map-tooltip').setAttribute('opacity', '0');
+      });
+    }
+
+    // Клик — начать уровень
     if (isAvailable) {
-      marker.onclick = () => {
+      g.addEventListener('click', () => {
         gameData.currentLevel = i;
         goToLevelStart(i);
-      };
+      });
     }
 
-    levelsContainer.appendChild(marker);
+    svg.appendChild(g);
   }
+
+  container.appendChild(svg);
 }
 
 // ── ЭКРАН ОТРЯДА ─────────────────────────────────────────
