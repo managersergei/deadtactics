@@ -20,7 +20,9 @@ function handlePlacement(c, r) {
   placedCount++;
   log(`⬛ Юнит размещён на [${c+1},${r+1}]`);
 
-  if (placedCount >= gameData.squad.length) {
+  // игрок может расставить не больше leadership или размера отряда
+  const maxPlace = Math.min(gameData.player.leadership, gameData.squad.length);
+  if (placedCount >= maxPlace) {
     // Спауним зомби для текущего уровня
     spawnZombiesForLevel(gameData.currentLevel);
     phase = 'player';

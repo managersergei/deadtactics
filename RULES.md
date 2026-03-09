@@ -82,6 +82,7 @@ highlights    — { move: Set<"x,y">, attack: Set<"x,y"> }
 | atkDmg         | —       | 1     |
 | poison (укус)  | —       | +1HP/ход |
 
+Игрок может размещать одновременно не более `leadership` юнитов; это значение хранится в `gameData.player.leadership`. В начале оно равно 1.
 Оружие игрока: WEAPONS = { pistol: { baseDmg: 1, critDmg: 2, critChance: 0.10 } }
 
 Менять баланс → только в config.js, не хардкодить числа в логике.

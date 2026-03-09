@@ -43,7 +43,8 @@ function updateSidebar() {
 function _sidebarPlacement(td, ps, ui, btn) {
   td.textContent = 'РАССТАНОВКА';
   td.className = 'placement';
-  ps.textContent = `Размести юнита ${placedCount + 1}/${PLAYER_UNIT_COUNT}`;
+  const maxPlace = Math.min(gameData.player.leadership, gameData.squad.length);
+  ps.textContent = `Размести юнита ${placedCount + 1}/${maxPlace}`;
   btn.disabled = true;
   ui.innerHTML = '<span class="text-muted">Кликни зелёную клетку</span>';
 }
