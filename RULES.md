@@ -63,6 +63,7 @@ selected      — текущий выбранный юнит игрока (null 
 phase         — 'placement' | 'player' | 'zombie' | 'over'
 placedCount   — сколько юнитов расставлено
 turnNum       — номер текущего хода
+turnsSurvived — сколько ходов выжило (считается, когда ход передаётся обратно игроку)
 highlights    — { move: Set<"x,y">, attack: Set<"x,y"> }
 ```
 
