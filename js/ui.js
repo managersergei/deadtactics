@@ -51,7 +51,7 @@ function _sidebarPlacement(td, ps, ui, btn) {
 function _sidebarPlayer(td, ps, ui, btn) {
   td.textContent = `ХОД ${turnNum} — ВЫ`;
   td.classList.add('player-turn');
-  ps.textContent = 'Управляй выжившими';
+  ps.textContent = `Выжито ходов: ${turnsSurvived}`;
   btn.disabled = false;
 
   if (selected && selected.kind === 'player') {
@@ -85,7 +85,7 @@ function _sidebarPlayer(td, ps, ui, btn) {
 function _sidebarZombie(td, ps, ui, btn) {
   td.textContent = 'ХОД ВРАГА';
   td.classList.add('zombie-turn');
-  ps.textContent = 'Ходят зомби...';
+  ps.textContent = `Выжито ходов: ${turnsSurvived}`;
   btn.disabled = true;
   ui.innerHTML = '<span class="text-zombie">🧟 Враг атакует...</span>';
 }

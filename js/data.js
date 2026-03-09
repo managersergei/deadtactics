@@ -38,6 +38,7 @@ function initializeNewGame() {
     id: 1,
     name: PLAYER_NAMES[Math.floor(Math.random() * PLAYER_NAMES.length)],
     emoji: '🧍',
+    // копируем параметры из конфига, чтобы не дублировать числа
     hp: PLAYER_STATS.hp,
     maxHp: PLAYER_STATS.maxHp,
     moveRange: PLAYER_STATS.moveRange,
