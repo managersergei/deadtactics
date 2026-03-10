@@ -1,0 +1,496 @@
+/* ════════════════════════════════════════════════════════
+   SCREENS — Все экраны игры
+   ════════════════════════════════════════════════════════ */
+
+/* ── ЭКРАН КАРТЫ МИРА (LAYOUT) ── */
+#screen-map {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  position: fixed;
+  inset: 0;
+  padding: 0;
+}
+
+/* Верхняя панель */
+#top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  width: 100%;
+}
+
+/* Контейнер карты (занимает всё доступное пространство) */
+#map-container {
+  flex: 1;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ── ЭКРАН СТАРТА ── */
+#screen-start {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.screen-start-title {
+  text-align: center;
+}
+
+.screen-start-subtitle {
+  color: #3a6a34;
+  letter-spacing: 2px;
+  font-size: 13px;
+  margin-top: 1rem;
+}
+
+.screen-start-desc {
+  max-width: 600px;
+  text-align: center;
+  color: var(--text);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.screen-start-tagline {
+  margin-top: 1rem;
+  color: #5a8a54;
+}
+
+.btn-start {
+  padding: 10px 24px;
+  font-size: 14px;
+  cursor: pointer;
+  background: var(--green);
+  color: var(--bg);
+  border: none;
+  font-weight: bold;
+  border-radius: 4px;
+  width: auto;
+  min-width: 140px;
+}
+
+/* ── ЭКРАН ИНТРО ── */
+#screen-intro {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 2rem;
+  min-height: 60vh;
+}
+
+.intro-text-container {
+  max-width: 600px;
+  text-align: left;
+  min-height: 200px;
+}
+
+.intro-text {
+  color: var(--text);
+  line-height: 1.8;
+  font-size: 15px;
+}
+
+.intro-input-container {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+#knife-container {
+  margin-bottom: 0.5rem;
+}
+
+.intro-input-label {
+  color: var(--text);
+  font-size: 14px;
+}
+
+.intro-input {
+  padding: 10px 20px;
+  font-size: 16px;
+  background: var(--panel);
+  color: var(--green);
+  border: 2px solid var(--green);
+  border-radius: 4px;
+  text-align: center;
+  font-family: 'Share Tech Mono', monospace;
+  width: 200px;
+}
+
+.btn-confirm {
+  padding: 8px 20px;
+  background: var(--green);
+  color: var(--bg);
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+  width: auto;
+  min-width: 120px;
+}
+
+.btn-next {
+  padding: 8px 20px;
+  background: var(--green);
+  color: var(--bg);
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+  width: auto;
+  min-width: 120px;
+}
+
+/* ── ЭКРАН КАРТЫ (КНОПКА ОТРЯДА) ── */
+.map-squad-btn {
+  padding: 12px 24px;
+  background: var(--green);
+  color: var(--bg);
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+}
+
+/* ── ЭКРАН ОТРЯДА ── */
+#screen-squad {
+  display: none;
+  padding: 2rem;
+}
+
+.squad-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.btn-back {
+  padding: 10px 20px;
+  background: var(--border);
+  color: var(--text);
+  border: none;
+  cursor: pointer;
+}
+
+.squad-content {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.squad-units-container {
+  flex: 2;
+}
+
+.squad-stats-container {
+  flex: 1;
+  border-left: 1px solid var(--border);
+  padding-left: 2rem;
+}
+
+.squad-stats-container h3 {
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+.squad-stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.squad-stat-label {
+  color: var(--text);
+}
+
+.squad-stat-value {
+  color: var(--green);
+  font-weight: bold;
+}
+
+.squad-shop-container {
+  flex: 1;
+  border-left: 1px solid var(--border);
+  padding-left: 2rem;
+}
+
+.squad-units-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+/* ── ЭКРАН ДЕТАЛЕЙ ЮНИТА ── */
+#screen-unit-detail {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.unit-detail-panel {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 700px;
+  width: 90%;
+}
+
+.unit-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+}
+
+.unit-detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ── ЭКРАН ПЕРЕД БОЕМ ── */
+#screen-level-start {
+  display: none;
+  padding: 2rem;
+  text-align: center;
+}
+
+.level-start-title {
+  font-size: 24px;
+  color: var(--green);
+  margin-bottom: 1rem;
+}
+
+.level-start-desc {
+  font-size: 16px;
+  color: var(--text);
+  margin: 1rem 0;
+}
+
+.level-start-stats-box {
+  margin: 2rem auto;
+  max-width: 400px;
+}
+
+.level-start-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.btn-fight {
+  padding: 10px 20px;
+  background: var(--red);
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* ── ЭКРАН БОЯ ── */
+#screen-battle {
+  display: none;
+  width: 100%;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.legend-text {
+  font-size: 10px;
+  line-height: 1.8;
+}
+
+.legend-move {
+  color: #1a4d8a;
+}
+
+.legend-attack {
+  color: #7a1a1a;
+}
+
+/* ── ЭКРАН МАГАЗИНА ── */
+#screen-shop {
+  display: none;
+  flex-direction: column;
+  padding: 2rem;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.shop-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.shop-header h2 {
+  color: var(--green);
+}
+
+#shop-gold {
+  color: var(--yellow);
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.shop-unit-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.shop-unit-selector label {
+  color: var(--text);
+}
+
+#shop-unit-select {
+  padding: 8px 12px;
+  background: var(--bg);
+  color: var(--green);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  min-width: 200px;
+}
+
+.shop-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.shop-section {
+  margin-bottom: 2rem;
+}
+
+.shop-section h3 {
+  color: var(--text);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.shop-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.shop-item {
+  background: #151a14;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.shop-item:hover {
+  border-color: var(--green);
+  background: #1a221a;
+}
+
+.shop-item.owned {
+  border-color: #3a5a3a;
+  opacity: 0.6;
+}
+
+.shop-item.owned::after {
+  content: ' (экипировано)';
+  color: var(--green);
+  font-size: 10px;
+}
+
+.shop-item-name {
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.shop-item-price {
+  color: var(--yellow);
+  font-weight: bold;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.shop-item-stats {
+  font-size: 11px;
+  color: #5a7a5a;
+  line-height: 1.4;
+}
+
+.btn-shop {
+  padding: 8px 16px;
+  background: var(--border);
+  color: var(--text);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  transition: all 0.15s;
+}
+
+.btn-shop:hover {
+  background: var(--green);
+  color: var(--bg);
+}
+
+.btn-recruit {
+  padding: 8px 16px;
+  background: var(--green);
+  color: var(--bg);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  transition: all 0.15s;
+}
+
+.btn-recruit:hover {
+  background: var(--green-dim);
+}
