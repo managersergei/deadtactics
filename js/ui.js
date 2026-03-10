@@ -759,10 +759,21 @@ function renderShopSection(containerId, type) {
 
 function getItemStatsText(item) {
   const stats = [];
-  if (item.baseDmg) stats.push(`⚔️ ${item.baseDmg}`);
+  if (item.baseDmg) {
+    // Показать диапазон урона
+    const minDmg = item.baseDmg;
+    const maxDmg = item.critDmg || item.baseDmg + 1;
+    stats.push(`⚔️ ${minDmg}-${maxDmg}`);
+  }
   if (item.critChance) stats.push(`🎯 ${(item.critChance*100).toFixed(0)}%`);
   if (item.extraHp) stats.push(`❤️ +${item.extraHp}`);
   if (item.moveBonus) stats.push(`👟 +${item.moveBonus}`);
+  
+  // Добавить описание предмета
+  if (item.desc) {
+    stats.push(`<br><span style="color:#5a7a5a;font-size:10px">${item.desc}</span>`);
+  }
+  
   return stats.join(' ');
 }
 

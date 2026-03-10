@@ -14,7 +14,7 @@ let gameData = {
     gold: 0,
     avatar: '🧍',
     level: 1,
-    leadership: 1  // определяет максимум юнитов в отряде (1 в начале)
+    leadership: 2  // определяет максимум юнитов в отряде (2 в начале)
   },
   
   squad: [],  // массив юнитов { id, name, emoji, stats... }
@@ -35,16 +35,22 @@ let gameData = {
   currentLevel: null  // выбранный уровень для боя
 };
 
+// Обновить лидерство = максимум юнитов в отряде
+function updateLeadership() {
+  gameData.player.leadership = gameData.squad.length;
+}
+
 // Инициализировать новую игру
 function initializeNewGame() {
   gameData.player.name = PLAYER_NAMES[Math.floor(Math.random() * PLAYER_NAMES.length)];
   gameData.player.gold = 0;
   
-  // Создать первого юнита для отряда
+  // Создать первого юнита для отряда (лидер отряда)
   const startingUnit = {
     id: 1,
     name: PLAYER_NAMES[Math.floor(Math.random() * PLAYER_NAMES.length)],
     emoji: '🧍',
+    role: 'leader',  // лидер отряда
     // копируем параметры из конфига, чтобы не дублировать числа
     hp: PLAYER_STATS.hp,
     maxHp: PLAYER_STATS.maxHp,
@@ -61,6 +67,7 @@ function initializeNewGame() {
   };
   
   gameData.squad.push(startingUnit);
+  gameData.player.leadership = gameData.squad.length;  // лидерство = кол-во юнитов
   gameData.levelProgress[1].status = 'available';
 }
 
@@ -131,11 +138,12 @@ function recruitUnit(type) {
   // Списать золото
   gameData.player.gold -= recruit.price;
   
-  // Создать нового юнита
+  // Создать нового юнита (член отряда)
   const newUnit = {
     id: Date.now(),  // уникальный ID
     name: PLAYER_NAMES[Math.floor(Math.random() * PLAYER_NAMES.length)],
     emoji: recruit.emoji,
+    role: 'member',  // член отряда (не лидер)
     hp: recruit.hp,
     maxHp: recruit.maxHp,
     moveRange: recruit.moveRange,
@@ -150,6 +158,7 @@ function recruitUnit(type) {
   };
   
   gameData.squad.push(newUnit);
+  updateLeadership();  // обновить лидерство после найма
   return { success: true, unit: newUnit };
 }
 

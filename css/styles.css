@@ -759,14 +759,16 @@ button.danger:hover:not(:disabled) {
 
 /* Кнопка старта */
 .btn-start {
-  padding: 12px 32px;
-  font-size: 16px;
+  padding: 10px 24px;
+  font-size: 14px;
   cursor: pointer;
   background: var(--green);
   color: var(--bg);
   border: none;
   font-weight: bold;
   border-radius: 4px;
+  width: auto;
+  min-width: 140px;
 }
 
 /* Экран интро */
@@ -816,23 +818,27 @@ button.danger:hover:not(:disabled) {
 }
 
 .btn-confirm {
-  padding: 10px 30px;
+  padding: 8px 20px;
   background: var(--green);
   color: var(--bg);
   border: none;
   font-weight: bold;
   cursor: pointer;
   border-radius: 4px;
+  width: auto;
+  min-width: 120px;
 }
 
 .btn-next {
-  padding: 10px 30px;
+  padding: 8px 20px;
   background: var(--green);
   color: var(--bg);
   border: none;
   font-weight: bold;
   cursor: pointer;
   border-radius: 4px;
+  width: auto;
+  min-width: 120px;
 }
 
 /* Экран карты — кнопка отряда */
@@ -954,8 +960,10 @@ button.danger:hover:not(:disabled) {
   background: none;
   border: none;
   color: var(--text);
-  font-size: 20px;
+  font-size: 16px;
   cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
 }
 
 .unit-detail-content {

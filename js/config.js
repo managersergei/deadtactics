@@ -46,16 +46,16 @@ const ITEM_TYPES = {
 
 const ITEMS = {
   // ОРУЖИЕ
-  pistol:  { id: 'pistol',  name: 'Пистолет',  type: 'weapon', price: 0,   baseDmg: 1, critDmg: 2, critChance: 0.10, shots: 1 },
-  uzi:     { id: 'uzi',     name: 'Узи',       type: 'weapon', price: 80,  baseDmg: 1, critDmg: 3, critChance: 0.10, midDmg: 2, midChance: 0.40, shots: 1 },
-  rifle:   { id: 'rifle',   name: 'Автомат',   type: 'weapon', price: 120, baseDmg: 2, critDmg: 3, critChance: 0.30, shots: 2 },
-  rocket:  { id: 'rocket',  name: 'Ракетница', type: 'weapon', price: 200, baseDmg: 3, critDmg: 5, critChance: 0.20, splashRange: 1, shots: 1 },
+  pistol:  { id: 'pistol',  name: 'Пистолет',  type: 'weapon', price: 0,   baseDmg: 1, critDmg: 2, critChance: 0.10, shots: 1, desc: 'Базовая зброя выжившего' },
+  uzi:     { id: 'uzi',     name: 'Узи',       type: 'weapon', price: 80,  baseDmg: 1, critDmg: 3, critChance: 0.10, midDmg: 2, midChance: 0.40, shots: 1, desc: 'Автоматический огонь' },
+  rifle:   { id: 'rifle',   name: 'Автомат',   type: 'weapon', price: 120, baseDmg: 2, critDmg: 3, critChance: 0.30, shots: 2, desc: 'Два выстрела за ход' },
+  rocket:  { id: 'rocket',  name: 'Ракетница', type: 'weapon', price: 200, baseDmg: 3, critDmg: 5, critChance: 0.20, splashRange: 1, shots: 1, desc: 'Урон по площади' },
   
   // БРОНЯ
-  vest:    { id: 'vest',    name: 'Броник',    type: 'armor',  price: 60,  extraHp: 2, blockPoison: true },
+  vest:    { id: 'vest',    name: 'Броник',    type: 'armor',  price: 60,  extraHp: 2, blockPoison: true, desc: 'Защита +2 HP, блокирует яд 2 хода' },
   
   // ОБУВЬ
-  shoes:   { id: 'shoes',   name: 'Кроссовки', type: 'boots',  price: 40,  moveBonus: 1 },
+  shoes:   { id: 'shoes',   name: 'Кроссовки', type: 'boots',  price: 40,  moveBonus: 1, desc: '+1 клетка движения' },
 };
 
 // РЕКРУТЫ
