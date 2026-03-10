@@ -100,6 +100,30 @@ function calcDamage(weapon) {
   return Math.random() < w.critChance ? w.critDmg : w.baseDmg;
 }
 
+// Получить эффективное значение стата с учётом снаряжения
+function getEffectiveStat(unit, stat) {
+  const eq = unit.equipment || {};
+  
+  // weapon → возвращает id оружия
+  if (stat === 'weapon') {
+    return eq.weapon || 'pistol';
+  }
+  
+  let value = unit[stat];
+  
+  // maxHp: +extraHp от брони
+  if (stat === 'maxHp' && eq.armor && ITEMS[eq.armor]) {
+    value += ITEMS[eq.armor].extraHp || 0;
+  }
+  
+  // moveRange: +moveBonus от обуви
+  if (stat === 'moveRange' && eq.boots && ITEMS[eq.boots]) {
+    value += ITEMS[eq.boots].moveBonus || 0;
+  }
+  
+  return value;
+}
+
 // экспорт для тестов (Node environment)
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
@@ -109,5 +133,6 @@ if (typeof module !== 'undefined' && module.exports) {
     aliveZombies,
     alivePlayers,
     calcDamage,
+    getEffectiveStat,
   };
 }
