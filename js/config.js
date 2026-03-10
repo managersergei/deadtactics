@@ -3,6 +3,11 @@
 // Меняй баланс только здесь, не хардкодь числа в логике
 // ════════════════════════════════════════════════════════
 
+// Делаем переменные глобальными для браузера
+if (typeof window !== 'undefined') {
+  window.CONFIG = {};
+}
+
 const COLS = 10;
 const ROWS = 8;
 
@@ -181,5 +186,24 @@ const LEVELS = {
     position: { x: 90, y: 10 }
   }
 };
+
+// Экспорт в глобальную область видимости для браузера
+if (typeof window !== 'undefined') {
+  window.COLS = COLS;
+  window.ROWS = ROWS;
+  window.PLACE_COLS = PLACE_COLS;
+  window.PLAYER_UNIT_COUNT = PLAYER_UNIT_COUNT;
+  window.ZOMBIE_SPAWN_POSITIONS = ZOMBIE_SPAWN_POSITIONS;
+  window.PLAYER_STATS = PLAYER_STATS;
+  window.WEAPONS = WEAPONS;
+  window.ZOMBIE_STATS = ZOMBIE_STATS;
+  window.ZOMBIE_ACTION_DELAY = ZOMBIE_ACTION_DELAY;
+  window.ZOMBIE_TURN_END_DELAY = ZOMBIE_TURN_END_DELAY;
+  window.LORE_MESSAGES = LORE_MESSAGES;
+  window.LEVELS = LEVELS;
+  window.ITEM_TYPES = ITEM_TYPES;
+  window.ITEMS = ITEMS;
+  window.RECRUITS = RECRUITS;
+}
 
 module.exports = { COLS, ROWS, PLACE_COLS, PLAYER_UNIT_COUNT, ZOMBIE_SPAWN_POSITIONS, PLAYER_STATS, WEAPONS, ZOMBIE_STATS, ZOMBIE_ACTION_DELAY, ZOMBIE_TURN_END_DELAY, LORE_MESSAGES, LEVELS, ITEM_TYPES, ITEMS, RECRUITS };
