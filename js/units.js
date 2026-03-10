@@ -3,21 +3,28 @@
 // Новый тип юнита → добавь фабрику здесь + параметры в config.js
 // ════════════════════════════════════════════════════════
 
-function mkPlayer(x, y) {
+function mkPlayer(x, y, squadUnit) {
+  // Получаем equipment из squadUnit или используем по умолчанию
+  const eq = squadUnit?.equipment || { weapon: 'pistol', armor: null, boots: null };
+  
+  // Рассчитываем эффективные статы с учётом снаряжения
+  const effectiveMaxHp = getEffectiveStat(squadUnit, 'maxHp') || PLAYER_STATS.maxHp;
+  const effectiveMoveRange = getEffectiveStat(squadUnit, 'moveRange') || PLAYER_STATS.moveRange;
+  
   return {
     id: uid(),
     kind: 'player',
-    emoji: PLAYER_STATS.emoji,
+    emoji: squadUnit?.emoji || PLAYER_STATS.emoji,
     x, y,
-    hp: PLAYER_STATS.hp,
-    maxHp: PLAYER_STATS.maxHp,
-    moveRange: PLAYER_STATS.moveRange,
+    hp: effectiveMaxHp,           // HP полный в начале боя
+    maxHp: effectiveMaxHp,        // Макс. HP с учётом брони
+    moveRange: effectiveMoveRange, // Диапазон движения с учётом ботинок
     atkRange: PLAYER_STATS.atkRange,
-    weapon: 'pistol',
-    equipment: { weapon: 'pistol', armor: null, boots: null },
-    poisoned: false,  // заражён укусом зомби
-    moved: false,     // уже переместился в этот ход
-    attacked: false,  // уже атаковал в этот ход
+    weapon: 'pistol',             // Base weapon (actual used is in equipment)
+    equipment: eq,                 // Снаряжение из squad
+    poisoned: false,              // заражён укусом зомби
+    moved: false,                 // уже переместился в этот ход
+    attacked: false,              // уже атаковал в этот ход
     alive: true,
   };
 }

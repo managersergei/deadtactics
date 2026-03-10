@@ -16,7 +16,9 @@ function handlePlacement(c, r) {
   if (!PLACE_COLS.includes(c)) return;
   if (unitAt(c, r)) return;
 
-  units.push(mkPlayer(c, r));
+  // Получаем юнита из отряда для передачи его снаряжения
+  const squadUnit = gameData.squad[placedCount];
+  units.push(mkPlayer(c, r, squadUnit));
   placedCount++;
   log(`⬛ Юнит размещён на [${c+1},${r+1}]`);
 
