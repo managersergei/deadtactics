@@ -14,6 +14,7 @@ function mkPlayer(x, y) {
     moveRange: PLAYER_STATS.moveRange,
     atkRange: PLAYER_STATS.atkRange,
     weapon: 'pistol',
+    equipment: { weapon: 'pistol', armor: null, boots: null },
     poisoned: false,  // заражён укусом зомби
     moved: false,     // уже переместился в этот ход
     attacked: false,  // уже атаковал в этот ход

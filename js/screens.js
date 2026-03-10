@@ -12,6 +12,18 @@ const SCREENS = {
   BATTLE: 'screen-battle'
 };
 
+// Тип display для каждого экрана
+// screen-battle должен быть block, иначе flex-контекст ломает grid
+const SCREEN_DISPLAY = {
+  'screen-start':       'flex',
+  'screen-intro':      'flex',
+  'screen-map':        'flex',
+  'screen-squad':      'block',
+  'screen-unit-detail':'flex',
+  'screen-level-start':'block',
+  'screen-battle':     'block',   // КЛЮЧЕВОЕ: block, не flex
+};
+
 let currentScreen = SCREENS.START;
 
 // Показать экран
@@ -19,7 +31,7 @@ function showScreen(screenName) {
   hideAllScreens();
   const el = document.getElementById(screenName);
   if (el) {
-    el.style.display = 'flex';
+    el.style.display = SCREEN_DISPLAY[screenName] || 'flex';
     currentScreen = screenName;
   }
 }

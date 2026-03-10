@@ -55,10 +55,43 @@ function alivePlayers() {
   return units.filter(u => u.alive && u.kind === 'player');
 }
 
-// Случайные позиции для зомби из ZOMBIE_SPAWN_POSITIONS
+// Генерация случайных позиций для зомби в правой части карты
+// Зомби появляются в колонках 6-9 (справа от игрока)
 function randomZombiePositions(count) {
-  const shuffled = [...ZOMBIE_SPAWN_POSITIONS].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, count);
+  const positions = [];
+  const maxAttempts = 100;
+  
+  // Зомби появляются в правой части поля
+  const minX = 6;   //COLS - 4 (COLS = 10)
+  const maxX = 9;   //COLS - 1
+  const minY = 1;   // не на самом краю
+  const maxY = ROWS - 2;
+  
+  for (let i = 0; i < count; i++) {
+    let x, y, attempts = 0;
+    let found = false;
+    
+    // Пытаемся найти уникальную позицию
+    do {
+      x = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
+      y = Math.floor(Math.random() * (maxY - minY + 1)) + minY;
+      attempts++;
+      
+      // Проверяем, что позиция уникальна
+      const isUnique = !positions.some(p => p[0] === x && p[1] === y);
+      if (isUnique) {
+        found = true;
+        positions.push([x, y]);
+      }
+    } while (!found && attempts < maxAttempts);
+    
+    // Если не нашли уникальную позицию за maxAttempts — добавляем всё равно
+    if (!found) {
+      positions.push([x, y]);
+    }
+  }
+  
+  return positions;
 }
 
 // Вычисление урона для оружия (с учётом крита)

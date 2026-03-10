@@ -4,9 +4,14 @@
 const assert = require('assert');
 const helpers = require('../helpers.js');
 const statsMod = require('../stats.js');
+const config = require('../config.js');
 
 // Мок-нужные глобальные переменные
 global.units = [];
+global.COLS = config.COLS;
+global.ROWS = config.ROWS;
+global.WEAPONS = config.WEAPONS;
+global.stats = { zombiesKilled:0, damageDealt:0, damageTaken:0, poisonDamageTaken:0, turnsSurvived:0, battlesPlayed:0 };
 
 function run() {
   console.log('=== Running helpers tests ===');
