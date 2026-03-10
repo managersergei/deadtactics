@@ -754,3 +754,67 @@ function buyItemFromShop(itemId) {
     alert(result.reason || 'Не удалось купить предмет');
   }
 }
+
+// ── НАЙМ ЮНИТОВ ─────────────────────────────────────────
+
+function showRecruitModal() {
+  // Проверить, есть ли место в отряде
+  if (gameData.squad.length >= gameData.player.leadership) {
+    alert('Отряд полон! Увеличь лидерство для расширения отряда.');
+    return;
+  }
+
+  // Создать модалку
+  const overlay = document.createElement('div');
+  overlay.id = 'recruit-modal';
+  overlay.style.cssText = `
+    position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+    z-index: 2000; display: flex; align-items: center; justify-content: center;
+  `;
+
+  const recruitsHtml = Object.entries(RECRUITS).map(([id, r]) => `
+    <div class="recruit-option" onclick="recruitFromUI('${id}')" style="
+      background: var(--panel);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    " onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="font-size: 48px;">${r.emoji}</div>
+      <div style="color: var(--green); font-weight: bold; margin: 0.5rem 0;">${r.name}</div>
+      <div style="color: var(--yellow); font-weight: bold;">💰 ${r.price}</div>
+      <div style="color: var(--text); font-size: 11px; margin-top: 0.5rem;">
+        HP:${r.hp} MOV:${r.moveRange} ATK:${r.atkRange}
+      </div>
+    </div>
+  `).join('');
+
+  overlay.innerHTML = `
+    <div style="background: var(--panel); border: 2px solid var(--green); padding: 2rem; border-radius: 8px; text-align: center; max-width: 500px; width: 90%;">
+      <h2 style="color: var(--green); margin-bottom: 1rem;">👥 НАНЯТЬ В ОТРЯД</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+        ${recruitsHtml}
+      </div>
+      <button onclick="document.getElementById('recruit-modal').remove()" style="padding: 10px 20px; background: var(--border); color: var(--text); border: none; border-radius: 4px; cursor: pointer;">ОТМЕНА</button>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+}
+
+function recruitFromUI(type) {
+  const result = recruitUnit(type);
+  
+  // Закрыть модалку
+  const modal = document.getElementById('recruit-modal');
+  if (modal) modal.remove();
+  
+  if (result.success) {
+    // Обновить экран отряда
+    renderSquadScreen();
+  } else {
+    alert(result.reason || 'Не удалось нанять юнита');
+  }
+}
