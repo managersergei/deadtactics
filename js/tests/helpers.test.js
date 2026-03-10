@@ -11,6 +11,7 @@ global.units = [];
 global.COLS = config.COLS;
 global.ROWS = config.ROWS;
 global.WEAPONS = config.WEAPONS;
+global.ITEMS = config.ITEMS;
 global.stats = { zombiesKilled:0, damageDealt:0, damageTaken:0, poisonDamageTaken:0, turnsSurvived:0, battlesPlayed:0 };
 
 function run() {
@@ -34,8 +35,10 @@ function run() {
   assert(cells.every(([c,r])=>Math.abs(c-1)+Math.abs(r-1)<=2));
 
   // calcDamage randomness - run many times to ensure within bounds
+  // Теперь возвращает массив [dmg]
   for (let i=0;i<100;i++) {
-    const dmg = helpers.calcDamage('pistol');
+    const dmgArr = helpers.calcDamage('pistol');
+    const dmg = dmgArr[0];
     assert(dmg === 1 || dmg === 2);
   }
 

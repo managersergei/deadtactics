@@ -95,9 +95,29 @@ function randomZombiePositions(count) {
 }
 
 // Вычисление урона для оружия (с учётом крита)
-function calcDamage(weapon) {
-  const w = WEAPONS[weapon];
-  return Math.random() < w.critChance ? w.critDmg : w.baseDmg;
+// Возвращает массив уронов [dmg1, dmg2] для совместимости с автоматом
+function calcDamage(weaponId) {
+  // Получаем предмет из ITEMS (с запасным для пистолета)
+  const w = ITEMS[weaponId] || ITEMS.pistol;
+  
+  // Для автомата (shots: 2) - массив двух выстрелов
+  if (w.shots && w.shots > 1) {
+    const dmg1 = Math.random() < w.critChance ? w.critDmg : w.baseDmg;
+    const dmg2 = Math.random() < w.critChance ? w.critDmg : w.baseDmg;
+    return [dmg1, dmg2];
+  }
+  
+  // Узи имеет midDmg/midChance
+  if (w.midChance) {
+    const roll = Math.random();
+    if (roll < w.critChance) return [w.critDmg];
+    if (roll < w.critChance + w.midChance) return [w.midDmg];
+    return [w.baseDmg];
+  }
+  
+  // Обычное оружие (пистолет)
+  const isCrit = Math.random() < w.critChance;
+  return [isCrit ? w.critDmg : w.baseDmg];
 }
 
 // Получить эффективное значение стата с учётом снаряжения
