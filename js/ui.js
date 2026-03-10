@@ -434,6 +434,44 @@ function renderSquadScreen() {
 
     unitsContainer.appendChild(card);
   });
+  
+  // Рендер статистики отряда
+  renderSquadStats();
+}
+
+function renderSquadStats() {
+  const container = document.getElementById('squad-stats');
+  if (!container) return;
+
+  // Посчитать статистику
+  let totalKills = 0;
+  let totalDamage = 0;
+  let totalBattles = 0;
+  
+  gameData.squad.forEach(unit => {
+    totalKills += unit.personalStats.zombiesKilled;
+    totalDamage += unit.personalStats.totalDamageDealt;
+    totalBattles += unit.personalStats.battlesPlayed;
+  });
+
+  container.innerHTML = `
+    <div class="squad-stat-row">
+      <span class="squad-stat-label">🧟 Всего убито</span>
+      <span class="squad-stat-value">${totalKills}</span>
+    </div>
+    <div class="squad-stat-row">
+      <span class="squad-stat-label">⚔️ Нанесено урона</span>
+      <span class="squad-stat-value">${totalDamage}</span>
+    </div>
+    <div class="squad-stat-row">
+      <span class="squad-stat-label">🎮 Сыграно боёв</span>
+      <span class="squad-stat-value">${totalBattles}</span>
+    </div>
+    <div class="squad-stat-row">
+      <span class="squad-stat-label">👥 Юнитов</span>
+      <span class="squad-stat-value">${gameData.squad.length}</span>
+    </div>
+  `;
 }
 
 // ── ЭКРАН ДЕТАЛЕЙ ЮНИТА ──────────────────────────────────

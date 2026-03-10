@@ -878,6 +878,33 @@ button.danger:hover:not(:disabled) {
   flex: 2;
 }
 
+.squad-stats-container {
+  flex: 1;
+  border-left: 1px solid var(--border);
+  padding-left: 2rem;
+}
+
+.squad-stats-container h3 {
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+.squad-stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.squad-stat-label {
+  color: var(--text);
+}
+
+.squad-stat-value {
+  color: var(--green);
+  font-weight: bold;
+}
+
 .squad-shop-container {
   flex: 1;
   border-left: 1px solid var(--border);
