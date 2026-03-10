@@ -694,35 +694,57 @@ function renderIntroKnife() {
   const container = document.getElementById('knife-container');
   if (!container) return;
   
-  // Уже отрендерено - не нужно делать снова
-  if (container.querySelector('svg')) return;
+  // Очистить контейнер для перерисовки
+  container.innerHTML = '';
   
   const name = gameData.player.name || '';
   
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('viewBox', '0 0 200 60');
-  svg.setAttribute('width', '200');
-  svg.setAttribute('height', '60');
+  svg.setAttribute('viewBox', '0 0 300 80');
+  svg.setAttribute('width', '300');
+  svg.setAttribute('height', '80');
   svg.style.cssText = 'display:block; margin: 0 auto;';
   
-  // Нож - простой силуэт
+  // Нож - большой и красивый
   svg.innerHTML = `
     <defs>
       <linearGradient id="knife-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#888"/>
-        <stop offset="50%" stop-color="#ccc"/>
-        <stop offset="100%" stop-color="#666"/>
+        <stop offset="0%" stop-color="#666"/>
+        <stop offset="30%" stop-color="#ddd"/>
+        <stop offset="50%" stop-color="#fff"/>
+        <stop offset="70%" stop-color="#ddd"/>
+        <stop offset="100%" stop-color="#555"/>
+      </linearGradient>
+      <linearGradient id="handle-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#4a3020"/>
+        <stop offset="50%" stop-color="#2a1810"/>
+        <stop offset="100%" stop-color="#1a0a00"/>
       </linearGradient>
     </defs>
-    <!-- Лезвие ножа -->
-    <path d="M 10 30 L 80 30 L 80 35 L 15 35 L 10 30" fill="url(#knife-grad)" stroke="#444" stroke-width="1"/>
+    
+    <!-- Лезвие ножа - широкое -->
+    <path d="M 10 40 L 150 40 L 150 55 L 15 55 L 10 40" fill="url(#knife-grad)" stroke="#333" stroke-width="2"/>
+    <path d="M 10 40 L 40 40 L 40 55 L 15 55 L 10 40" fill="#eee" stroke="none"/>
+    
     <!-- Рукоятка -->
-    <rect x="80" y="28" width="60" height="8" rx="2" fill="#2a1a0a" stroke="#1a0a00" stroke-width="1"/>
-    <!-- Линия гравировки на лезвии -->
-    <text x="45" y="33" font-family="monospace" font-size="8" fill="#333" text-anchor="middle">${name}</text>
+    <rect x="150" y="35" width="100" height="20" rx="4" fill="url(#handle-grad)" stroke="#1a0a00" stroke-width="2"/>
+    <ellipse cx="155" cy="45" rx="5" ry="8" fill="#5a4030"/>
+    <ellipse cx="245" cy="45" rx="5" ry="8" fill="#5a4030"/>
+    
+    <!-- Линия гравировки на лезвии - большая -->
+    <text x="80" y="50" font-family="monospace" font-size="14" font-weight="bold" fill="#222" text-anchor="middle">${name}</text>
   `;
   
   container.appendChild(svg);
+  
+  // Добавить обработчик ввода для обновления гравировки
+  const input = document.getElementById('player-name-input');
+  if (input) {
+    input.oninput = function() {
+      gameData.player.name = this.value;
+      renderIntroKnife();
+    };
+  }
 }
 
 function showNextIntroText() {
