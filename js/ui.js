@@ -681,11 +681,48 @@ function showLoreText() {
     nextBtn.style.display = 'block';
     nextBtn.textContent = currentLoreIndex === LORE_MESSAGES.length - 1 ? 'ДАЛЕЕ →' : 'ДАЛЕЕ →';
   } else {
-    // Показываем ввод имени
+    // Показываем ввод имени + нож с гравировкой
     textEl.textContent = '';
+    renderIntroKnife();
     inputContainer.style.display = 'flex';
     nextBtn.style.display = 'none';
   }
+}
+
+// Отрендерить SVG-нож с гравировкой
+function renderIntroKnife() {
+  const container = document.getElementById('knife-container');
+  if (!container) return;
+  
+  // Уже отрендерено - не нужно делать снова
+  if (container.querySelector('svg')) return;
+  
+  const name = gameData.player.name || '';
+  
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 200 60');
+  svg.setAttribute('width', '200');
+  svg.setAttribute('height', '60');
+  svg.style.cssText = 'display:block; margin: 0 auto;';
+  
+  // Нож - простой силуэт
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="knife-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#888"/>
+        <stop offset="50%" stop-color="#ccc"/>
+        <stop offset="100%" stop-color="#666"/>
+      </linearGradient>
+    </defs>
+    <!-- Лезвие ножа -->
+    <path d="M 10 30 L 80 30 L 80 35 L 15 35 L 10 30" fill="url(#knife-grad)" stroke="#444" stroke-width="1"/>
+    <!-- Рукоятка -->
+    <rect x="80" y="28" width="60" height="8" rx="2" fill="#2a1a0a" stroke="#1a0a00" stroke-width="1"/>
+    <!-- Линия гравировки на лезвии -->
+    <text x="45" y="33" font-family="monospace" font-size="8" fill="#333" text-anchor="middle">${name}</text>
+  `;
+  
+  container.appendChild(svg);
 }
 
 function showNextIntroText() {
