@@ -33,3 +33,60 @@ function showNextIntroText() {
   currentLoreIndex++;
   showLoreText();
 }
+
+// ── РЕНДЕР НОЖА С ГРАВИРОВКОЙ ───────────────────────────
+
+function renderIntroKnife() {
+  const container = document.getElementById('knife-container');
+  if (!container) return;
+  
+  container.innerHTML = '';
+  
+  const name = gameData.player.name || '';
+  
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 400 120');
+  svg.setAttribute('width', '400');
+  svg.setAttribute('height', '120');
+  svg.style.cssText = 'display:block; margin: 0 auto;';
+  
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="knife-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#555"/>
+        <stop offset="25%" stop-color="#ccc"/>
+        <stop offset="50%" stop-color="#fff"/>
+        <stop offset="75%" stop-color="#ccc"/>
+        <stop offset="100%" stop-color="#444"/>
+      </linearGradient>
+      <linearGradient id="handle-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#5a4030"/>
+        <stop offset="50%" stop-color="#2a1810"/>
+        <stop offset="100%" stop-color="#1a0a00"/>
+      </linearGradient>
+    </defs>
+    
+    <path d="M 10 60 L 200 60 L 200 90 L 15 90 L 10 60" fill="url(#knife-grad)" stroke="#333" stroke-width="2"/>
+    <path d="M 15 65 L 60 65 L 60 75 L 20 75 L 15 65" fill="#fff" opacity="0.4"/>
+    
+    <rect x="200" y="50" width="140" height="30" rx="6" fill="url(#handle-grad)" stroke="#1a0a00" stroke-width="3"/>
+    <ellipse cx="210" cy="65" rx="6" ry="12" fill="#6a5040" stroke="#1a0a00" stroke-width="1"/>
+    <ellipse cx="240" cy="65" rx="6" ry="12" fill="#6a5040" stroke="#1a0a00" stroke-width="1"/>
+    <ellipse cx="270" cy="65" rx="6" ry="12" fill="#6a5040" stroke="#1a0a00" stroke-width="1"/>
+    <ellipse cx="300" cy="65" rx="6" ry="12" fill="#6a5040" stroke="#1a0a00" stroke-width="1"/>
+    <ellipse cx="330" cy="65" rx="6" ry="12" fill="#6a5040" stroke="#1a0a00" stroke-width="1"/>
+    
+    <text x="105" y="80" font-family="monospace" font-size="18" font-weight="bold" fill="#1a1a1a" text-anchor="middle">${name}</text>
+  `;
+  
+  container.appendChild(svg);
+  
+  // Обновить гравировку при вводе - используем addEventListener
+  const input = document.getElementById('player-name-input');
+  if (input) {
+    input.oninput = function() {
+      gameData.player.name = this.value;
+      renderIntroKnife();
+    };
+  }
+}
