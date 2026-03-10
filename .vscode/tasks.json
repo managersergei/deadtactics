@@ -10,10 +10,7 @@
       "presentation": {
         "reveal": "never"
       },
-      "group": {
-        "kind": "serve",
-        "isDefault": true
-      }
+      "group": "none"
     }
   ]
 }
