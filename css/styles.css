@@ -777,7 +777,7 @@ button.danger:hover:not(:disabled) {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
+  gap: 1.5rem;
   padding: 2rem;
   min-height: 60vh;
 }
@@ -786,6 +786,7 @@ button.danger:hover:not(:disabled) {
   max-width: 600px;
   text-align: left;
   min-height: 200px;
+  display: none; /* Скрыт при вводе имени */
 }
 
 .intro-text {
@@ -799,6 +800,13 @@ button.danger:hover:not(:disabled) {
   flex-direction: column;
   align-items: center;
   gap: 1rem;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+#knife-container {
+  margin-bottom: 0.5rem;
 }
 
 .intro-input-label {
@@ -815,6 +823,7 @@ button.danger:hover:not(:disabled) {
   border-radius: 4px;
   text-align: center;
   font-family: 'Share Tech Mono', monospace;
+  width: 200px;
 }
 
 .btn-confirm {

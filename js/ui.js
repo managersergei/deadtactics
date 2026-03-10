@@ -700,39 +700,44 @@ function renderIntroKnife() {
   const name = gameData.player.name || '';
   
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('viewBox', '0 0 300 80');
-  svg.setAttribute('width', '300');
-  svg.setAttribute('height', '80');
+  svg.setAttribute('viewBox', '0 0 400 120');
+  svg.setAttribute('width', '400');
+  svg.setAttribute('height', '120');
   svg.style.cssText = 'display:block; margin: 0 auto;';
   
-  // Нож - большой и красивый
+  // Нож - очень толстый и большой
   svg.innerHTML = `
     <defs>
       <linearGradient id="knife-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#666"/>
-        <stop offset="30%" stop-color="#ddd"/>
+        <stop offset="0%" stop-color="#555"/>
+        <stop offset="25%" stop-color="#ccc"/>
         <stop offset="50%" stop-color="#fff"/>
-        <stop offset="70%" stop-color="#ddd"/>
-        <stop offset="100%" stop-color="#555"/>
+        <stop offset="75%" stop-color="#ccc"/>
+        <stop offset="100%" stop-color="#444"/>
       </linearGradient>
       <linearGradient id="handle-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#4a3020"/>
+        <stop offset="0%" stop-color="#5a4030"/>
         <stop offset="50%" stop-color="#2a1810"/>
         <stop offset="100%" stop-color="#1a0a00"/>
       </linearGradient>
     </defs>
     
-    <!-- Лезвие ножа - широкое -->
-    <path d="M 10 40 L 150 40 L 150 55 L 15 55 L 10 40" fill="url(#knife-grad)" stroke="#333" stroke-width="2"/>
-    <path d="M 10 40 L 40 40 L 40 55 L 15 55 L 10 40" fill="#eee" stroke="none"/>
+    <!-- Лезвие ножа - очень толстое (30px высота) -->
+    <path d="M 10 60 L 200 60 L 200 90 L 15 90 L 10 60" fill="url(#knife-grad)" stroke="#333" stroke-width="2"/>
+    <!-- Блик на лезвии -->
+    <path d="M 15 65 L 60 65 L 60 75 L 20 75 L 15 65" fill="#fff" opacity="0.4"/>
     
-    <!-- Рукоятка -->
-    <rect x="150" y="35" width="100" height="20" rx="4" fill="url(#handle-grad)" stroke="#1a0a00" stroke-width="2"/>
-    <ellipse cx="155" cy="45" rx="5" ry="8" fill="#5a4030"/>
-    <ellipse cx="245" cy="45" rx="5" ry="8" fill="#5a4030"/>
+    <!-- Рукоятка - толстая -->
+    <rect x="200" y="50" width="140" height="30" rx="6" fill="url(#handle-grad)" stroke="#1a0a00" stroke-width="3"/>
+    <!-- Кольца на рукоятке -->
+    <ellipse cx="210" cy="65" rx="6" ry="12" fill="#6a5040" stroke="#1a0a00" stroke-width="1"/>
+    <ellipse cx="240" cy="65" rx="6" ry="12" fill="#6a5040" stroke="#1a0a00" stroke-width="1"/>
+    <ellipse cx="270" cy="65" rx="6" ry="12" fill="#6a5040" stroke="#1a0a00" stroke-width="1"/>
+    <ellipse cx="300" cy="65" rx="6" ry="12" fill="#6a5040" stroke="#1a0a00" stroke-width="1"/>
+    <ellipse cx="330" cy="65" rx="6" ry="12" fill="#6a5040" stroke="#1a0a00" stroke-width="1"/>
     
-    <!-- Линия гравировки на лезвии - большая -->
-    <text x="80" y="50" font-family="monospace" font-size="14" font-weight="bold" fill="#222" text-anchor="middle">${name}</text>
+    <!-- Гравировка на лезвии - большая -->
+    <text x="105" y="80" font-family="monospace" font-size="18" font-weight="bold" fill="#1a1a1a" text-anchor="middle">${name}</text>
   `;
   
   container.appendChild(svg);
