@@ -786,7 +786,6 @@ button.danger:hover:not(:disabled) {
   max-width: 600px;
   text-align: left;
   min-height: 200px;
-  display: none; /* Скрыт при вводе имени */
 }
 
 .intro-text {
