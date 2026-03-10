@@ -854,9 +854,10 @@ button.danger:hover:not(:disabled) {
 
 .squad-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-  margin-bottom: 2rem;
+  gap: 10px;
+  margin-bottom: 1rem;
 }
 
 .btn-back {
@@ -1120,9 +1121,9 @@ button.danger:hover:not(:disabled) {
 
 .btn-shop {
   padding: 8px 16px;
-  background: var(--green-dim);
-  color: var(--green);
-  border: 1px solid var(--green);
+  background: var(--border);
+  color: var(--text);
+  border: none;
   border-radius: 4px;
   cursor: pointer;
   font-family: 'Share Tech Mono', monospace;
