@@ -97,6 +97,62 @@ function getUnitById(unitId) {
   return gameData.squad.find(u => u.id === unitId);
 }
 
+// Купить предмет для юнита
+function buyItem(unitId, itemId) {
+  const item = ITEMS[itemId];
+  const unit = getUnitById(unitId);
+  
+  // Проверки
+  if (!item) return { success: false, reason: 'Предмет не найден' };
+  if (!unit) return { success: false, reason: 'Юнит не найден' };
+  if (gameData.player.gold < item.price) return { success: false, reason: 'Недостаточно золота' };
+  
+  // Списать золото
+  gameData.player.gold -= item.price;
+  
+  // Экипировать предмет (создать equipment если нет)
+  if (!unit.equipment) {
+    unit.equipment = { weapon: 'pistol', armor: null, boots: null };
+  }
+  unit.equipment[item.type] = itemId;
+  
+  return { success: true };
+}
+
+// Нанять нового юнита в отряд
+function recruitUnit(type) {
+  const recruit = RECRUITS[type];
+  
+  // Проверки
+  if (!recruit) return { success: false, reason: 'Тип юнита не найден' };
+  if (gameData.player.gold < recruit.price) return { success: false, reason: 'Недостаточно золота' };
+  if (gameData.squad.length >= gameData.player.leadership) return { success: false, reason: 'Отряд полон' };
+  
+  // Списать золото
+  gameData.player.gold -= recruit.price;
+  
+  // Создать нового юнита
+  const newUnit = {
+    id: Date.now(),  // уникальный ID
+    name: PLAYER_NAMES[Math.floor(Math.random() * PLAYER_NAMES.length)],
+    emoji: recruit.emoji,
+    hp: recruit.hp,
+    maxHp: recruit.maxHp,
+    moveRange: recruit.moveRange,
+    atkRange: recruit.atkRange,
+    equipment: { weapon: 'pistol', armor: null, boots: null },
+    personalStats: {
+      zombiesKilled: 0,
+      damageTaken: 0,
+      totalDamageDealt: 0,
+      battlesPlayed: 0
+    }
+  };
+  
+  gameData.squad.push(newUnit);
+  return { success: true, unit: newUnit };
+}
+
 // Обновить статистику юнита после боя
 function updateUnitStats(unitId, battleStats) {
   const unit = getUnitById(unitId);
