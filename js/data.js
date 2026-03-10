@@ -35,9 +35,9 @@ let gameData = {
   currentLevel: null  // выбранный уровень для боя
 };
 
-// Обновить лидерство = максимум юнитов в отряде
+// Обновить лидерство = максимум юнитов в отряде (минимум 2)
 function updateLeadership() {
-  gameData.player.leadership = gameData.squad.length;
+  gameData.player.leadership = Math.max(2, gameData.squad.length);
 }
 
 // Инициализировать новую игру
@@ -67,7 +67,8 @@ function initializeNewGame() {
   };
   
   gameData.squad.push(startingUnit);
-  gameData.player.leadership = gameData.squad.length;  // лидерство = кол-во юнитов
+  // Лидерство = макс. юнитов в отряде, но минимум 2
+  gameData.player.leadership = Math.max(2, gameData.squad.length);
   gameData.levelProgress[1].status = 'available';
 }
 
