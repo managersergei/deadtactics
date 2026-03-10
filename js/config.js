@@ -34,6 +34,35 @@ const WEAPONS = {
   },
 };
 
+// ════════════════════════════════════════════════════════
+// ПРЕДМЕТЫ МАГАЗИНА
+// ════════════════════════════════════════════════════════
+
+const ITEM_TYPES = {
+  WEAPON: 'weapon',
+  ARMOR:  'armor',
+  BOOTS:  'boots',
+};
+
+const ITEMS = {
+  // ОРУЖИЕ
+  pistol:  { id: 'pistol',  name: 'Пистолет',  type: 'weapon', price: 0,   baseDmg: 1, critDmg: 2, critChance: 0.10, shots: 1 },
+  uzi:     { id: 'uzi',     name: 'Узи',       type: 'weapon', price: 80,  baseDmg: 1, critDmg: 3, critChance: 0.10, midDmg: 2, midChance: 0.40, shots: 1 },
+  rifle:   { id: 'rifle',   name: 'Автомат',   type: 'weapon', price: 120, baseDmg: 2, critDmg: 3, critChance: 0.30, shots: 2 },
+  rocket:  { id: 'rocket',  name: 'Ракетница', type: 'weapon', price: 200, baseDmg: 3, critDmg: 5, critChance: 0.20, splashRange: 1, shots: 1 },
+  
+  // БРОНЯ
+  vest:    { id: 'vest',    name: 'Броник',    type: 'armor',  price: 60,  extraHp: 2, blockPoison: true },
+  
+  // ОБУВЬ
+  shoes:   { id: 'shoes',   name: 'Кроссовки', type: 'boots',  price: 40,  moveBonus: 1 },
+};
+
+// РЕКРУТЫ
+const RECRUITS = {
+  survivor: { id: 'survivor', name: 'Выживший', price: 150, emoji: '🧍', hp: 5, maxHp: 5, moveRange: 5, atkRange: 4 },
+};
+
 // Параметры зомби
 const ZOMBIE_STATS = {
   hp: 3,
@@ -153,4 +182,4 @@ const LEVELS = {
   }
 };
 
-module.exports = { COLS, ROWS, PLACE_COLS, PLAYER_UNIT_COUNT, ZOMBIE_SPAWN_POSITIONS, PLAYER_STATS, WEAPONS, ZOMBIE_STATS, ZOMBIE_ACTION_DELAY, ZOMBIE_TURN_END_DELAY, LORE_MESSAGES, LEVELS };
+module.exports = { COLS, ROWS, PLACE_COLS, PLAYER_UNIT_COUNT, ZOMBIE_SPAWN_POSITIONS, PLAYER_STATS, WEAPONS, ZOMBIE_STATS, ZOMBIE_ACTION_DELAY, ZOMBIE_TURN_END_DELAY, LORE_MESSAGES, LEVELS, ITEM_TYPES, ITEMS, RECRUITS };
