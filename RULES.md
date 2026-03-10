@@ -25,21 +25,21 @@ dead-tactics/
     ├── units.js       ← фабрики юнитов
     ├── helpers.js     ← утилиты
     ├── ui.js          ← UI без логики
-    ├── render.js      ← базовый рендер (cell, buildGrid)
     ├── ai.js          ← AI зомби
     ├── audio.js       ← звуки
     ├── game.js        ← игровая логика
-    ├── screens.js     ← навигация между экранами
     ├── stats.js       ← статистика
-    ├── screens/       ← рендер экранов
-    │   ├── screenMap.js
-    │   ├── screenSquad.js
-    │   ├── screenShop.js
-    │   ├── screenIntro.js
-    │   ├── screenLevel.js
-    │   └── screenDetail.js
+    ├── screens/       ← роутинг и рендеры экранов
+    │   ├── screens.js     ← роутинг (goToMap, goToSquad...)
+    │   ├── screenMap.js   ← рендер карты
+    │   ├── screenSquad.js ← рендер отряда
+    │   ├── screenShop.js  ← рендер магазина
+    │   ├── screenIntro.js ← рендер интро
+    │   ├── screenLevel.js ← рендер уровня
+    │   └── screenDetail.js ← рендер деталей юнита
     └── render/        ← рендер боя
-        └── battle.js
+        ├── render.js   ← core (cell, buildGrid)
+        └── battle.js   ← рендер боя (render, _drawUnits...)
 ```
 
 **Правило:** каждый файл отвечает ровно за одну область. Не смешивай логику и UI.
