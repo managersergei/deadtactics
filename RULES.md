@@ -10,7 +10,7 @@
 ```
 dead-tactics/
 ├── index.html        ← только HTML-разметка
-├── RULES.md         ← этот файл
+├── RULES.md          ← этот файл
 ├── css/
 │   ├── styles.css      ← главный (импорты + :root)
 │   ├── base.css       ← сброс, body, header
@@ -25,12 +25,21 @@ dead-tactics/
     ├── units.js       ← фабрики юнитов
     ├── helpers.js     ← утилиты
     ├── ui.js          ← UI без логики
-    ├── render.js      ← отрисовка
+    ├── render.js      ← базовый рендер (cell, buildGrid)
     ├── ai.js          ← AI зомби
     ├── audio.js       ← звуки
     ├── game.js        ← игровая логика
-    ├── screens.js     ← навигация
-    └── stats.js       ← статистика
+    ├── screens.js     ← навигация между экранами
+    ├── stats.js       ← статистика
+    ├── screens/       ← рендер экранов
+    │   ├── screenMap.js
+    │   ├── screenSquad.js
+    │   ├── screenShop.js
+    │   ├── screenIntro.js
+    │   ├── screenLevel.js
+    │   └── screenDetail.js
+    └── render/        ← рендер боя
+        └── battle.js
 ```
 
 **Правило:** каждый файл отвечает ровно за одну область. Не смешивай логику и UI.
