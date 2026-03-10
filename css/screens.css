@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════
-   SCREENS — Все экраны игры
+   SCREENS — Все экраны игры (только уникальные стили)
    ════════════════════════════════════════════════════════ */
 
 /* ── ЭКРАН КАРТЫ МИРА (LAYOUT) ── */
@@ -11,17 +11,6 @@
   position: fixed;
   inset: 0;
   padding: 0;
-}
-
-/* Верхняя панель */
-#top-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 24px;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-  width: 100%;
 }
 
 /* Контейнер карты (занимает всё доступное пространство) */
@@ -65,19 +54,6 @@
 .screen-start-tagline {
   margin-top: 1rem;
   color: #5a8a54;
-}
-
-.btn-start {
-  padding: 10px 24px;
-  font-size: 14px;
-  cursor: pointer;
-  background: var(--green);
-  color: var(--bg);
-  border: none;
-  font-weight: bold;
-  border-radius: 4px;
-  width: auto;
-  min-width: 140px;
 }
 
 /* ── ЭКРАН ИНТРО ── */
@@ -134,41 +110,6 @@
   width: 200px;
 }
 
-.btn-confirm {
-  padding: 8px 20px;
-  background: var(--green);
-  color: var(--bg);
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-  border-radius: 4px;
-  width: auto;
-  min-width: 120px;
-}
-
-.btn-next {
-  padding: 8px 20px;
-  background: var(--green);
-  color: var(--bg);
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-  border-radius: 4px;
-  width: auto;
-  min-width: 120px;
-}
-
-/* ── ЭКРАН КАРТЫ (КНОПКА ОТРЯДА) ── */
-.map-squad-btn {
-  padding: 12px 24px;
-  background: var(--green);
-  color: var(--bg);
-  font-weight: bold;
-  cursor: pointer;
-  border: none;
-  border-radius: 4px;
-}
-
 /* ── ЭКРАН ОТРЯДА ── */
 #screen-squad {
   display: none;
@@ -181,14 +122,6 @@
   align-items: center;
   gap: 10px;
   margin-bottom: 1rem;
-}
-
-.btn-back {
-  padding: 10px 20px;
-  background: var(--border);
-  color: var(--text);
-  border: none;
-  cursor: pointer;
 }
 
 .squad-content {
@@ -268,16 +201,6 @@
   margin-bottom: 1.5rem;
 }
 
-.btn-close {
-  background: none;
-  border: none;
-  color: var(--text);
-  font-size: 16px;
-  cursor: pointer;
-  padding: 4px 8px;
-  line-height: 1;
-}
-
 .unit-detail-content {
   display: flex;
   flex-direction: column;
@@ -314,26 +237,12 @@
   justify-content: center;
 }
 
-.btn-fight {
-  padding: 10px 20px;
-  background: var(--red);
-  color: white;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-}
-
 /* ── ЭКРАН БОЯ ── */
 #screen-battle {
   display: none;
   width: 100%;
   padding: 16px;
   box-sizing: border-box;
-}
-
-.legend-text {
-  font-size: 10px;
-  line-height: 1.8;
 }
 
 .legend-move {
@@ -362,12 +271,6 @@
 
 .shop-header h2 {
   color: var(--green);
-}
-
-#shop-gold {
-  color: var(--yellow);
-  font-size: 20px;
-  font-weight: bold;
 }
 
 .shop-unit-selector {
@@ -460,37 +363,4 @@
   font-size: 11px;
   color: #5a7a5a;
   line-height: 1.4;
-}
-
-.btn-shop {
-  padding: 8px 16px;
-  background: var(--border);
-  color: var(--text);
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 13px;
-  transition: all 0.15s;
-}
-
-.btn-shop:hover {
-  background: var(--green);
-  color: var(--bg);
-}
-
-.btn-recruit {
-  padding: 8px 16px;
-  background: var(--green);
-  color: var(--bg);
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 13px;
-  transition: all 0.15s;
-}
-
-.btn-recruit:hover {
-  background: var(--green-dim);
 }
