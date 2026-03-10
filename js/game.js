@@ -132,8 +132,11 @@ function doMove(u, c, r) {
 }
 
 function doAttack(attacker, target) {
-  const damage = calcDamage(attacker.weapon);
-  const isCrit = damage === WEAPONS[attacker.weapon].critDmg;
+  // Получаем эффективное оружие из снаряжения
+  const weaponId = getEffectiveStat(attacker, 'weapon');
+  const damageArr = calcDamage(weaponId);
+  const damage = damageArr[0];
+  const isCrit = damage === ITEMS[weaponId].critDmg;
   target.hp -= damage;
   recordDamageDealt(damage);
   attacker.attacked = true;
