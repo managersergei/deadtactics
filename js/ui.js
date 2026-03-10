@@ -142,7 +142,7 @@ function renderMapScreen() {
   // Фон сетки + туман войны + пятна крови
   const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
   defs.innerHTML = `
-    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <pattern id="map-grid" width="40" height="40" patternUnits="userSpaceOnUse">
       <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#0f2510" stroke-width="0.5"/>
     </pattern>
     <filter id="glow">
@@ -170,7 +170,7 @@ function renderMapScreen() {
   const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
   bgRect.setAttribute('width', SVG_W);
   bgRect.setAttribute('height', SVG_H);
-  bgRect.setAttribute('fill', 'url(#grid)');
+  bgRect.setAttribute('fill', 'url(#map-grid)');
   svg.appendChild(bgRect);
 
   // Пятно крови в правом нижнем углу
