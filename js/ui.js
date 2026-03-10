@@ -610,3 +610,110 @@ function showNextIntroText() {
   currentLoreIndex++;
   showLoreText();
 }
+
+// ── МАГАЗИН ────────────────────────────────────────────
+
+// Глобальная переменная для выбранного юнита в магазине
+let shopSelectedUnitId = null;
+
+function renderShopScreen() {
+  // Обновить золото
+  const goldEl = document.getElementById('shop-gold');
+  if (goldEl) goldEl.textContent = '💰 ' + (gameData.player.gold || 0);
+  
+  // Обновить селектор юнитов
+  updateShopUnitSelector();
+  
+  // Рендер секций
+  renderShopSection('shop-weapons', 'weapon');
+  renderShopSection('shop-armors', 'armor');
+  renderShopSection('shop-boots', 'boots');
+}
+
+function updateShopUnitSelector() {
+  const select = document.getElementById('shop-unit-select');
+  if (!select) return;
+  
+  // Сохранить текущее значение
+  const currentValue = select.value;
+  
+  // Заполнить список юнитов
+  select.innerHTML = '<option value="">-- Выберите юнита --</option>';
+  
+  gameData.squad.forEach(unit => {
+    const option = document.createElement('option');
+    option.value = unit.id;
+    option.textContent = `${unit.emoji} ${unit.name}`;
+    select.appendChild(option);
+  });
+  
+  // Восстановить выбор
+  if (currentValue && gameData.squad.some(u => u.id === parseInt(currentValue))) {
+    select.value = currentValue;
+    shopSelectedUnitId = parseInt(currentValue);
+  }
+}
+
+function renderShopSection(containerId, type) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  
+  // Найти предметы этого типа
+  const items = Object.entries(ITEMS).filter(([id, item]) => item.type === type);
+  
+  container.innerHTML = items.map(([id, item]) => {
+    // Проверить, экипирован ли предмет у выбранного юнита
+    let isOwned = false;
+    if (shopSelectedUnitId) {
+      const unit = getUnitById(shopSelectedUnitId);
+      if (unit && unit.equipment && unit.equipment[type] === id) {
+        isOwned = true;
+      }
+    }
+    
+    return `
+      <div class="shop-item ${isOwned ? 'owned' : ''}" 
+           onclick="buyItemFromShop('${id}')">
+        <div class="shop-item-name">${item.emoji} ${item.name}</div>
+        <div class="shop-item-price">💰 ${item.price}</div>
+        <div class="shop-item-stats">${getItemStatsText(item)}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function getItemStatsText(item) {
+  const stats = [];
+  if (item.baseDmg) stats.push(`⚔️ ${item.baseDmg}`);
+  if (item.critChance) stats.push(`🎯 ${(item.critChance*100).toFixed(0)}%`);
+  if (item.extraHp) stats.push(`❤️ +${item.extraHp}`);
+  if (item.moveBonus) stats.push(`👟 +${item.moveBonus}`);
+  return stats.join(' ');
+}
+
+function shopSelectUnit(unitId) {
+  shopSelectedUnitId = unitId ? parseInt(unitId) : null;
+  // Перерисовать секции чтобы обновить статус "экипировано"
+  renderShopSection('shop-weapons', 'weapon');
+  renderShopSection('shop-armors', 'armor');
+  renderShopSection('shop-boots', 'boots');
+}
+
+function buyItemFromShop(itemId) {
+  if (!shopSelectedUnitId) {
+    alert('Сначала выберите юнита в выпадающем списке!');
+    return;
+  }
+  
+  const result = buyItem(shopSelectedUnitId, itemId);
+  if (result.success) {
+    // Обновить UI
+    renderShopScreen();
+    // Также обновить отряд если открыт
+    if (currentScreen === 'screen-squad') {
+      renderSquadScreen();
+    }
+  } else {
+    alert(result.reason || 'Не удалось купить предмет');
+  }
+}

@@ -80,6 +80,7 @@
 <div id="screen-squad">
   <div class="squad-header">
     <h2>👥 МОЙ ОТРЯД</h2>
+    <button onclick="goToShop()" class="btn-shop">🏪 МАГАЗИН</button>
     <button onclick="goToMap()" class="btn-back">← НА КАРТУ</button>
   </div>
 
@@ -90,11 +91,41 @@
         <!-- карточки юнитов -->
       </div>
     </div>
-    <div class="squad-shop-container">
-      <h3>📊 Магазин (скоро)</h3>
-      <p class="shop-disabled">Пока недоступен</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- ЭКРАН 3.5: МАГАЗИН -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div id="screen-shop" class="screen">
+  <div class="shop-header">
+    <h2>🏪 МАГАЗИН</h2>
+    <span id="shop-gold">💰 0</span>
+  </div>
+  
+  <div class="shop-unit-selector">
+    <label>Экипировать юнита:</label>
+    <select id="shop-unit-select" onchange="shopSelectUnit(this.value)">
+      <option value="">-- Выберите юнита --</option>
+    </select>
+  </div>
+  
+  <div class="shop-content">
+    <div class="shop-section">
+      <h3>⚔️ Оружие</h3>
+      <div id="shop-weapons" class="shop-items"></div>
+    </div>
+    <div class="shop-section">
+      <h3>🛡️ Броня</h3>
+      <div id="shop-armors" class="shop-items"></div>
+    </div>
+    <div class="shop-section">
+      <h3>👟 Обувь</h3>
+      <div id="shop-boots" class="shop-items"></div>
     </div>
   </div>
+  
+  <button onclick="goToSquad()" class="btn-back">← К ОТРЯДУ</button>
 </div>
 
 <!-- ═══════════════════════════════════════════════════ -->

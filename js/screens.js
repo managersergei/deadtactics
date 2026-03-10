@@ -7,6 +7,7 @@ const SCREENS = {
   INTRO: 'screen-intro',
   MAP: 'screen-map',
   SQUAD: 'screen-squad',
+  SHOP: 'screen-shop',
   UNIT_DETAIL: 'screen-unit-detail',
   LEVEL_START: 'screen-level-start',
   BATTLE: 'screen-battle'
@@ -74,4 +75,10 @@ function goToLevelStart(levelNum) {
 function goToIntro() {
   showScreen(SCREENS.INTRO);
   renderIntroScreen();
+}
+
+// Переход в магазин
+function goToShop() {
+  showScreen(SCREENS.SHOP);
+  renderShopScreen();
 }
