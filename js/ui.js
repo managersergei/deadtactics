@@ -417,12 +417,19 @@ function renderSquadScreen() {
     const card = document.createElement('div');
     card.className = 'squad-unit-card';
 
+    // Fallback значения для защиты от undefined
+    const name = unit.name || 'Выживший';
+    const emoji = unit.emoji || '🧍';
+    const hp = unit.hp ?? 0;
+    const maxHp = unit.maxHp ?? 5;
+    const battles = unit.personalStats?.battlesPlayed ?? 0;
+
     card.innerHTML = `
-      <div class="unit-emoji">${unit.emoji}</div>
-      <div class="unit-name">${unit.name}</div>
+      <div class="unit-emoji">${emoji}</div>
+      <div class="unit-name">${name}</div>
       <div class="unit-stats">
-        ❤ HP: ${unit.hp}/${unit.maxHp}<br>
-        ⚡ Боёв: ${unit.personalStats.battlesPlayed}
+        ❤ HP: ${hp}/${maxHp}<br>
+        ⚡ Боёв: ${battles}
       </div>
     `;
 
