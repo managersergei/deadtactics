@@ -82,12 +82,25 @@ function zombieMove(z, target) {
 function zombieAttack(z, target) {
   target.hp -= z.atkDmg;
   recordDamageTaken(z.atkDmg);
+  
+  // Проверить есть ли броня с защитой от яда
+  const armorId = target.equipment?.armor;
+  const armor = armorId ? ITEMS[armorId] : null;
+  const hasPoisonBlock = armor?.blockPoison === true;
+  
+  // Заражаем только если нет защиты от яда
   const wasPoison = target.poisoned;
-  target.poisoned = true;
+  if (!hasPoisonBlock) {
+    target.poisoned = true;
+  }
   playBite();
 
   if (!wasPoison) {
-    log(`🧟 Укус! ☠ Выживший заражён — яд будет жечь каждый ход`, 'poison');
+    if (hasPoisonBlock) {
+      log(`🧟 Укус! Выживший → ${target.hp}/${target.maxHp}HP (броня защитила от яда!)`, 'zombie-act');
+    } else {
+      log(`🧟 Укус! ☠ Выживший заражён — яд будет жечь каждый ход`, 'poison');
+    }
   } else {
     log(`🧟 Укус! Выживший → ${target.hp}/${target.maxHp}HP`, 'zombie-act');
   }
