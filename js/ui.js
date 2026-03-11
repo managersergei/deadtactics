@@ -23,74 +23,99 @@ function clearLog() {
 // ── САЙДБАР БОЯ ───────────────────────────────────────────
 
 function updateSidebar() {
-  const td = document.getElementById('turn-display');
-  const ps = document.getElementById('phase-sub');
   const ui = document.getElementById('unit-info');
   const btn = document.getElementById('btn-end-turn');
 
-  if (!td || !ps || !ui || !btn) return;
-
-  td.className = '';
+  if (!ui || !btn) return;
 
   if (phase === 'placement') {
-    _sidebarPlacement(td, ps, ui, btn);
+    _sidebarPlacement(ui, btn);
   } else if (phase === 'player') {
-    _sidebarPlayer(td, ps, ui, btn);
+    _sidebarUnit(ui, btn);
   } else if (phase === 'zombie') {
-    _sidebarZombie(td, ps, ui, btn);
+    _sidebarUnit(ui, btn);
   }
 }
 
-function _sidebarPlacement(td, ps, ui, btn) {
-  td.textContent = 'РАССТАНОВКА';
-  td.className = 'placement';
+function _sidebarPlacement(ui, btn) {
   const maxPlace = Math.min(gameData.player.leadership, gameData.squad.length);
-  ps.textContent = `Размести юнита ${placedCount + 1}/${maxPlace}`;
+  log('📍 Расстановка. Размести юнита ' + (placedCount + 1) + '/' + maxPlace, 'sys');
   btn.disabled = true;
   ui.innerHTML = '<span class="text-muted">Кликни зелёную клетку</span>';
 }
 
-function _sidebarPlayer(td, ps, ui, btn) {
-  td.textContent = `ХОД ${turnNum} — ВЫ`;
-  td.classList.add('player-turn');
-  ps.textContent = `Выжито ходов: ${turnsSurvived}`;
-  btn.disabled = false;
+function _sidebarUnit(ui, btn) {
+  // Кнопка в зависимости от фазы
+  if (phase === 'player') {
+    btn.disabled = false;
+  } else if (phase === 'zombie') {
+    btn.disabled = true;
+  }
 
   if (selected && selected.kind === 'player') {
     const u = selected;
-    const canMove = !u.moved;
-    const canAtk  = !u.attacked;
     const poisonBadge = u.poisoned ? ' <span class="text-poison">☠</span>' : '';
 
+    // Оружие
+    const w = ITEMS[u.weapon];
+    const weaponName = w ? w.name : 'Пистолет';
+    const weaponDesc = w ? w.desc : 'Надёжное оружие';
+    const weaponDmg = w ? w.baseDmg : 1;
+    const weaponRange = w && w.atkRange ? w.atkRange : u.atkRange;
+    
+    // Айтемы
+    let itemsHtml = '';
+    if (u.equipment) {
+      if (u.equipment.armor) {
+        const armor = ITEMS[u.equipment.armor];
+        itemsHtml += `<div class="stat-row"><span class="stat-label">Броня</span><span class="stat-val">${armor ? armor.name : '-'}</span></div>`;
+      }
+      if (u.equipment.boots) {
+        const boots = ITEMS[u.equipment.boots];
+        itemsHtml += `<div class="stat-row"><span class="stat-label">Обувь</span><span class="stat-val">${boots ? boots.name : '-'}</span></div>`;
+      }
+    }
+
+    // Тип юнита (из RECRUITS)
+    const unitTypeData = RECRUITS.survivor;
+    const typeDesc = unitTypeData && unitTypeData.description ? unitTypeData.description : 'Обычный выживший';
+    
     ui.innerHTML = `
-      <div class="name text-player">🧍 Выживший</div>
+      <div class="name text-player">🧍 ${u.name || 'Выживший'}</div>
+      <div class="stat-row" style="font-size: 9px; color: #4a7a44;">${typeDesc}</div>
       <div class="stat-row">
         <span class="stat-label">HP</span>
         <span class="stat-val">${u.hp}/${u.maxHp}${poisonBadge}</span>
       </div>
       <div class="stat-row">
-        <span class="stat-label">Движение</span>
-        <span class="stat-val">${canMove ? '✅' : '❌'}</span>
+        <span class="stat-label">Оружие</span>
+        <span class="stat-val">${weaponName} (${weaponDmg} урон, ${weaponRange} кл.)</span>
+      </div>
+      <div class="stat-row" style="font-size: 9px; color: #4a7a44;">${weaponDesc}</div>
+      ${itemsHtml}`;
+  } else if (selected && selected.kind === 'zombie') {
+    // Информация о зомби
+    const z = selected;
+    const zombieType = ZOMBIE_TYPES[z.type] || ZOMBIE_TYPES.zombie;
+    
+    ui.innerHTML = `
+      <div class="name text-zombie">🧟 Зомби</div>
+      <div class="stat-row">
+        <span class="stat-label">HP</span>
+        <span class="stat-val">${z.hp}/${z.maxHp}</span>
       </div>
       <div class="stat-row">
-        <span class="stat-label">Атака</span>
-        <span class="stat-val">${canAtk ? '✅' : '❌'}</span>
+        <span class="stat-label">Урон</span>
+        <span class="stat-val">${z.atkDmg}</span>
       </div>
-      <div class="unit-status text-muted">
-        ${u.moved ? 'Переместился' : u.attacked ? 'Атаковал' : 'Готов'}
-      </div>`;
+      ${zombieType.description ? `<div class="stat-row" style="font-size: 9px; color: #4a7a44;">${zombieType.description}</div>` : ''}
+      ${zombieType.atkProperties ? `<div class="stat-row" style="font-size: 9px; color: var(--purple);">${zombieType.atkProperties}</div>` : ''}
+      <div class="unit-status text-muted">Враг</div>`;
   } else {
     ui.innerHTML = '<span class="text-muted">Кликни своего юнита</span>';
   }
 }
 
-function _sidebarZombie(td, ps, ui, btn) {
-  td.textContent = 'ХОД ВРАГА';
-  td.classList.add('zombie-turn');
-  ps.textContent = `Выжито ходов: ${turnsSurvived}`;
-  btn.disabled = true;
-  ui.innerHTML = '<span class="text-zombie">🧟 Враг атакует...</span>';
-}
 
 // ── ОВЕРЛЕЙ В КОНЦЕ БОЯ ───────────────────────────────────
 
