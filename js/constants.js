@@ -51,3 +51,13 @@ const MAP_ZOMBIE_BACKGROUND = [
   {x: 650, y: 350},
   {x: 200, y: 200},
 ];
+
+// Экспорт в глобальную область видимости для браузера
+if (typeof window !== 'undefined') {
+  window.SVG_W = SVG_W;
+  window.SVG_H = SVG_H;
+  window.MAP_POSITIONS = MAP_POSITIONS;
+  window.MAP_COLORS = MAP_COLORS;
+  window.MAP_MARKER = MAP_MARKER;
+  window.MAP_ZOMBIE_BACKGROUND = MAP_ZOMBIE_BACKGROUND;
+}

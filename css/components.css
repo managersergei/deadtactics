@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════════════
-   COMPONENTS — Карточки, карта мира, маркеры, анимации
+   COMPONENTS — Карточки, карта мира, маркеры, анимации, оверлеи
    ════════════════════════════════════════════════════════ */
 
 /* ── КАРТОЧКИ УРОВНЕЙ ── */
@@ -259,4 +259,283 @@
     border-color: #2a7a4a;
     background: #0a2a18;
   }
+}
+
+/* ════════════════════════════════════════════════════════
+   OVERLAYS — Оверлеи (конец боя, найм, детали)
+   ════════════════════════════════════════════════════════ */
+
+/* ── ОБЩИЙ ОВЕРЛЕЙ ── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay-box {
+  background: var(--panel);
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  max-width: 500px;
+  width: 90%;
+}
+
+/* ── ОВЕРЛЕЙ КОНЦА БОЯ ── */
+.overlay-end {
+  border: 3px solid var(--green);
+}
+
+.overlay-end.defeat {
+  border-color: var(--red);
+}
+
+.overlay-end-title {
+  font-size: 48px;
+  margin-bottom: 0.5rem;
+}
+
+.overlay-end.win .overlay-end-title {
+  color: var(--green);
+}
+
+.overlay-end.lose .overlay-end-title {
+  color: var(--red);
+}
+
+.overlay-end-status {
+  letter-spacing: 2px;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.overlay-end.win .overlay-end-status {
+  color: #3a7a34;
+}
+
+.overlay-end.lose .overlay-end-status {
+  color: #7a2a24;
+}
+
+.overlay-end-stats {
+  background: rgba(100,100,100,0.2);
+  padding: 1rem;
+  border-radius: 4px;
+  margin: 1rem 0;
+  text-align: left;
+}
+
+.overlay-end-stat {
+  margin: 0.5rem 0;
+  color: var(--text);
+}
+
+.overlay-end-stat span {
+  color: var(--green);
+}
+
+.overlay-end-reward {
+  margin: 0.5rem 0;
+  color: var(--green);
+  font-weight: bold;
+}
+
+.overlay-end-quote {
+  margin-top: 1rem;
+  font-size: 12px;
+}
+
+.overlay-end.win .overlay-end-quote {
+  color: #2ecc71;
+}
+
+.overlay-end.lose .overlay-end-quote {
+  color: var(--red);
+}
+
+.overlay-end-btn {
+  margin-top: 1.5rem;
+  padding: 10px 20px;
+  background: var(--green);
+  color: var(--bg);
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.overlay-end-btn:hover {
+  opacity: 0.9;
+}
+
+/* ── ОВЕРЛЕЙ НАЙМА ── */
+.recruit-overlay {
+  border: 2px solid var(--green);
+}
+
+.recruit-title {
+  color: var(--green);
+  margin-bottom: 1rem;
+}
+
+.recruit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.recruit-option {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.recruit-option:hover {
+  border-color: var(--green);
+}
+
+.recruit-emoji {
+  font-size: 48px;
+}
+
+.recruit-name {
+  color: var(--green);
+  font-weight: bold;
+  margin: 0.5rem 0;
+}
+
+.recruit-price {
+  color: var(--yellow);
+  font-weight: bold;
+}
+
+.recruit-stats {
+  color: var(--text);
+  font-size: 11px;
+  margin-top: 0.5rem;
+}
+
+.recruit-cancel {
+  padding: 10px 20px;
+  background: var(--border);
+  color: var(--text);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* ════════════════════════════════════════════════════════
+   ДЕТАЛИ ЮНИТА — Экран детальной информации
+   ════════════════════════════════════════════════════════ */
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.detail-avatar {
+  text-align: center;
+}
+
+.detail-emoji {
+  font-size: 100px;
+}
+
+.detail-name {
+  color: var(--green);
+  font-weight: bold;
+  margin-top: 1rem;
+  font-size: 18px;
+}
+
+.detail-level {
+  color: var(--text);
+  font-size: 12px;
+  margin-top: 0.25rem;
+}
+
+.detail-stats {
+  border-left: 1px solid var(--border);
+  padding-left: 1rem;
+}
+
+.detail-section-title {
+  color: var(--yellow);
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.detail-stat {
+  margin: 0.5rem 0;
+  color: var(--text);
+}
+
+.detail-stat-label {
+  color: var(--green);
+}
+
+.detail-equipment {
+  border-top: 1px solid var(--border);
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.detail-stats-section {
+  border-top: 1px solid var(--border);
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+/* ── КНОПКА ЗАКРЫТИЯ ── */
+.btn-close {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.btn-close:hover {
+  color: var(--red);
+}
+
+/* ── КНОПКИ ЭКРАНОВ ── */
+.btn-recruit, .btn-shop {
+  background: var(--green);
+  color: var(--bg);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-recruit:hover, .btn-shop:hover {
+  opacity: 0.9;
+}
+
+.btn-back {
+  background: var(--border);
+  color: var(--text);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-back:hover {
+  background: var(--text);
+  color: var(--bg);
 }

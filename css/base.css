@@ -2,6 +2,23 @@
    BASE — Сброс, тело, заголовок, базовый лейаут
    ════════════════════════════════════════════════════════ */
 
+/* ── CSS ПЕРЕМЕННЫЕ (должны быть первыми!) ── */
+:root {
+  --green: #39ff14;
+  --green-dim: #1a7a08;
+  --green-dark: #0a3004;
+  --red: #ff2222;
+  --red-dim: #7a0808;
+  --yellow: #ffcc00;
+  --purple: #cc44ff;
+  --bg: #050a04;
+  --panel: #080f07;
+  --border: #1f4d14;
+  --text: #a8d4a0;
+  --cell-empty: #0a150a;
+  --cell-hover: #0f2510;
+}
+
 /* ── СБРОС ── */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 

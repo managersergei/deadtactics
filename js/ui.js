@@ -96,10 +96,7 @@ function _sidebarZombie(td, ps, ui, btn) {
 
 function showEndOverlay(win) {
   const overlay = document.createElement('div');
-  overlay.style.cssText = `
-    position: fixed; inset: 0; background: rgba(0,0,0,0.9); 
-    z-index: 2000; display: flex; align-items: center; justify-content: center;
-  `;
+  overlay.className = 'overlay';
 
   const zAlive = aliveZombies().length;
   const playerLosses = units.filter(u => !u.alive && u.kind === 'player').length;
@@ -117,28 +114,30 @@ function showEndOverlay(win) {
     });
   }
 
+  const winClass = win ? 'win' : 'lose';
+  
   overlay.innerHTML = `
-    <div style="background: var(--panel); border: 3px solid ${win ? 'var(--green)' : 'var(--red)'}; padding: 2rem; border-radius: 8px; text-align: center; max-width: 500px;">
-      <div style="font-size: 48px; color: ${win ? 'var(--green)' : 'var(--red)'}; margin-bottom: 0.5rem;">
+    <div class="overlay-box overlay-end ${winClass}">
+      <div class="overlay-end-title">
         ${win ? '🎉 ПОБЕДА' : '💀 ПОРАЖЕНИЕ'}
       </div>
-      <p style="color:${win ? '#3a7a34' : '#7a2a24'};letter-spacing:2px;font-size:13px;margin-bottom:12px">
+      <p class="overlay-end-status">
         ${win ? '✔ ВСЕ ЗОМБИ УНИЧТОЖЕНЫ' : '✘ ВЫЖИВШИЕ ПАЛИ'}
       </p>
 
-      <div style="background: rgba(100,100,100,0.2); padding: 1rem; border-radius: 4px; margin: 1rem 0; text-align: left;">
-        <div style="margin: 0.5rem 0; color: var(--text);">Ход: <span style="color: var(--green);">${turnNum}</span></div>
-        <div style="margin: 0.5rem 0; color: var(--text);">Выжито ходов: <span style="color: var(--green);">${turnsSurvived}</span></div>
-        <div style="margin: 0.5rem 0; color: var(--text);">Зомби осталось: <span style="color: var(--green);">${zAlive}</span></div>
-        <div style="margin: 0.5rem 0; color: var(--text);">Потери: <span style="color: var(--green);">${playerLosses} / ${gameData.squad.length}</span></div>
-        <div style="margin: 0.5rem 0; color: var(--text);">Убито: <span style="color: var(--green);">${stats.zombiesKilled}</span></div>
-        <div style="margin: 0.5rem 0; color: var(--text);">Урон нанесён: <span style="color: var(--green);">${stats.damageDealt}</span></div>
-        ${win && levelReward > 0 ? `<div style="margin: 0.5rem 0; color: var(--green); font-weight: bold;">+${levelReward} монет!</div>` : ''}
+      <div class="overlay-end-stats">
+        <div class="overlay-end-stat">Ход: <span>${turnNum}</span></div>
+        <div class="overlay-end-stat">Выжито ходов: <span>${turnsSurvived}</span></div>
+        <div class="overlay-end-stat">Зомби осталось: <span>${zAlive}</span></div>
+        <div class="overlay-end-stat">Потери: <span>${playerLosses} / ${gameData.squad.length}</span></div>
+        <div class="overlay-end-stat">Убито: <span>${stats.zombiesKilled}</span></div>
+        <div class="overlay-end-stat">Урон нанесён: <span>${stats.damageDealt}</span></div>
+        ${win && levelReward > 0 ? `<div class="overlay-end-reward">+${levelReward} монет!</div>` : ''}
       </div>
 
-      <p style="color:${win ? '#2ecc71' : 'var(--red)'};margin-top:1rem;font-size:12px">${quote}</p>
+      <p class="overlay-end-quote">${quote}</p>
 
-      <button onclick="this.parentElement.parentElement.remove(); goToMap();" style="margin-top: 1.5rem; padding: 10px 20px; background: var(--green); color: var(--bg); border: none; font-weight: bold; cursor: pointer; border-radius: 4px;">← НА КАРТУ</button>
+      <button class="overlay-end-btn" onclick="this.parentElement.parentElement.remove(); goToMap();">← НА КАРТУ</button>
     </div>
   `;
 
@@ -154,38 +153,25 @@ function showRecruitModal() {
   }
 
   const overlay = document.createElement('div');
+  overlay.className = 'overlay';
   overlay.id = 'recruit-modal';
-  overlay.style.cssText = `
-    position: fixed; inset: 0; background: rgba(0,0,0,0.9);
-    z-index: 2000; display: flex; align-items: center; justify-content: center;
-  `;
 
   const recruitsHtml = Object.entries(RECRUITS).map(([id, r]) => `
-    <div class="recruit-option" onclick="recruitFromUI('${id}')" style="
-      background: var(--panel);
-      border: 2px solid var(--border);
-      border-radius: 8px;
-      padding: 1rem;
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.2s;
-    " onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
-      <div style="font-size: 48px;">${r.emoji}</div>
-      <div style="color: var(--green); font-weight: bold; margin: 0.5rem 0;">${r.name}</div>
-      <div style="color: var(--yellow); font-weight: bold;">💰 ${r.price}</div>
-      <div style="color: var(--text); font-size: 11px; margin-top: 0.5rem;">
-        HP:${r.hp} MOV:${r.moveRange} ATK:${r.atkRange}
-      </div>
+    <div class="recruit-option" onclick="recruitFromUI('${id}')">
+      <div class="recruit-emoji">${r.emoji}</div>
+      <div class="recruit-name">${r.name}</div>
+      <div class="recruit-price">💰 ${r.price}</div>
+      <div class="recruit-stats">HP:${r.hp} MOV:${r.moveRange} ATK:${r.atkRange}</div>
     </div>
   `).join('');
 
   overlay.innerHTML = `
-    <div style="background: var(--panel); border: 2px solid var(--green); padding: 2rem; border-radius: 8px; text-align: center; max-width: 500px; width: 90%;">
-      <h2 style="color: var(--green); margin-bottom: 1rem;">👥 НАНЯТЬ В ОТРЯД</h2>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+    <div class="overlay-box recruit-overlay">
+      <h2 class="recruit-title">👥 НАНЯТЬ В ОТРЯД</h2>
+      <div class="recruit-grid">
         ${recruitsHtml}
       </div>
-      <button onclick="document.getElementById('recruit-modal').remove()" style="padding: 10px 20px; background: var(--border); color: var(--text); border: none; border-radius: 4px; cursor: pointer;">ОТМЕНА</button>
+      <button class="recruit-cancel" onclick="document.getElementById('recruit-modal').remove()">ОТМЕНА</button>
     </div>
   `;
 

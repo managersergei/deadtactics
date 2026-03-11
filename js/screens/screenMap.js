@@ -25,8 +25,14 @@ function renderMapScreen() {
     }
   }
 
-  // Используем константы из constants.js
-  const { SVG_W, SVG_H, MAP_POSITIONS, MAP_COLORS, MAP_MARKER, MAP_ZOMBIE_BACKGROUND } = constants;
+  // Используем глобальные константы из constants.js
+  // (они экспортируются в window через constants.js)
+  const SVG_W = window.SVG_W;
+  const SVG_H = window.SVG_H;
+  const MAP_POSITIONS = window.MAP_POSITIONS;
+  const MAP_COLORS = window.MAP_COLORS;
+  const MAP_MARKER = window.MAP_MARKER;
+  const MAP_ZOMBIE_BACKGROUND = window.MAP_ZOMBIE_BACKGROUND;
 
   // SVG
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
