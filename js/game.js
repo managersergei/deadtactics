@@ -61,8 +61,9 @@ function spawnZombiesForLevel(levelNum) {
 
 function handlePlayer(c, r) {
   const clicked = unitAt(c, r);
+  const key = `${c},${r}`;
 
-  // Выбрать своего юнита
+  // 1. Клик на своего юнита → выбрать
   if (clicked && clicked.kind === 'player') {
     // Отмена выбора при повторном клике на того же юнита
     if (selected && clicked.id === selected.id) {
@@ -78,25 +79,41 @@ function handlePlayer(c, r) {
     return;
   }
 
-  if (!selected) return;
+  // 2. Если игрок ВЫБРАН - проверяем атаку и движение
+  if (selected && selected.kind === 'player') {
+    // Атаковать врага (в зоне поражения)
+    if (highlights.attack.has(key) && clicked && clicked.kind === 'zombie') {
+      doAttack(selected, clicked);
+      return;
+    }
 
-  const key = `${c},${r}`;
+    // Переместиться (в зоне движения)
+    if (highlights.move.has(key)) {
+      doMove(selected, c, r);
+      return;
+    }
 
-  // Переместиться
-  if (highlights.move.has(key)) {
-    doMove(selected, c, r);
+    // Клик на зомби НЕ в зоне → показать инфу о зомби
+    if (clicked && clicked.kind === 'zombie') {
+      selected = clicked;
+      render();
+      return;
+    }
+
+    // Клик на пустую клетку → снять выбор
+    selected = null;
+    clearHL();
+    render();
     return;
   }
 
-  // Атаковать врага
-  if (highlights.attack.has(key) && clicked && clicked.kind === 'zombie') {
-    doAttack(selected, clicked);
+  // 3. Если игрок НЕ выбран - клик на зомби для инфы
+  if (clicked && clicked.kind === 'zombie') {
+    selected = clicked;
+    render();
     return;
   }
-
-  // Клик на пустое место — снять выделение
-  selected = null;
-  clearHL();
+  
   render();
 }
 
