@@ -237,20 +237,6 @@
   justify-content: center;
 }
 
-/* ── ЭКРАН БОЯ ── */
-#screen-battle {
-  display: none;
-  width: 100%;
-  padding: 16px;
-  box-sizing: border-box;
-  /* Боевая карта "road" - рамка */
-  background-image: url('../assets/battlefield/road/fight_map_frame.png');
-  background-size: 994px 852px;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-color: #0a0f0a;
-}
-
 .legend-move {
   color: #1a4d8a;
 }
@@ -378,43 +364,49 @@
   display: none;
   width: 100%;
   min-height: 852px;
+  background-color: #0a0f0a;
   box-sizing: border-box;
-  /* Боевая карта "road" - рамка */
+}
+
+#screen-battle #game-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+  width: 100%;
+  padding-top: 16px;
+}
+
+/* Frame — ровно 994×852, padding центрирует грид внутри */
+#screen-battle #grid-wrap {
+  width: 994px;
+  height: 852px;
+  flex-shrink: 0;
   background-image: url('../assets/battlefield/road/fight_map_frame.png');
   background-size: 994px 852px;
-  background-position: center;
   background-repeat: no-repeat;
-  background-color: #0a0f0a;
-  position: relative;
+  /* Центрировать grid через padding: (994-710)/2=142, (852-568)/2=142 */
+  padding: 142px 142px;
+  box-sizing: border-box;
 }
 
-/* Контейнер игры внутри экрана боя */
-#screen-battle #game-container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  gap: 20px;
-}
-
-/* Обёртка грида с фоном сетки */
-#screen-battle #grid-wrap {
-  /* Фон сетки 710x568 */
-  background-image: url('../assets/battlefield/road/fight_map_grid.png');
-  background-size: 710px 568px;
-  background-position: center;
-  background-repeat: no-repeat;
-  width: 710px;
-  height: 568px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Грид поверх фона */
+/* Грид — 710×568, точно в центре фрейма */
 #screen-battle #grid {
   width: 710px;
   height: 568px;
+  flex-shrink: 0;
+  background-image: url('../assets/battlefield/road/fight_map_grid.png');
+  background-size: 710px 568px;
+  background-repeat: no-repeat;
+}
+
+/* Сайдбар — слева от фрейма */
+#screen-battle #side-panel {
+  width: 240px;
+  flex-shrink: 0;
+  margin-top: 16px;
+  margin-right: 24px;
 }
 
 .btn-start:hover {

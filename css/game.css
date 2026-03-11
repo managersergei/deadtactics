@@ -3,33 +3,28 @@
    ════════════════════════════════════════════════════════ */
 
 /* ── ГРИД ── */
-#grid-wrap { 
-  flex-shrink: 0;
-}
-
 #grid {
   display: grid;
   grid-template-columns: repeat(10, 71px);
   grid-template-rows: repeat(8, 71px);
   gap: 0;
   background: transparent;
-  border: 2px solid var(--border);
-  box-shadow: 0 0 30px rgba(57,255,20,0.08), inset 0 0 30px rgba(0,0,0,0.5);
-  padding: 2px;
 }
 
 /* ── КЛЕТКИ ── */
 .cell {
   width: 71px; height: 71px;
-  background: var(--cell-empty);
-  border: 1px solid #0f240d;
+  background: transparent;
+  border: none;
   cursor: pointer;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.12s, border-color 0.12s;
+  transition: background 0.12s, box-shadow 0.12s;
   user-select: none;
+  /* Тонкая рамка на все клетки - грид виден */
+  box-shadow: inset 0 0 0 1px rgba(57, 255, 20, 0.1);
 }
 
 .cell::after {
@@ -39,31 +34,42 @@
   pointer-events: none;
 }
 
-.cell:hover { background: var(--cell-hover); }
+.cell:hover { 
+  /* Прозрачный оверлей - показывает фон под клеткой */
+  background: rgba(57, 255, 20, 0.08) !important;
+}
 
 .cell.placement-zone {
-  background: #061a10;
-  border-color: #1a4d2a;
-  animation: pulse-green 2s infinite;
+  /* Яркая рамка и легкая заливка для зоны расстановки */
+  background: rgba(57, 255, 20, 0.12) !important;
+  box-shadow: inset 0 0 0 2px rgba(57, 255, 20, 0.5);
+}
+
+.cell.placement-zone:hover {
+  /* При наведении - еще ярче */
+  background: rgba(57, 255, 20, 0.2) !important;
+  box-shadow: inset 0 0 0 2px rgba(57, 255, 20, 0.8);
 }
 
 .cell.move-range {
-  background: #061529;
-  border-color: #1a5a9c;
+  background: rgba(6, 21, 41, 0.3);
   cursor: pointer;
 }
 
-.cell.move-range:hover { background: #0a2040; border-color: #4a9ae4; }
+.cell.move-range:hover { 
+  background: rgba(10, 32, 64, 0.4);
+}
 
 .cell.attack-range {
-  background: #1a0505;
-  border-color: #7a1a1a;
+  background: rgba(26, 5, 5, 0.3);
   cursor: crosshair;
 }
 
-.cell.attack-range:hover { background: #2a0808; border-color: var(--red); }
+.cell.attack-range:hover { 
+  background: rgba(42, 8, 8, 0.4);
+}
 
-.cell.selected-unit { border-color: var(--yellow) !important; }
+.cell.selected-unit { box-shadow: inset 0 0 0 2px var(--yellow); }
 
 /* ── ЮНИТЫ ── */
 .unit {
