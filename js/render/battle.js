@@ -84,11 +84,24 @@ function _buildUnitEl(u) {
   const tooltip = document.createElement('div');
   tooltip.className = 'unit-tooltip';
   
-  let tooltipHTML = `<span class="tooltip-name">${u.emoji} ${u.kind === 'player' ? 'Выживший' : 'Зомби'}</span><span class="tooltip-hp">HP: ${u.hp}/${u.maxHp}</span>`;
+  // Определяем имя и тип
+  let unitType = u.kind === 'player' ? 'Выживший' : 'Зомби';
+  let unitName = u.kind === 'player' ? (u.name || 'Выживший') : 'Зомби';
+  let tooltipHTML = `<span class="tooltip-name">${u.emoji} ${unitName}</span>`;
+  tooltipHTML += `<span class="tooltip-type">${unitType}</span>`;
+  tooltipHTML += `<span class="tooltip-hp">HP: ${u.hp}/${u.maxHp}</span>`;
   
   if (u.kind === 'player') {
-    const w = WEAPONS[u.weapon];
-    tooltipHTML += `<span class="tooltip-atk">Атака: дальность ${u.atkRange}, урон ${w.baseDmg}-${w.critDmg} (крит ${Math.round(w.critChance * 100)}%)</span>`;
+    // Статус движения и атаки (только вторая часть)
+    const moveStatus = u.moved ? 'Сходил' : 'Может идти';
+    const atkStatus = u.attacked ? 'Атаковал' : 'Может атаковать';
+    tooltipHTML += `<span class="tooltip-move">Движение: ${moveStatus}</span>`;
+    tooltipHTML += `<span class="tooltip-atk">Атака: ${atkStatus}</span>`;
+    
+    // Эффекты (яд)
+    if (u.poisoned) {
+      tooltipHTML += `<span class="tooltip-effect">☠ Отравлен</span>`;
+    }
   }
   
   tooltip.innerHTML = tooltipHTML;

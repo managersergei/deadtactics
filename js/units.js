@@ -13,6 +13,7 @@ function mkPlayer(x, y, squadUnit) {
   
   return {
     id: uid(),
+    name: squadUnit?.name || 'Выживший',
     kind: 'player',
     emoji: squadUnit?.emoji || PLAYER_STATS.emoji,
     x, y,

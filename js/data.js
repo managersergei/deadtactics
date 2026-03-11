@@ -42,7 +42,10 @@ function updateLeadership() {
 
 // Инициализировать новую игру
 function initializeNewGame() {
-  gameData.player.name = PLAYER_NAMES[Math.floor(Math.random() * PLAYER_NAMES.length)];
+  // Не перезаписывать имя если игрок уже ввёл его в интро
+  if (!gameData.player.name) {
+    gameData.player.name = PLAYER_NAMES[Math.floor(Math.random() * PLAYER_NAMES.length)];
+  }
   gameData.player.gold = 1000;
   
   // Создать первого юнита для отряда (лидер отряда)
