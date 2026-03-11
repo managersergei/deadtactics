@@ -25,7 +25,7 @@ const ZOMBIE_SPAWN_POSITIONS = [[7, 0], [7, 3], [6, 5]];
 const PLAYER_STATS = {
   hp: 5,
   maxHp: 5,
-  moveRange: 5,
+  moveRange : 4,
   atkRange: 4,
   emoji: '🧍',
 };
@@ -51,24 +51,43 @@ const ITEM_TYPES = {
 
 const ITEMS = {
   // ОРУЖИЕ
-  pistol:  { id: 'pistol',  name: 'Пистолет',  type: 'weapon', price: 0,   baseDmg: 1, critDmg: 2, critChance: 0.10, shots: 1, desc: 'Базовая зброя выжившего' },
-  uzi:     { id: 'uzi',     name: 'Узи',       type: 'weapon', price: 80,  baseDmg: 1, critDmg: 3, critChance: 0.10, midDmg: 2, midChance: 0.40, shots: 1, desc: 'Автоматический огонь' },
-  rifle:   { id: 'rifle',   name: 'Автомат',   type: 'weapon', price: 120, baseDmg: 2, critDmg: 3, critChance: 0.30, shots: 2, desc: 'Два выстрела за ход' },
-  rocket:  { id: 'rocket',  name: 'Ракетница', type: 'weapon', price: 200, baseDmg: 3, critDmg: 5, critChance: 0.20, splashRange: 1, shots: 1, desc: 'Урон по площади' },
+  pistol:  { id: 'pistol',  name: 'Пистолет',  type: 'weapon', price: 0,   baseDmg: 1, critDmg: 2, critChance: 0.10, shots: 1, isRanged: true,  atkRange: 4, desc: 'Базовая зброя выжившего' },
+  uzi:     { id: 'uzi',     name: 'Узи',       type: 'weapon', price: 80,  baseDmg: 1, critDmg: 3, critChance: 0.10, midDmg: 2, midChance: 0.40, shots: 1, isRanged: true,  atkRange: 4, desc: 'Автоматический огонь' },
+  rifle:   { id: 'rifle',   name: 'Автомат',   type: 'weapon', price: 120, baseDmg: 2, critDmg: 3, critChance: 0.30, shots: 2, isRanged: true,  atkRange: 5, desc: 'Два выстрела за ход' },
+  rocket:  { id: 'rocket',  name: 'Ракетница', type: 'weapon', price: 200, baseDmg: 3, critDmg: 5, critChance: 0.20, splashRange: 1, shots: 1, isRanged: true,  atkRange: 3, desc: 'Урон по площади' },
   
   // БРОНЯ
-  vest:    { id: 'vest',    name: 'Броник',    type: 'armor',  price: 60,  extraHp: 2, blockPoison: true, desc: 'Защита +2 HP, блокирует яд 2 хода' },
+  vest:    { id: 'vest',    name: 'Броник',    type: 'armor',  price: 60,  extraHp: 2, blockPoison: true, isRanged: false, desc: 'Защита +2 HP, блокирует яд 2 хода' },
   
   // ОБУВЬ
-  shoes:   { id: 'shoes',   name: 'Кроссовки', type: 'boots',  price: 40,  moveBonus: 1, desc: '+1 клетка движения' },
+  shoes:   { id: 'shoes',   name: 'Кроссовки', type: 'boots',  price: 40,  moveBonus: 1, isRanged: false, desc: '+1 клетка движения' },
 };
 
 // РЕКРУТЫ
 const RECRUITS = {
-  survivor: { id: 'survivor', name: 'Выживший', price: 150, emoji: '🧍', hp: 5, maxHp: 5, moveRange: 5, atkRange: 4 },
+  survivor: { 
+    id: 'survivor', 
+    name: 'Выживший', 
+    type: 'survivor',
+    description: 'Обычный выживший. Не имеет особых навыков, но может использовать любое оружие.',
+    price: 150, 
+    emoji: '🧍', 
+    hp: 5, maxHp: 5, moveRange: 4, atkRange: 4 
+  },
 };
 
-// Параметры зомби
+// ТИПЫ ЗОМБИ
+const ZOMBIE_TYPES = {
+  zombie: {
+    id: 'zombie',
+    name: 'Зомби',
+    type: 'zombie',
+    description: 'Безмозглое существо, не знающее боли и страха. Наносит укус и заражает ядом.',
+    atkProperties: 'Отравление: -1 HP каждый ход до конца игры',
+  }
+};
+
+// Параметры зомби (используем дефолтный тип)
 const ZOMBIE_STATS = {
   hp: 3,
   maxHp: 3,
@@ -77,6 +96,7 @@ const ZOMBIE_STATS = {
   atkDmg: 1,
   poisonDmg: 1,   // урон яда в начале каждого хода игрока
   emoji: '🧟',
+  type: 'zombie',  // ссылка на тип зомби
 };
 
 // Задержка между действиями зомби в мс (анимационная пауза)
@@ -196,6 +216,7 @@ if (typeof window !== 'undefined') {
   window.ZOMBIE_SPAWN_POSITIONS = ZOMBIE_SPAWN_POSITIONS;
   window.PLAYER_STATS = PLAYER_STATS;
   window.WEAPONS = WEAPONS;
+  window.ZOMBIE_TYPES = ZOMBIE_TYPES;
   window.ZOMBIE_STATS = ZOMBIE_STATS;
   window.ZOMBIE_ACTION_DELAY = ZOMBIE_ACTION_DELAY;
   window.ZOMBIE_TURN_END_DELAY = ZOMBIE_TURN_END_DELAY;
