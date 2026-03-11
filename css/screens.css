@@ -372,19 +372,49 @@
 }
 
 /* ════════════════════════════════════════════════════════
-   ОБЩИЕ КНОПКИ — используются на разных экранах
+   ЭКРАН БОЯ — фоновая карта
    ════════════════════════════════════════════════════════ */
+#screen-battle {
+  display: none;
+  width: 100%;
+  min-height: 852px;
+  box-sizing: border-box;
+  /* Боевая карта "road" - рамка */
+  background-image: url('../assets/battlefield/road/fight_map_frame.png');
+  background-size: 994px 852px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #0a0f0a;
+  position: relative;
+}
 
-/* Кнопка старта игры */
-.btn-start {
-  padding: 1rem 3rem;
-  font-size: 18px;
-  background: var(--green);
-  color: var(--bg);
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
+/* Контейнер игры внутри экрана боя */
+#screen-battle #game-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  gap: 20px;
+}
+
+/* Обёртка грида с фоном сетки */
+#screen-battle #grid-wrap {
+  /* Фон сетки 710x568 */
+  background-image: url('../assets/battlefield/road/fight_map_grid.png');
+  background-size: 710px 568px;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 710px;
+  height: 568px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Грид поверх фона */
+#screen-battle #grid {
+  width: 710px;
+  height: 568px;
 }
 
 .btn-start:hover {
