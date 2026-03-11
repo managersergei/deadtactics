@@ -3,14 +3,23 @@
    ════════════════════════════════════════════════════════ */
 
 /* ── ГРИД ── */
-#grid-wrap { flex-shrink: 0; }
+#grid-wrap { 
+  flex-shrink: 0;
+  /* Боевая карта "road" - сетка */
+  background-image: url('../assets/battlefield/road/fight_map_grid.png');
+  background-size: 710px 568px;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 142px 142px; /* Центрируем 710x568 в frame 994x852 */
+}
 
 #grid {
   display: grid;
-  grid-template-columns: repeat(10, 68px);
-  grid-template-rows: repeat(8, 68px);
-  gap: 2px;
-  background: #0a1f08;
+  grid-template-columns: repeat(10, 71px);
+  grid-template-rows: repeat(8, 71px);
+  gap: 0;
+  /* Убираем старый фон - теперь он на grid-wrap */
+  background: transparent;
   border: 2px solid var(--border);
   box-shadow: 0 0 30px rgba(57,255,20,0.08), inset 0 0 30px rgba(0,0,0,0.5);
   padding: 2px;
@@ -18,7 +27,7 @@
 
 /* ── КЛЕТКИ ── */
 .cell {
-  width: 68px; height: 68px;
+  width: 71px; height: 71px;
   background: var(--cell-empty);
   border: 1px solid #0f240d;
   cursor: pointer;

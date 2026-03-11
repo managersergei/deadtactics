@@ -13,8 +13,8 @@ function buildGrid() {
   const g = document.getElementById('grid');
   g.innerHTML = '';
   // гарантируем, что CSS‑грид соответствует текущим константам
-  g.style.gridTemplateColumns = `repeat(${COLS}, 68px)`;
-  g.style.gridTemplateRows = `repeat(${ROWS}, 68px)`;
+  g.style.gridTemplateColumns = `repeat(${COLS}, 71px)`;
+  g.style.gridTemplateRows = `repeat(${ROWS}, 71px)`;
 
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {

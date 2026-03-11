@@ -243,6 +243,12 @@
   width: 100%;
   padding: 16px;
   box-sizing: border-box;
+  /* Боевая карта "road" - рамка */
+  background-image: url('../assets/battlefield/road/fight_map_frame.png');
+  background-size: 994px 852px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #0a0f0a;
 }
 
 .legend-move {
