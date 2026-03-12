@@ -76,7 +76,7 @@
 .unit {
   width: 100px;
   height: 100px;
-  position: absolute;
+  position: relative; /* Для позиционирования status-icon */
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
