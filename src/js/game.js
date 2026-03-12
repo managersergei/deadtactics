@@ -348,6 +348,9 @@ function startPlayerTurn() {
 
     if (checkEnd()) return;
 
+    // Пауза анимации на время poison анимации
+    animationPaused = true;
+    
     // Включаем анимацию poisonFlash
     poisonedUnits.forEach(u => {
       if (u.alive) {
@@ -364,6 +367,7 @@ function startPlayerTurn() {
           u.poisonFlash = false;
         }
       });
+      animationPaused = false;
       state.setPhase('player');
       log(`════ Ход ${state.getTurnNum()} · Ваши действия ════`, 'sys');
       render();
