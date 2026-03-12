@@ -362,15 +362,19 @@ function startPlayerTurn() {
 
     // Через 300ms выключаем анимацию (2 кадра × 150ms)
     setTimeout(() => {
+      // Сначала сбрасываем флаг, ПОТОМ render()
       poisonedUnits.forEach(u => {
         if (u.alive) {
           u.poisonFlash = false;
         }
       });
+      
+      // Полный render() - пересоздаст все элементы с правильными спрайтами
       animationPaused = false;
+      render();
+      
       state.setPhase('player');
       log(`════ Ход ${state.getTurnNum()} · Ваши действия ════`, 'sys');
-      render();
     }, 300);
   } else {
     // Нет отравленных - сразу продолжаем
