@@ -59,14 +59,15 @@ function _sidebarUnit(ui, btn) {
   }
 
   const selected = state.getSelected();
-  if (selected && selected.kind === 'player') {
+  if (selected && selected.kind === 'survivor') {
     const u = selected;
     const poisonBadge = u.poisoned ? ' <span class="text-poison">☠</span>' : '';
 
-    // Оружие
-    const w = ITEMS[u.weapon];
+    // Оружие - берём из equipment
+    const weaponId = u.equipment?.weapon || 'pistol';
+    const w = ITEMS[weaponId];
     const weaponName = w ? w.name : 'Пистолет';
-    const weaponDesc = w ? w.desc : 'Надёжное оружие';
+    const weaponDesc = w ? w.desc : 'Надёжное оружие ближнего боя. 10% крит';
     const weaponDmg = w ? w.baseDmg : 1;
     const weaponRange = w && w.atkRange ? w.atkRange : u.atkRange;
     
@@ -131,7 +132,7 @@ function showEndOverlay(win) {
   overlay.className = 'overlay';
 
   const zAlive = aliveZombies().length;
-  const playerLosses = state.getUnits().filter(u => !u.alive && u.kind === 'player').length;
+  const playerLosses = state.getUnits().filter(u => !u.alive && u.kind === 'survivor').length;
   const quote = win
     ? '«They mostly come at night... mostly.» — Aliens'
     : '«It\'s not the end of the world... oh wait, it is.»';

@@ -51,7 +51,7 @@ const ITEM_TYPES = {
 
 const ITEMS = {
   // ОРУЖИЕ
-  pistol:  { id: 'pistol',  name: 'Пистолет',  type: 'weapon', price: 0,   baseDmg: 1, critDmg: 2, critChance: 0.10, shots: 1, isRanged: true,  atkRange: 4, desc: 'Базовая зброя выжившего' },
+  pistol:  { id: 'pistol',  name: 'Пистолет',  type: 'weapon', price: 0,   baseDmg: 1, critDmg: 2, critChance: 0.10, shots: 1, isRanged: true,  atkRange: 4, desc: 'Надёжное оружие ближнего боя. 10% крит' },
   uzi:     { id: 'uzi',     name: 'Узи',       type: 'weapon', price: 80,  baseDmg: 1, critDmg: 3, critChance: 0.10, midDmg: 2, midChance: 0.40, shots: 1, isRanged: true,  atkRange: 4, desc: 'Автоматический огонь' },
   rifle:   { id: 'rifle',   name: 'Автомат',   type: 'weapon', price: 120, baseDmg: 2, critDmg: 3, critChance: 0.30, shots: 2, isRanged: true,  atkRange: 5, desc: 'Два выстрела за ход' },
   rocket:  { id: 'rocket',  name: 'Ракетница', type: 'weapon', price: 200, baseDmg: 3, critDmg: 5, critChance: 0.20, splashRange: 1, shots: 1, isRanged: true,  atkRange: 3, desc: 'Урон по площади' },

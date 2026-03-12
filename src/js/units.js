@@ -14,7 +14,7 @@ function mkPlayer(x, y, squadUnit) {
   return {
     id: uid(),
     name: squadUnit?.name || 'Выживший',
-    kind: 'player',
+    kind: 'survivor',
     emoji: squadUnit?.emoji || PLAYER_STATS.emoji,
     x, y,
     hp: effectiveMaxHp,           // HP полный в начале боя
@@ -27,6 +27,7 @@ function mkPlayer(x, y, squadUnit) {
     moved: false,                 // уже переместился в этот ход
     attacked: false,              // уже атаковал в этот ход
     alive: true,
+    direction: 'right',           // направление взгляда
   };
 }
 
@@ -45,5 +46,6 @@ function mkZombie(x, y) {
     moved: false,
     attacked: false,
     alive: true,
+    direction: 'left',  // зомби обычно появляются справа и смотрят влево
   };
 }

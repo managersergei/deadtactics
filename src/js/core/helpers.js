@@ -60,7 +60,7 @@ function aliveZombies() {
 // Все живые юниты игрока
 function alivePlayers() {
   const units = getAllUnits();
-  return units.filter(u => u.alive && u.kind === 'player');
+  return units.filter(u => u.alive && u.kind === 'survivor');
 }
 
 // Генерация случайных позиций для зомби в правой части карты
@@ -152,6 +152,32 @@ function getEffectiveStat(unit, stat) {
   return value;
 }
 
+// Определить направление взгляда юнита
+// Если есть target - смотрим на него
+// Если нет и это зомби - смотрим на ближайшего игрока
+// Иначе - возвращаем текущее направление
+function getDirection(unit, target) {
+  // Если есть конкретная цель - смотрим на неё
+  if (target) {
+    return (target.x < unit.x) ? 'left' : 'right';
+  }
+  
+  // Для зомби - ближайший игрок
+  if (unit.kind === 'zombie') {
+    const players = alivePlayers();
+    if (players.length > 0) {
+      // Находим ближайшего игрока
+      const nearest = players.reduce((a, b) => 
+        manhattan(unit, a) < manhattan(unit, b) ? a : b
+      );
+      return (nearest.x < unit.x) ? 'left' : 'right';
+    }
+  }
+  
+  // Иначе - текущее направление или 'right' по умолчанию
+  return unit.direction || 'right';
+}
+
 // экспорт для тестов (Node environment)
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
@@ -162,5 +188,6 @@ if (typeof module !== 'undefined' && module.exports) {
     alivePlayers,
     calcDamage,
     getEffectiveStat,
+    getDirection,
   };
 }
