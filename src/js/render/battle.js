@@ -135,22 +135,22 @@ function _drawUnits() {
 // isDead - если true, создаём упрощённый элемент без кликов/tooltip
 function _buildUnitEl(u, isDead = false) {
   const selected = state.getSelected();
+  
+  // Основной контейнер .unit
   const div = document.createElement('div');
   div.className = `unit ${u.kind}`;
   if (!isDead && selected && selected.id === u.id) div.classList.add('selected');
   if (!isDead && (u.moved || u.attacked) && u.kind === UNIT_TYPES.SURVIVOR) div.classList.add('acted');
   if (u.poisonFlash) div.classList.add('poison-flash');
-
-  // Для мёртвых зомби - особый класс
   if (isDead) div.classList.add('dead');
 
-  // Определяем направление (для killed всегда left)
-  const direction = isDead ? 'left' : getDirection(u);
+  // === unit-visual — визуальная часть (спрайт/эмодзи) ===
+  const visual = document.createElement('div');
+  visual.className = 'unit-visual';
   
-  // Определяем kind для пути
+  const direction = isDead ? 'left' : getDirection(u);
   const spriteKind = u.kind === UNIT_TYPES.SURVIVOR ? 'survivor' : u.kind;
   
-  // Для зомби — спрайты по состоянию
   if (u.kind === UNIT_TYPES.ZOMBIE) {
     const animState = isDead ? 'killed' : getZombieAnimState(u);
     const frameCount = ZOMBIE_FRAMES[animState] || 4;
@@ -166,31 +166,38 @@ function _buildUnitEl(u, isDead = false) {
       const em = document.createElement('span');
       em.textContent = u.emoji;
       em.style.cssText = 'font-size:40px;';
-      div.insertBefore(em, div.firstChild);
+      visual.appendChild(em);
     };
-    div.insertBefore(img, div.firstChild);
+    visual.appendChild(img);
   } else {
     // Для игроков — эмодзи
     const em = document.createElement('span');
     em.textContent = u.emoji;
     em.style.cssText = 'font-size:40px;';
-    div.insertBefore(em, div.firstChild);
+    visual.appendChild(em);
   }
+  div.appendChild(visual);
 
-  // Иконка яда (только для живых)
-  if (!isDead && u.poisoned) {
-    const si = document.createElement('div');
-    si.className = 'status-icon';
-    si.textContent = '☠';
-    div.appendChild(si);
-  }
-
-  // HP-бар (только для живых)
+  // === unit-status — статус бар (hp + иконки) ===
   if (!isDead) {
-    div.appendChild(_buildHpBar(u));
+    const status = document.createElement('div');
+    status.className = 'unit-status';
+    
+    // HP-бар
+    status.appendChild(_buildHpBar(u));
+    
+    // Иконка яда (справа от HP-бара)
+    if (u.poisoned) {
+      const si = document.createElement('div');
+      si.className = 'status-icon';
+      si.textContent = '☠';
+      status.appendChild(si);
+    }
+    
+    div.appendChild(status);
   }
 
-  // Tooltip (только для живых)
+  // === unit-tooltip — всплывающая подсказка ===
   if (!isDead) {
     const tooltip = document.createElement('div');
     tooltip.className = 'unit-tooltip';
