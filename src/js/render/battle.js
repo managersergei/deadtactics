@@ -43,13 +43,14 @@ function getZombieAnimState(u) {
 }
 
 // Определить состояние анимации для выжившего
-// poisonFlash НЕ переключает на poisoned — только CSS эффект
 function getSurvivorAnimState(u) {
-  // Приоритет: die > reload > attack > move > idle (poison только CSS)
+  // Приоритет: die > reload > attack > move > poisoned > idle
   if (u.dying) return 'die';
   if (u.reloading) return 'reload';
   if (u.attacking) return 'attack';
   if (u.moving) return 'move';
+  // poisonFlash - одноразовый эффект, только если ЕСТЬ постоянный poisoned
+  if (u.poisoned && !u.poisonFlash) return 'poisoned';
   return 'idle';
 }
 
