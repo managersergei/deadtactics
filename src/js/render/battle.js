@@ -109,38 +109,50 @@ function _drawHighlights() {
   });
 }
 
-// Нарисовать юнитов
+// Нарисовать юнитов (включая мёртвых зомби)
 function _drawUnits() {
   const units = state.getUnits();
   const selected = state.getSelected();
+  
+  // Рисуем живых
   units.filter(u => u.alive).forEach(u => {
     const el = cell(u.x, u.y);
     if (!el) return;
-
     if (selected && selected.id === u.id) el.classList.add('selected-unit');
-
     el.appendChild(_buildUnitEl(u));
+  });
+  
+  // Рисуем мёртвых зомби (трупы остаются до конца боя)
+  units.filter(u => !u.alive && u.kind === UNIT_TYPES.ZOMBIE).forEach(u => {
+    const el = cell(u.x, u.y);
+    if (!el) return;
+    // Для мёртвых зомби создаём элемент без кликов
+    el.appendChild(_buildUnitEl(u, true));
   });
 }
 
 // Создать элемент юнита
-function _buildUnitEl(u) {
+// isDead - если true, создаём упрощённый элемент без кликов/tooltip
+function _buildUnitEl(u, isDead = false) {
   const selected = state.getSelected();
   const div = document.createElement('div');
   div.className = `unit ${u.kind}`;
-  if (selected && selected.id === u.id) div.classList.add('selected');
-  if ((u.moved || u.attacked) && u.kind === 'survivor') div.classList.add('acted');
+  if (!isDead && selected && selected.id === u.id) div.classList.add('selected');
+  if (!isDead && (u.moved || u.attacked) && u.kind === UNIT_TYPES.SURVIVOR) div.classList.add('acted');
   if (u.poisonFlash) div.classList.add('poison-flash');
 
-  // Определяем направление
-  const direction = getDirection(u);
+  // Для мёртвых зомби - особый класс
+  if (isDead) div.classList.add('dead');
+
+  // Определяем направление (для killed всегда left)
+  const direction = isDead ? 'left' : getDirection(u);
   
   // Определяем kind для пути
-  const spriteKind = u.kind === 'survivor' ? 'survivor' : u.kind;
+  const spriteKind = u.kind === UNIT_TYPES.SURVIVOR ? 'survivor' : u.kind;
   
   // Для зомби — спрайты по состоянию
-  if (u.kind === 'zombie') {
-    const animState = getZombieAnimState(u);
+  if (u.kind === UNIT_TYPES.ZOMBIE) {
+    const animState = isDead ? 'killed' : getZombieAnimState(u);
     const frameCount = ZOMBIE_FRAMES[animState] || 4;
     const base = `src/assets/units/${spriteKind}/${animState}_${direction}/`;
     const img = document.createElement('img');
@@ -165,39 +177,43 @@ function _buildUnitEl(u) {
     div.insertBefore(em, div.firstChild);
   }
 
-  // Иконка яда
-  if (u.poisoned) {
+  // Иконка яда (только для живых)
+  if (!isDead && u.poisoned) {
     const si = document.createElement('div');
     si.className = 'status-icon';
     si.textContent = '☠';
     div.appendChild(si);
   }
 
-  // HP-бар
-  div.appendChild(_buildHpBar(u));
-
-  // Tooltip
-  const tooltip = document.createElement('div');
-  tooltip.className = 'unit-tooltip';
-  
-  let unitType = u.kind === 'survivor' ? 'Выживший' : 'Зомби';
-  let unitName = u.kind === 'survivor' ? (u.name || 'Выживший') : 'Зомби';
-  let tooltipHTML = `<span class="tooltip-name">${u.emoji} ${unitName}</span>`;
-  tooltipHTML += `<span class="tooltip-type">${unitType}</span>`;
-  tooltipHTML += `<span class="tooltip-hp">HP: ${u.hp}/${u.maxHp}</span>`;
-  
-  if (u.kind === 'survivor') {
-    const moveStatus = u.moved ? 'Сходил' : 'Может идти';
-    const atkStatus = u.attacked ? 'Атаковал' : 'Может атаковать';
-    tooltipHTML += `<span class="tooltip-move">Движение: ${moveStatus}</span>`;
-    tooltipHTML += `<span class="tooltip-atk">Атака: ${atkStatus}</span>`;
-    if (u.poisoned) {
-      tooltipHTML += `<span class="tooltip-effect">☠ Отравлен</span>`;
-    }
+  // HP-бар (только для живых)
+  if (!isDead) {
+    div.appendChild(_buildHpBar(u));
   }
-  
-  tooltip.innerHTML = tooltipHTML;
-  div.appendChild(tooltip);
+
+  // Tooltip (только для живых)
+  if (!isDead) {
+    const tooltip = document.createElement('div');
+    tooltip.className = 'unit-tooltip';
+    
+    let unitType = u.kind === UNIT_TYPES.SURVIVOR ? 'Выживший' : 'Зомби';
+    let unitName = u.kind === UNIT_TYPES.SURVIVOR ? (u.name || 'Выживший') : 'Зомби';
+    let tooltipHTML = `<span class="tooltip-name">${u.emoji} ${unitName}</span>`;
+    tooltipHTML += `<span class="tooltip-type">${unitType}</span>`;
+    tooltipHTML += `<span class="tooltip-hp">HP: ${u.hp}/${u.maxHp}</span>`;
+    
+    if (u.kind === UNIT_TYPES.SURVIVOR) {
+      const moveStatus = u.moved ? 'Сходил' : 'Может идти';
+      const atkStatus = u.attacked ? 'Атаковал' : 'Может атаковать';
+      tooltipHTML += `<span class="tooltip-move">Движение: ${moveStatus}</span>`;
+      tooltipHTML += `<span class="tooltip-atk">Атака: ${atkStatus}</span>`;
+      if (u.poisoned) {
+        tooltipHTML += `<span class="tooltip-effect">☠ Отравлен</span>`;
+      }
+    }
+    
+    tooltip.innerHTML = tooltipHTML;
+    div.appendChild(tooltip);
+  }
 
   return div;
 }
