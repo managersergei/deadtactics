@@ -331,35 +331,67 @@ function startPlayerTurn() {
     u.attacked = false;
   });
 
-  // Урон от яда в начале хода (без render() - анимация будет через CSS)
-  alivePlayers().filter(u => u.poisoned).forEach(u => {
-    u.hp -= ZOMBIE_STATS.poisonDmg;
-    playPoison();
-    u.poisonFlash = true;
-    state.recordPoisonDamage(ZOMBIE_STATS.poisonDmg);
-    log(`☠ Яд: Выживший −${ZOMBIE_STATS.poisonDmg}HP → ${u.hp}/${u.maxHp}HP`, 'poison');
-    if (u.hp <= 0) {
-      u.alive = false;
-      log(`💀 Выживший погиб от заражения!`, 'dmg');
-    }
-  });
-
-  if (checkEnd()) return;
-
-  state.setPhase('player');
-  log(`════ Ход ${state.getTurnNum()} · Ваши действия ════`, 'sys');
-  
-  // Запустить таймер для сброса poisonFlash после render
-  setTimeout(() => {
-    state.getUnits().forEach(u => {
-      if (u.poisonFlash) {
-        u.poisonFlash = false;
+  // Урон от яда в начале хода - с анимацией
+  const poisonedUnits = alivePlayers().filter(u => u.poisoned);
+  if (poisonedUnits.length > 0) {
+    // Сначала render() чтобы показатьpoisoned анимацию
+    render();
+    
+    // Запустить анимацию poisoned для каждого отравленного
+    poisonedUnits.forEach(u => {
+      u.hp -= ZOMBIE_STATS.poisonDmg;
+      state.recordPoisonDamage(ZOMBIE_STATS.poisonDmg);
+      log(`☠ Яд: Выживший −${ZOMBIE_STATS.poisonDmg}HP → ${u.hp}/${u.maxHp}HP`, 'poison');
+      
+      if (u.hp <= 0) {
+        u.alive = false;
+        log(`💀 Выживший погиб от заражения!`, 'dmg');
+        return;
+      }
+      
+      playPoison();
+      
+      // Меняем спрейт на poisoned вручную
+      const unitCell = cell(u.x, u.y);
+      const unitEl = unitCell ? unitCell.querySelector('.unit.survivor') : null;
+      const img = unitEl ? unitEl.querySelector('img') : null;
+      
+      if (img) {
+        const weaponId = u.weapon || u.equipment?.weapon || 'pistol';
+        const dir = u.direction === 'left' ? 'right' : u.direction;
+        img.dataset.animated = `src/assets/units/survivor/${weaponId}/poisoned_${dir}/`;
+        img.dataset.animState = 'poisoned';
+        img.dataset.maxFrames = 2;
       }
     });
+
+    // Ждем пока анимация закончится (2 кадра * 150ms = 300ms)
+    setTimeout(() => {
+      // Возвращаем idle
+      poisonedUnits.forEach(u => {
+        if (!u.alive) return;
+        const unitCell = cell(u.x, u.y);
+        const unitEl = unitCell ? unitCell.querySelector('.unit.survivor') : null;
+        const img = unitEl ? unitEl.querySelector('img') : null;
+        
+        if (img) {
+          const weaponId = u.weapon || u.equipment?.weapon || 'pistol';
+          img.dataset.animated = `src/assets/units/survivor/${weaponId}/idle_right/`;
+          img.dataset.animState = 'idle';
+          img.dataset.maxFrames = 3;
+        }
+      });
+      
+      state.setPhase('player');
+      log(`════ Ход ${state.getTurnNum()} · Ваши действия ════`, 'sys');
+      render();
+    }, 350);
+  } else {
+    // Нет отравленных - сразу продолжаем
+    state.setPhase('player');
+    log(`════ Ход ${state.getTurnNum()} · Ваши действия ════`, 'sys');
     render();
-  }, 100);
-  
-  render();
+  }
 }
 
 // ── Конец боя ────────────────────────────────────────────
