@@ -194,10 +194,12 @@ function _buildUnitEl(u, isDead = false) {
     // Для выживших — спрайты по оружию и состоянию
     const animState = getSurvivorAnimState(u);
     const weaponId = u.weapon || u.equipment?.weapon || 'pistol';
-    // Fallback: если нет left-спрайтов, используем right
+    // Для die - папка без _right
     const dir = direction === 'left' ? 'right' : direction;
     const frameCount = SURVIVOR_FRAMES[animState] || 3;
-    const base = `src/assets/units/${spriteKind}/${weaponId}/${animState}_${dir}/`;
+    // die -> 'die/', остальные -> 'idle_right/', 'move_right/' и т.д.
+    const folder = animState === 'die' ? 'die/' : `${animState}_${dir}/`;
+    const base = `src/assets/units/${spriteKind}/${weaponId}/${folder}`;
     const img = document.createElement('img');
     img.src = `${base}${animState}_1.png`;
     img.dataset.animated = base;
