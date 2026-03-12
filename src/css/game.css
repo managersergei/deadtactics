@@ -163,10 +163,13 @@
 .hp-fill.med { background: var(--yellow); }
 .hp-fill.low { background: var(--red); }
 
-/* Иконка яда */
+/* Иконка яда - справа от HP-бара */
 .status-icon {
-  position: absolute; bottom: 2px; right: 2px;
-  font-size: 10px; line-height: 1;
+  position: absolute;
+  bottom: 2px;
+  right: 20px;
+  font-size: 10px;
+  line-height: 1;
 }
 
 /* Мёртвый зомби (труп) - более заметный чем раньше */
