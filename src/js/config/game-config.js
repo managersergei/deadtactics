@@ -234,3 +234,12 @@ if (typeof window !== 'undefined') {
     ZOMBIE_STATS, ZOMBIE_ACTION_DELAY, ZOMBIE_TURN_END_DELAY, LORE_MESSAGES, LEVELS,
   };
 }
+
+// Экспорт для Node.js (тесты)
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    COLS, ROWS, PLACE_COLS, PLAYER_UNIT_COUNT, ZOMBIE_SPAWN_POSITIONS,
+    PLAYER_STATS, WEAPONS, ITEM_TYPES, ITEMS, RECRUITS, ZOMBIE_TYPES,
+    ZOMBIE_STATS, ZOMBIE_ACTION_DELAY, ZOMBIE_TURN_END_DELAY, LORE_MESSAGES, LEVELS,
+  };
+}
