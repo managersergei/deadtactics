@@ -171,6 +171,7 @@
 .hp-bar {
   height: 3px;
   width: 60%;
+  margin: 0 auto;
   background: #111;
   border-radius: 2px;
 }
