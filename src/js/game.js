@@ -334,13 +334,7 @@ function startPlayerTurn() {
   // Урон от яда в начале хода - с анимацией
   const poisonedUnits = alivePlayers().filter(u => u.poisoned);
   if (poisonedUnits.length > 0) {
-    // Пауза анимации
-    animationPaused = true;
-    
-    // Сначала render() чтобы показатьpoisoned анимацию
-    render();
-    
-    // Запустить анимацию poisoned для каждого отравленного
+    // Урон
     poisonedUnits.forEach(u => {
       u.hp -= ZOMBIE_STATS.poisonDmg;
       state.recordPoisonDamage(ZOMBIE_STATS.poisonDmg);
@@ -349,47 +343,31 @@ function startPlayerTurn() {
       if (u.hp <= 0) {
         u.alive = false;
         log(`💀 Выживший погиб от заражения!`, 'dmg');
-        return;
-      }
-      
-      playPoison();
-      
-      // Меняем спрейт на poisoned вручную
-      const unitCell = cell(u.x, u.y);
-      const unitEl = unitCell ? unitCell.querySelector('.unit.survivor') : null;
-      const img = unitEl ? unitEl.querySelector('img') : null;
-      
-      if (img) {
-        const weaponId = u.weapon || u.equipment?.weapon || 'pistol';
-        const dir = u.direction === 'left' ? 'right' : u.direction;
-        img.dataset.animated = `src/assets/units/survivor/${weaponId}/poisoned_${dir}/`;
-        img.dataset.animState = 'poisoned';
-        img.dataset.maxFrames = 2;
       }
     });
 
-    // Ждем пока анимация закончится (2 кадра * 150ms = 300ms)
+    if (checkEnd()) return;
+
+    // Включаем анимацию poisonFlash
+    poisonedUnits.forEach(u => {
+      if (u.alive) {
+        u.poisonFlash = true;
+      }
+    });
+    playPoison();
+    render();
+
+    // Через 300ms выключаем анимацию (2 кадра × 150ms)
     setTimeout(() => {
-      // Возвращаем idle
       poisonedUnits.forEach(u => {
-        if (!u.alive) return;
-        const unitCell = cell(u.x, u.y);
-        const unitEl = unitCell ? unitCell.querySelector('.unit.survivor') : null;
-        const img = unitEl ? unitEl.querySelector('img') : null;
-        
-        if (img) {
-          const weaponId = u.weapon || u.equipment?.weapon || 'pistol';
-          img.dataset.animated = `src/assets/units/survivor/${weaponId}/idle_right/`;
-          img.dataset.animState = 'idle';
-          img.dataset.maxFrames = 3;
+        if (u.alive) {
+          u.poisonFlash = false;
         }
       });
-      
-      animationPaused = false;
       state.setPhase('player');
       log(`════ Ход ${state.getTurnNum()} · Ваши действия ════`, 'sys');
       render();
-    }, 350);
+    }, 300);
   } else {
     // Нет отравленных - сразу продолжаем
     state.setPhase('player');

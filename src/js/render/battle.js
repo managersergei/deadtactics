@@ -47,10 +47,9 @@ function getSurvivorAnimState(u) {
   // Приоритет: die > reload > attack > move > poisoned > idle
   if (u.dying) return 'die';
   if (u.reloading) return 'reload';
+  if (u.poisonFlash) return 'poisoned'; // только временный флаг
   if (u.attacking) return 'attack';
   if (u.moving) return 'move';
-  // poisonFlash - одноразовый эффект, только если ЕСТЬ постоянный poisoned
-  if (u.poisoned && !u.poisonFlash) return 'poisoned';
   return 'idle';
 }
 
