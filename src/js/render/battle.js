@@ -161,8 +161,7 @@ function _buildUnitEl(u, isDead = false) {
   const div = document.createElement('div');
   div.className = `unit ${u.kind}`;
   if (!isDead && selected && selected.id === u.id) div.classList.add('selected');
-  if (!isDead && (u.moved || u.attacked) && u.kind === UNIT_TYPES.SURVIVOR) div.classList.add('acted');
-  // CSS класс poison-flash убран
+  // CSS класс acted убран - эффект прозрачности убран
   if (isDead) div.classList.add('dead');
 
   // === unit-visual — визуальная часть (спрайт/эмодзи) ===

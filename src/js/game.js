@@ -259,55 +259,69 @@ function doAttack(attacker, target) {
   const damageArr = calcDamage(weaponId);
   const damage = damageArr[0];
   const isCrit = damage === ITEMS[weaponId].critDmg;
-  target.hp -= damage;
-  state.recordDamageDealt(damage);
-  attacker.attacked = true;
   
-  // Логика перезарядки (для выживших)
+  // Анимация атаки выжившего
   if (attacker.kind === 'survivor') {
-    attacker.shotsFired = (attacker.shotsFired || 0) + 1;
-    if (attacker.shotsFired >= 3) {
-      attacker.reloading = true;
-      attacker.shotsFired = 0;
-      log(`🔄 Перезарядка...`, 'sys');
-      // Анимация перезарядки - пауза на 1 секунду
-      animationPaused = true;
-      render();
-      setTimeout(() => {
-        attacker.reloading = false;
-        animationPaused = false;
+    attacker.attacking = true;
+    animationPaused = true;
+    render();
+  }
+  
+  // Наносим урон после небольшой задержки для анимации
+  setTimeout(() => {
+    target.hp -= damage;
+    state.recordDamageDealt(damage);
+    attacker.attacked = true;
+    
+    // Логика перезарядки (для выживших)
+    if (attacker.kind === 'survivor') {
+      attacker.attacking = false;
+      attacker.shotsFired = (attacker.shotsFired || 0) + 1;
+      if (attacker.shotsFired >= 3) {
+        attacker.reloading = true;
+        attacker.shotsFired = 0;
+        log(`🔄 Перезарядка...`, 'sys');
+        // Анимация перезарядки - пауза на 1 секунду
+        animationPaused = true;
         render();
-      }, 1000);
+        setTimeout(() => {
+          attacker.reloading = false;
+          animationPaused = false;
+          render();
+        }, 1000);
+      } else {
+        animationPaused = false;
+      }
     }
-  }
-  
-  // Анимация: если крит - cr_damaged, иначе damaged
-  if (target.hp > 0) {
-    target.damagedFlash = true;
-    if (isCrit) {
-      target.critFlash = true;
-      setTimeout(() => { target.critFlash = false; render(); }, 300);
+    
+    // Анимация: если крит - cr_damaged, иначе damaged
+    if (target.hp > 0) {
+      target.damagedFlash = true;
+      if (isCrit) {
+        target.critFlash = true;
+        setTimeout(() => { target.critFlash = false; render(); }, 300);
+      }
+      setTimeout(() => { target.damagedFlash = false; render(); }, 300);
+    } else {
+      // Зомби умирает
+      target.dying = true;
+      setTimeout(() => {
+        target.alive = false;
+        target.dying = false;
+        render();
+        checkEnd();
+      }, 600);
+      log(`💀 Зомби уничтожен!`, 'dmg');
+      state.recordKill();
     }
-    setTimeout(() => { target.damagedFlash = false; render(); }, 300);
-  } else {
-    // Зомби умирает
-    target.dying = true;
-    setTimeout(() => {
-      target.alive = false;
-      target.dying = false;
-      render();
-      checkEnd();
-    }, 600);
-    log(`💀 Зомби уничтожен!`, 'dmg');
-    state.recordKill();
-  }
-  
-  playShot();
-  log(`💥 Атака${isCrit ? ' (КРИТ!)' : ''} → зомби [${target.x+1},${target.y+1}] — ${target.hp}/${target.maxHp}HP`, 'dmg');
+    
+    playShot();
+    log(`💥 Атака${isCrit ? ' (КРИТ!)' : ''} → зомби [${target.x+1},${target.y+1}] — ${target.hp}/${target.maxHp}HP`, 'dmg');
 
-  state.clearHighlights();
-  state.setSelected(null);
-  render();
+    state.clearHighlights();
+    state.setSelected(null);
+    render();
+  }, 200);
 }
 
 // ── Смена хода ────────────────────────────────────────────

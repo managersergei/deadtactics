@@ -115,10 +115,7 @@
   border: none !important;
 }
 
-.unit.acted {
-  opacity: 0.45;
-  filter: grayscale(0.4);
-}
+/* Эффект для юнитов которые уже действовали - убран */
 
 .unit:hover { transform: translateX(-50%) scale(1.06); }
 
