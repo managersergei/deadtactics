@@ -185,9 +185,12 @@
 
 /* Иконка яда - справа от HP-бара */
 .status-icon {
-  margin-left: 8px;
+  position: absolute;
+  right: 10px;
+  bottom: 0;
   font-size: 10px;
   line-height: 1;
+  pointer-events: none;
 }
 
 /* Мёртвый зомби (труп) - более заметный чем раньше */
