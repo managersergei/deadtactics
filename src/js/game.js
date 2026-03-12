@@ -334,6 +334,9 @@ function startPlayerTurn() {
   // Урон от яда в начале хода - с анимацией
   const poisonedUnits = alivePlayers().filter(u => u.poisoned);
   if (poisonedUnits.length > 0) {
+    // Пауза анимации
+    animationPaused = true;
+    
     // Сначала render() чтобы показатьpoisoned анимацию
     render();
     
@@ -382,6 +385,7 @@ function startPlayerTurn() {
         }
       });
       
+      animationPaused = false;
       state.setPhase('player');
       log(`════ Ход ${state.getTurnNum()} · Ваши действия ════`, 'sys');
       render();
