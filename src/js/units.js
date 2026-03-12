@@ -26,6 +26,8 @@ function mkPlayer(x, y, squadUnit) {
     poisoned: false,              // заражён укусом зомби
     moved: false,                 // уже переместился в этот ход
     attacked: false,              // уже атаковал в этот ход
+    shotsFired: 0,               // количество выстрелов (для перезарядки)
+    reloading: false,             // идёт перезарядка
     alive: true,
     direction: 'right',           // направление взгляда
   };

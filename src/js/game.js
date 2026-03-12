@@ -168,6 +168,21 @@ function doAttack(attacker, target) {
   state.recordDamageDealt(damage);
   attacker.attacked = true;
   
+  // Логика перезарядки (для выживших)
+  if (attacker.kind === 'survivor') {
+    attacker.shotsFired = (attacker.shotsFired || 0) + 1;
+    if (attacker.shotsFired >= 3) {
+      attacker.reloading = true;
+      attacker.shotsFired = 0;
+      log(`🔄 Перезарядка...`, 'sys');
+      // Перезарядка длится 1 ход
+      setTimeout(() => {
+        attacker.reloading = false;
+        render();
+      }, 1000);
+    }
+  }
+  
   // Анимация: если крит - cr_damaged, иначе damaged
   if (target.hp > 0) {
     target.damagedFlash = true;
