@@ -162,7 +162,7 @@ function _buildUnitEl(u, isDead = false) {
   div.className = `unit ${u.kind}`;
   if (!isDead && selected && selected.id === u.id) div.classList.add('selected');
   if (!isDead && (u.moved || u.attacked) && u.kind === UNIT_TYPES.SURVIVOR) div.classList.add('acted');
-  if (u.poisonFlash) div.classList.add('poison-flash');
+  if (u.poisonFlash && u.kind === UNIT_TYPES.ZOMBIE) div.classList.add('poison-flash');
   if (isDead) div.classList.add('dead');
 
   // === unit-visual — визуальная часть (спрайт/эмодзи) ===
