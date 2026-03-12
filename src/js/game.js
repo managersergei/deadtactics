@@ -270,9 +270,12 @@ function doAttack(attacker, target) {
       attacker.reloading = true;
       attacker.shotsFired = 0;
       log(`🔄 Перезарядка...`, 'sys');
-      // Перезарядка длится 1 ход
+      // Анимация перезарядки - пауза на 1 секунду
+      animationPaused = true;
+      render();
       setTimeout(() => {
         attacker.reloading = false;
+        animationPaused = false;
         render();
       }, 1000);
     }
