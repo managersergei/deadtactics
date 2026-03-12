@@ -162,7 +162,7 @@ function _buildUnitEl(u, isDead = false) {
   div.className = `unit ${u.kind}`;
   if (!isDead && selected && selected.id === u.id) div.classList.add('selected');
   if (!isDead && (u.moved || u.attacked) && u.kind === UNIT_TYPES.SURVIVOR) div.classList.add('acted');
-  // CSS класс poison-flash убран - только спрайтовая анимация
+  // CSS класс poison-flash убран
   if (isDead) div.classList.add('dead');
 
   // === unit-visual — визуальная часть (спрайт/эмодзи) ===
@@ -181,7 +181,7 @@ function _buildUnitEl(u, isDead = false) {
     img.dataset.animated = base;
     img.dataset.animState = animState;
     img.dataset.maxFrames = frameCount;
-    img.style.cssText = 'width:auto;height:auto;max-width:100px;max-height:100px;';
+    img.style.cssText = 'width:100px;height:100px;object-fit:contain;pointer-events:none;display:block;';
     img.onerror = function() {
       this.style.display = 'none';
       const em = document.createElement('span');
@@ -205,7 +205,7 @@ function _buildUnitEl(u, isDead = false) {
     img.dataset.animated = base;
     img.dataset.animState = animState;
     img.dataset.maxFrames = frameCount;
-    img.style.cssText = 'width:auto;height:auto;max-width:100px;max-height:100px;';
+    img.style.cssText = 'width:100px;height:100px;object-fit:contain;pointer-events:none;display:block;';
     img.onerror = function() {
       this.style.display = 'none';
       const em = document.createElement('span');
