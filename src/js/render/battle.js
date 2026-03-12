@@ -197,7 +197,7 @@ function _buildUnitEl(u, isDead = false) {
     // Fallback: если нет left-спрайтов, используем right
     const dir = direction === 'left' ? 'right' : direction;
     const frameCount = SURVIVOR_FRAMES[animState] || 3;
-    const base = `src/assets/units/${spriteKind}/${weaponId}/${dir}/`;
+    const base = `src/assets/units/${spriteKind}/${weaponId}/${animState}_${dir}/`;
     const img = document.createElement('img');
     img.src = `${base}${animState}_1.png`;
     img.dataset.animated = base;
