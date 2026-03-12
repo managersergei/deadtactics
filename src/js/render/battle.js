@@ -2,6 +2,8 @@
 // RENDER BATTLE — рендер боя (грид, юниты, подсветка)
 // ════════════════════════════════════════════════════════
 
+// Функции state доступны через window.state
+
 // Полная перерисовка сцены (вызывается после каждого действия)
 function render() {
   _clearCells();
@@ -21,7 +23,7 @@ function _clearCells() {
 
 // Нарисовать зону расстановки
 function _drawPlacementZone() {
-  if (phase !== 'placement') return;
+  if (state.getPhase() !== 'placement') return;
   for (let r = 0; r < ROWS; r++) {
     for (const c of PLACE_COLS) {
       const el = cell(c, r);
@@ -32,6 +34,7 @@ function _drawPlacementZone() {
 
 // Нарисовать подсветку (движение/атака)
 function _drawHighlights() {
+  const highlights = state.getHighlights();
   highlights.move.forEach(k => {
     const [c, r] = k.split(',').map(Number);
     const el = cell(c, r);
@@ -46,6 +49,8 @@ function _drawHighlights() {
 
 // Нарисовать юнитов
 function _drawUnits() {
+  const units = state.getUnits();
+  const selected = state.getSelected();
   units.filter(u => u.alive).forEach(u => {
     const el = cell(u.x, u.y);
     if (!el) return;
@@ -58,6 +63,7 @@ function _drawUnits() {
 
 // Создать элемент юнита
 function _buildUnitEl(u) {
+  const selected = state.getSelected();
   const div = document.createElement('div');
   div.className = `unit ${u.kind}`;
   if (selected && selected.id === u.id) div.classList.add('selected');

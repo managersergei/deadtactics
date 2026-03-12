@@ -6,7 +6,7 @@
 // Функция для проигрывания звука с обработкой ошибок
 function playSound(filename) {
   try {
-    const audio = new Audio(`sounds/${filename}`);
+    const audio = new Audio(`src/sounds/${filename}`);
     audio.play().catch(() => {}); // Тихо игнорировать ошибки
   } catch (e) {
     // Тихо игнорировать

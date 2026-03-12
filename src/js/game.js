@@ -3,9 +3,12 @@
 // Точка входа для всех игровых действий
 // ════════════════════════════════════════════════════════
 
+// Функции state доступны через window.state
+
 // ── Обработчик клика по клетке ────────────────────────────
 
 function onCellClick(c, r) {
+  const phase = state.getPhase();
   if (phase === 'placement') handlePlacement(c, r);
   else if (phase === 'player') handlePlayer(c, r);
 }
@@ -16,20 +19,22 @@ function handlePlacement(c, r) {
   if (!PLACE_COLS.includes(c)) return;
   if (unitAt(c, r)) return;
 
+  const currentPlacedCount = state.getPlacedCount();
   // Получаем юнита из отряда для передачи его снаряжения
-  const squadUnit = gameData.squad[placedCount];
-  units.push(mkPlayer(c, r, squadUnit));
-  placedCount++;
+  const squadUnit = gameData.squad[currentPlacedCount];
+  const newUnit = mkPlayer(c, r, squadUnit);
+  state.addUnit(newUnit);
+  state.incrementPlacedCount();
   log(`⬛ Юнит размещён на [${c+1},${r+1}]`);
 
   // игрок может расставить не больше leadership или размера отряда
   const maxPlace = Math.min(gameData.player.leadership, gameData.squad.length);
-  if (placedCount >= maxPlace) {
+  if (state.getPlacedCount() >= maxPlace) {
     // Спауним зомби для текущего уровня
     spawnZombiesForLevel(gameData.currentLevel);
-    phase = 'player';
+    state.setPhase('player');
     log('════ БОЙ НАЧАЛСЯ ════', 'win');
-    log(`Ход ${turnNum} · Ваши действия`, 'sys');
+    log(`Ход ${state.getTurnNum()} · Ваши действия`, 'sys');
   }
   render();
 }
@@ -37,7 +42,7 @@ function handlePlacement(c, r) {
 function spawnZombies() {
   // определяем сколько зомби нужно разместить (раньше было по константе)
   const count = ZOMBIE_SPAWN_POSITIONS.length;
-  randomZombiePositions(count).forEach(([x, y]) => units.push(mkZombie(x, y)));
+  randomZombiePositions(count).forEach(([x, y]) => state.addUnit(mkZombie(x, y)));
   log('🧟🧟🧟 Зомби появились!', 'zombie-act');
 }
 
@@ -51,7 +56,7 @@ function spawnZombiesForLevel(levelNum) {
   const positions = randomZombiePositions(enemyCount);
   
   positions.forEach(([x, y]) => {
-    units.push(mkZombie(x, y));
+    state.addUnit(mkZombie(x, y));
   });
   
   log(`🧟 На этом уровне ${enemyCount} врагов!`, 'zombie-act');
@@ -62,18 +67,20 @@ function spawnZombiesForLevel(levelNum) {
 function handlePlayer(c, r) {
   const clicked = unitAt(c, r);
   const key = `${c},${r}`;
+  const selected = state.getSelected();
+  const highlights = state.getHighlights();
 
   // 1. Клик на своего юнита → выбрать
   if (clicked && clicked.kind === 'player') {
     // Отмена выбора при повторном клике на того же юнита
     if (selected && clicked.id === selected.id) {
-      selected = null;
-      clearHL();
+      state.setSelected(null);
+      state.clearHighlights();
       render();
       return;
     }
 
-    selected = clicked;
+    state.setSelected(clicked);
     recalcHighlights();
     render();
     return;
@@ -95,21 +102,21 @@ function handlePlayer(c, r) {
 
     // Клик на зомби НЕ в зоне → показать инфу о зомби
     if (clicked && clicked.kind === 'zombie') {
-      selected = clicked;
+      state.setSelected(clicked);
       render();
       return;
     }
 
     // Клик на пустую клетку → снять выбор
-    selected = null;
-    clearHL();
+    state.setSelected(null);
+    state.clearHighlights();
     render();
     return;
   }
 
   // 3. Если игрок НЕ выбран - клик на зомби для инфы
   if (clicked && clicked.kind === 'zombie') {
-    selected = clicked;
+    state.setSelected(clicked);
     render();
     return;
   }
@@ -119,25 +126,26 @@ function handlePlayer(c, r) {
 
 // Пересчитать подсвеченные клетки для выбранного юнита
 function recalcHighlights() {
-  clearHL();
+  state.clearHighlights();
+  const selected = state.getSelected();
   if (!selected || selected.kind !== 'player') return;
   const u = selected;
 
   // Синяя зона движения — если ещё не переместился
   if (!u.moved) {
-    reachable(u).forEach(([c, r]) => highlights.move.add(`${c},${r}`));
+    reachable(u).forEach(([c, r]) => {
+      const highlights = state.getHighlights();
+      highlights.move.add(`${c},${r}`);
+    });
   }
 
   // Красная зона атаки — если ещё не атаковал
   if (!u.attacked) {
     aliveZombies().forEach(e => {
+      const highlights = state.getHighlights();
       if (manhattan(u, e) <= u.atkRange) highlights.attack.add(`${e.x},${e.y}`);
     });
   }
-}
-
-function clearHL() {
-  highlights = { move: new Set(), attack: new Set() };
 }
 
 function doMove(u, c, r) {
@@ -145,7 +153,7 @@ function doMove(u, c, r) {
   u.x = c; u.y = r;
   u.moved = true;
   playFootstep();
-  clearHL(); // после движения атаки нет
+  state.clearHighlights(); // после движения атаки нет
   render();
   checkEnd();
 }
@@ -157,19 +165,19 @@ function doAttack(attacker, target) {
   const damage = damageArr[0];
   const isCrit = damage === ITEMS[weaponId].critDmg;
   target.hp -= damage;
-  recordDamageDealt(damage);
+  state.recordDamageDealt(damage);
   attacker.attacked = true;
   playShot();
   log(`💥 Атака${isCrit ? ' (КРИТ!)' : ''} → зомби [${target.x+1},${target.y+1}] — ${target.hp}/${target.maxHp}HP`, 'dmg');
 
   if (target.hp <= 0) {
     target.alive = false;
-    recordKill();
+    state.recordKill();
     log(`💀 Зомби уничтожен!`, 'dmg');
   }
 
-  clearHL();
-  selected = null;
+  state.clearHighlights();
+  state.setSelected(null);
   render();
   checkEnd();
 }
@@ -178,22 +186,22 @@ function doAttack(attacker, target) {
 
 // Кнопка "Завершить ход"
 document.getElementById('btn-end-turn').addEventListener('click', () => {
-  if (phase !== 'player') return;
-  selected = null;
-  clearHL();
-  phase = 'zombie';
+  if (state.getPhase() !== 'player') return;
+  state.setSelected(null);
+  state.clearHighlights();
+  state.setPhase('zombie');
   render();
   setTimeout(runZombies, 400);
 });
 
 // Ход игрока: сбросить флаги, применить яд
 function startPlayerTurn() {
-  turnsSurvived++;
-  if (phase === 'over') return;
-  turnNum++;
+  state.incrementTurnsSurvived();
+  if (state.getPhase() === 'over') return;
+  state.nextTurn();
 
   // Сбросить флаги действий
-  units.filter(u => u.alive).forEach(u => {
+  state.getUnits().filter(u => u.alive).forEach(u => {
     u.moved = false;
     u.attacked = false;
   });
@@ -204,7 +212,7 @@ function startPlayerTurn() {
     playPoison();
     u.poisonFlash = true;
     setTimeout(() => u.poisonFlash = false, 1500);
-    recordPoisonDamage(ZOMBIE_STATS.poisonDmg);
+    state.recordPoisonDamage(ZOMBIE_STATS.poisonDmg);
     log(`☠ Яд: Выживший −${ZOMBIE_STATS.poisonDmg}HP → ${u.hp}/${u.maxHp}HP`, 'poison');
     if (u.hp <= 0) {
       u.alive = false;
@@ -214,8 +222,8 @@ function startPlayerTurn() {
 
   if (checkEnd()) return;
 
-  phase = 'player';
-  log(`════ Ход ${turnNum} · Ваши действия ════`, 'sys');
+  state.setPhase('player');
+  log(`════ Ход ${state.getTurnNum()} · Ваши действия ════`, 'sys');
   render();
 }
 
@@ -223,12 +231,12 @@ function startPlayerTurn() {
 
 function checkEnd() {
   if (aliveZombies().length === 0) {
-    phase = 'over';
+    state.setPhase('over');
     setTimeout(() => showEndOverlay(true), 250);
     return true;
   }
   if (alivePlayers().length === 0) {
-    phase = 'over';
+    state.setPhase('over');
     setTimeout(() => showEndOverlay(false), 250);
     return true;
   }
@@ -240,8 +248,8 @@ function checkEnd() {
 document.getElementById('btn-restart').addEventListener('click', () => goToMap());
 
 function startGame() {
-  resetState();
-  resetStats();
+  state.resetState();
+  state.resetStats();
   clearLog();
   goToMap();
 }
@@ -249,8 +257,8 @@ function startGame() {
 // Начать бой на уровне
 function startBattle(levelNum) {
   gameData.currentLevel = levelNum;
-  resetState();
-  resetStats();
+  state.resetState();
+  state.resetStats();
   clearLog();
   buildGrid();
   log('=== БОЙ НАЧИНАЕТСЯ ===', 'win');

@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>☣ DEAD TACTICS</title>
   <!-- Основной CSS (без @import для совместимости с file://) -->
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/game.css">
-  <link rel="stylesheet" href="css/ui.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/screens.css">
+  <link rel="stylesheet" href="src/css/base.css">
+  <link rel="stylesheet" href="src/css/game.css">
+  <link rel="stylesheet" href="src/css/ui.css">
+  <link rel="stylesheet" href="src/css/components.css">
+  <link rel="stylesheet" href="src/css/screens.css">
 </head>
 <body>
 
@@ -205,33 +205,37 @@
 </div>
 
 <!-- СКРИПТЫ: порядок важен! -->
-<script src="js/config.js"></script>
-<script src="js/constants.js"></script>
-<script src="js/state.js"></script>
-<script src="js/data.js"></script>
+
+<!-- Сначала загружаем конфиги (до всех остальных скриптов!) -->
+<script src="src/js/config/game-config.js"></script>
+<script src="src/js/config/ui-constants.js"></script>
+<script src="src/js/core/state.js"></script>
+
+<!-- State is managed by main.js -->
+<script src="src/js/data.js"></script>
 
 <!-- SCREENS: роутинг -->
-<script src="js/screens/screens.js"></script>
+<script src="src/js/screens/screens.js"></script>
 <!-- SCREENS: рендеры -->
-<script src="js/screens/screenMap.js"></script>
-<script src="js/screens/screenSquad.js"></script>
-<script src="js/screens/screenShop.js"></script>
-<script src="js/screens/screenIntro.js"></script>
-<script src="js/screens/screenLevel.js"></script>
-<script src="js/screens/screenDetail.js"></script>
+<script src="src/js/screens/screenMap.js"></script>
+<script src="src/js/screens/screenSquad.js"></script>
+<script src="src/js/screens/screenShop.js"></script>
+<script src="src/js/screens/screenIntro.js"></script>
+<script src="src/js/screens/screenLevel.js"></script>
+<script src="src/js/screens/screenDetail.js"></script>
 
-<script src="js/units.js"></script>
-<script src="js/helpers.js"></script>
-<script src="js/stats.js"></script>
+<script src="src/js/units.js"></script>
+<script src="src/js/core/helpers.js"></script>
 
 <!-- RENDER: core + battle -->
-<script src="js/render/render.js"></script>
-<script src="js/render/battle.js"></script>
+<script src="src/js/render/render.js"></script>
+<script src="src/js/render/battle.js"></script>
 
-<script src="js/ui.js"></script>
-<script src="js/audio.js"></script>
-<script src="js/ai.js"></script>
-<script src="js/game.js"></script>
+<script src="src/js/ui.js"></script>
+<script src="src/js/audio.js"></script>
+<script src="src/js/ai.js"></script>
+<script src="src/js/game.js"></script>
+<!-- main.js удалён - теперь используем обычные скрипты вместо ES modules -->
 
 </body>
 </html>

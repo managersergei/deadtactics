@@ -3,8 +3,14 @@
 // Не должны изменять стейт, только вычислять и возвращать
 // ════════════════════════════════════════════════════════
 
+// Получаем units из state (глобальная функция)
+function getAllUnits() {
+  return typeof getUnits === 'function' ? getUnits() : window.state?.units || [];
+}
+
 // Юнит на клетке (c, r), или null
 function unitAt(c, r) {
+  const units = getAllUnits();
   return units.find(u => u.alive && u.x === c && u.y === r) || null;
 }
 
@@ -47,11 +53,13 @@ function reachable(u) {
 
 // Все живые зомби
 function aliveZombies() {
+  const units = getAllUnits();
   return units.filter(u => u.alive && u.kind === 'zombie');
 }
 
 // Все живые юниты игрока
 function alivePlayers() {
+  const units = getAllUnits();
   return units.filter(u => u.alive && u.kind === 'player');
 }
 

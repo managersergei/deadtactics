@@ -3,6 +3,8 @@
 // Стратегия: двигаться к ближайшему игроку, атаковать при возможности
 // ════════════════════════════════════════════════════════
 
+// Функции state доступны через window.state
+
 // Запустить ход всех зомби (с анимационными задержками)
 function runZombies() {
   const zs = aliveZombies();
@@ -34,13 +36,14 @@ function runZombies() {
 
   // После всех зомби — передать ход игроку
   setTimeout(() => {
-    if (phase === 'over') return;
+    if (state.getPhase() === 'over') return;
     startPlayerTurn();
   }, delay + ZOMBIE_TURN_END_DELAY);
 }
 
 // Передвинуть зомби к цели (жадный алгоритм по Manhattan)
 function zombieMove(z, target) {
+  const units = state.getUnits();
   const occupied = new Set(
     units.filter(u => u.alive && u.id !== z.id).map(u => `${u.x},${u.y}`)
   );

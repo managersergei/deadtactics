@@ -3,6 +3,8 @@
 // ВНИМАНИЕ: render функции находятся в screens/*.js
 // ════════════════════════════════════════════════════════
 
+// Функции state доступны через window.state
+
 // ── ЛОГ БОЯ ──────────────────────────────────────────────
 
 function log(text, cls = 'sys') {
@@ -28,6 +30,8 @@ function updateSidebar() {
 
   if (!ui || !btn) return;
 
+  const phase = state.getPhase();
+
   if (phase === 'placement') {
     _sidebarPlacement(ui, btn);
   } else if (phase === 'player') {
@@ -39,12 +43,14 @@ function updateSidebar() {
 
 function _sidebarPlacement(ui, btn) {
   const maxPlace = Math.min(gameData.player.leadership, gameData.squad.length);
+  const placedCount = state.getPlacedCount();
   log('📍 Расстановка. Размести юнита ' + (placedCount + 1) + '/' + maxPlace, 'sys');
   btn.disabled = true;
   ui.innerHTML = '<span class="text-muted">Кликни зелёную клетку</span>';
 }
 
 function _sidebarUnit(ui, btn) {
+  const phase = state.getPhase();
   // Кнопка в зависимости от фазы
   if (phase === 'player') {
     btn.disabled = false;
@@ -52,6 +58,7 @@ function _sidebarUnit(ui, btn) {
     btn.disabled = true;
   }
 
+  const selected = state.getSelected();
   if (selected && selected.kind === 'player') {
     const u = selected;
     const poisonBadge = u.poisoned ? ' <span class="text-poison">☠</span>' : '';
@@ -124,12 +131,15 @@ function showEndOverlay(win) {
   overlay.className = 'overlay';
 
   const zAlive = aliveZombies().length;
-  const playerLosses = units.filter(u => !u.alive && u.kind === 'player').length;
+  const playerLosses = state.getUnits().filter(u => !u.alive && u.kind === 'player').length;
   const quote = win
     ? '«They mostly come at night... mostly.» — Aliens'
     : '«It\'s not the end of the world... oh wait, it is.»';
 
-  const stats = getStats();
+  const stats = state.getStats();
+  const turnNum = state.getTurnNum();
+  const turnsSurvived = state.getTurnsSurvived();
+  
   let levelReward = 0;
   if (win && gameData.currentLevel) {
     levelReward = completeLevel(gameData.currentLevel, stats);

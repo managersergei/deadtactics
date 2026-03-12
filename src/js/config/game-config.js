@@ -207,8 +207,9 @@ const LEVELS = {
   }
 };
 
-// Экспорт в глобальную область видимости для браузера
+// Делаем все переменные глобальными для браузера
 if (typeof window !== 'undefined') {
+  // Индивидуальные переменные
   window.COLS = COLS;
   window.ROWS = ROWS;
   window.PLACE_COLS = PLACE_COLS;
@@ -216,18 +217,20 @@ if (typeof window !== 'undefined') {
   window.ZOMBIE_SPAWN_POSITIONS = ZOMBIE_SPAWN_POSITIONS;
   window.PLAYER_STATS = PLAYER_STATS;
   window.WEAPONS = WEAPONS;
+  window.ITEM_TYPES = ITEM_TYPES;
+  window.ITEMS = ITEMS;
+  window.RECRUITS = RECRUITS;
   window.ZOMBIE_TYPES = ZOMBIE_TYPES;
   window.ZOMBIE_STATS = ZOMBIE_STATS;
   window.ZOMBIE_ACTION_DELAY = ZOMBIE_ACTION_DELAY;
   window.ZOMBIE_TURN_END_DELAY = ZOMBIE_TURN_END_DELAY;
   window.LORE_MESSAGES = LORE_MESSAGES;
   window.LEVELS = LEVELS;
-  window.ITEM_TYPES = ITEM_TYPES;
-  window.ITEMS = ITEMS;
-  window.RECRUITS = RECRUITS;
-}
-
-/* Для Node.js (тестов) - с проверкой */
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { COLS, ROWS, PLACE_COLS, PLAYER_UNIT_COUNT, ZOMBIE_SPAWN_POSITIONS, PLAYER_STATS, WEAPONS, ZOMBIE_STATS, ZOMBIE_ACTION_DELAY, ZOMBIE_TURN_END_DELAY, LORE_MESSAGES, LEVELS, ITEM_TYPES, ITEMS, RECRUITS };
+  
+  // Объект-конфиг (для совместимости)
+  window.CONFIG = {
+    COLS, ROWS, PLACE_COLS, PLAYER_UNIT_COUNT, ZOMBIE_SPAWN_POSITIONS,
+    PLAYER_STATS, WEAPONS, ITEM_TYPES, ITEMS, RECRUITS, ZOMBIE_TYPES,
+    ZOMBIE_STATS, ZOMBIE_ACTION_DELAY, ZOMBIE_TURN_END_DELAY, LORE_MESSAGES, LEVELS,
+  };
 }

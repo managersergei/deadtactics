@@ -52,7 +52,7 @@ const MAP_ZOMBIE_BACKGROUND = [
   {x: 200, y: 200},
 ];
 
-// Экспорт в глобальную область видимости для браузера
+// Делаем все переменные глобальными для браузера
 if (typeof window !== 'undefined') {
   window.SVG_W = SVG_W;
   window.SVG_H = SVG_H;
@@ -60,4 +60,9 @@ if (typeof window !== 'undefined') {
   window.MAP_COLORS = MAP_COLORS;
   window.MAP_MARKER = MAP_MARKER;
   window.MAP_ZOMBIE_BACKGROUND = MAP_ZOMBIE_BACKGROUND;
+  
+  // Объект uiConstants (для совместимости)
+  window.uiConstants = {
+    SVG_W, SVG_H, MAP_POSITIONS, MAP_COLORS, MAP_MARKER, MAP_ZOMBIE_BACKGROUND
+  };
 }
