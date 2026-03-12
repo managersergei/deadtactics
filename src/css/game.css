@@ -129,8 +129,8 @@
   width: 100%;
   display: flex;
   align-items: flex-end;
-  justify-content: space-between;
-  padding: 0 3px;
+  justify-content: center;
+  gap: 4px;
   box-sizing: border-box;
 }
 
@@ -170,7 +170,7 @@
 /* ── HP БАР ── */
 .hp-bar {
   height: 3px;
-  width: 70%;
+  width: 60%;
   background: #111;
   border-radius: 2px;
 }
