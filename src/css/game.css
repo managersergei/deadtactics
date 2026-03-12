@@ -169,7 +169,7 @@
 /* ── HP БАР ── */
 .hp-bar {
   height: 3px;
-  width: 60%;
+  width: 40%;
   background: #111;
   border-radius: 2px;
 }
@@ -185,6 +185,7 @@
 
 /* Иконка яда - справа от HP-бара */
 .status-icon {
+  margin-left: 8px;
   font-size: 10px;
   line-height: 1;
 }
