@@ -193,7 +193,7 @@ function _buildUnitEl(u, isDead = false) {
   } else if (u.kind === UNIT_TYPES.SURVIVOR) {
     // Для выживших — спрайты по оружию и состоянию
     const animState = getSurvivorAnimState(u);
-    const weaponId = u.equipment?.weapon || 'pistol';
+    const weaponId = u.weapon || u.equipment?.weapon || 'pistol';
     // Fallback: если нет left-спрайтов, используем right
     const dir = direction === 'left' ? 'right' : direction;
     const frameCount = SURVIVOR_FRAMES[animState] || 3;
