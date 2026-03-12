@@ -71,7 +71,7 @@ function handlePlayer(c, r) {
   const highlights = state.getHighlights();
 
   // 1. Клик на своего юнита → выбрать
-  if (clicked && clicked.kind === 'player') {
+  if (clicked && clicked.kind === 'survivor') {
     // Отмена выбора при повторном клике на того же юнита
     if (selected && clicked.id === selected.id) {
       state.setSelected(null);
@@ -87,7 +87,7 @@ function handlePlayer(c, r) {
   }
 
   // 2. Если игрок ВЫБРАН - проверяем атаку и движение
-  if (selected && selected.kind === 'player') {
+  if (selected && selected.kind === 'survivor') {
     // Атаковать врага (в зоне поражения)
     if (highlights.attack.has(key) && clicked && clicked.kind === 'zombie') {
       doAttack(selected, clicked);
@@ -128,7 +128,7 @@ function handlePlayer(c, r) {
 function recalcHighlights() {
   state.clearHighlights();
   const selected = state.getSelected();
-  if (!selected || selected.kind !== 'player') return;
+  if (!selected || selected.kind !== 'survivor') return;
   const u = selected;
 
   // Синяя зона движения — если ещё не переместился
@@ -167,19 +167,34 @@ function doAttack(attacker, target) {
   target.hp -= damage;
   state.recordDamageDealt(damage);
   attacker.attacked = true;
+  
+  // Анимация: если крит - cr_damaged, иначе damaged
+  if (target.hp > 0) {
+    target.damagedFlash = true;
+    if (isCrit) {
+      target.critFlash = true;
+      setTimeout(() => { target.critFlash = false; render(); }, 300);
+    }
+    setTimeout(() => { target.damagedFlash = false; render(); }, 300);
+  } else {
+    // Зомби умирает
+    target.dying = true;
+    setTimeout(() => {
+      target.alive = false;
+      target.dying = false;
+      render();
+      checkEnd();
+    }, 600);
+    log(`💀 Зомби уничтожен!`, 'dmg');
+    state.recordKill();
+  }
+  
   playShot();
   log(`💥 Атака${isCrit ? ' (КРИТ!)' : ''} → зомби [${target.x+1},${target.y+1}] — ${target.hp}/${target.maxHp}HP`, 'dmg');
-
-  if (target.hp <= 0) {
-    target.alive = false;
-    state.recordKill();
-    log(`💀 Зомби уничтожен!`, 'dmg');
-  }
 
   state.clearHighlights();
   state.setSelected(null);
   render();
-  checkEnd();
 }
 
 // ── Смена хода ────────────────────────────────────────────
