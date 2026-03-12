@@ -331,12 +331,11 @@ function startPlayerTurn() {
     u.attacked = false;
   });
 
-  // Урон от яда в начале хода
+  // Урон от яда в начале хода (без render() - анимация будет через CSS)
   alivePlayers().filter(u => u.poisoned).forEach(u => {
     u.hp -= ZOMBIE_STATS.poisonDmg;
     playPoison();
     u.poisonFlash = true;
-    setTimeout(() => u.poisonFlash = false, 1500);
     state.recordPoisonDamage(ZOMBIE_STATS.poisonDmg);
     log(`☠ Яд: Выживший −${ZOMBIE_STATS.poisonDmg}HP → ${u.hp}/${u.maxHp}HP`, 'poison');
     if (u.hp <= 0) {
@@ -349,6 +348,17 @@ function startPlayerTurn() {
 
   state.setPhase('player');
   log(`════ Ход ${state.getTurnNum()} · Ваши действия ════`, 'sys');
+  
+  // Запустить таймер для сброса poisonFlash после render
+  setTimeout(() => {
+    state.getUnits().forEach(u => {
+      if (u.poisonFlash) {
+        u.poisonFlash = false;
+      }
+    });
+    render();
+  }, 100);
+  
   render();
 }
 
