@@ -348,13 +348,28 @@ function startPlayerTurn() {
 
     if (checkEnd()) return;
 
-    // Анимация poisonFlash убрана - только звук и урон
+    // Анимация poisonFlash
+    animationPaused = true;
+    poisonedUnits.forEach(u => {
+      if (u.alive) {
+        u.poisonFlash = true;
+      }
+    });
     playPoison();
-    
-    // Сразу переходим к фазе игрока без анимации
-    state.setPhase('player');
-    log(`════ Ход ${state.getTurnNum()} · Ваши действия ════`, 'sys');
     render();
+
+    // Через 300ms выключаем анимацию (2 кадра × 150ms)
+    setTimeout(() => {
+      poisonedUnits.forEach(u => {
+        if (u.alive) {
+          u.poisonFlash = false;
+        }
+      });
+      animationPaused = false;
+      state.setPhase('player');
+      log(`════ Ход ${state.getTurnNum()} · Ваши действия ════`, 'sys');
+      render();
+    }, 300);
   } else {
     // Нет отравленных - сразу продолжаем
     state.setPhase('player');
