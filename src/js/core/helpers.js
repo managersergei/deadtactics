@@ -54,13 +54,13 @@ function reachable(u) {
 // Все живые зомби
 function aliveZombies() {
   const units = getAllUnits();
-  return units.filter(u => u.alive && u.kind === 'zombie');
+  return units.filter(u => u.alive && u.kind === UNIT_TYPES.ZOMBIE);
 }
 
 // Все живые юниты игрока
 function alivePlayers() {
   const units = getAllUnits();
-  return units.filter(u => u.alive && u.kind === 'survivor');
+  return units.filter(u => u.alive && u.kind === UNIT_TYPES.SURVIVOR);
 }
 
 // Генерация случайных позиций для зомби в правой части карты
@@ -163,7 +163,7 @@ function getDirection(unit, target) {
   }
   
   // Для зомби - ближайший игрок
-  if (unit.kind === 'zombie') {
+  if (unit.kind === UNIT_TYPES.ZOMBIE) {
     const players = alivePlayers();
     if (players.length > 0) {
       // Находим ближайшего игрока

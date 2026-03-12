@@ -14,7 +14,7 @@ function mkPlayer(x, y, squadUnit) {
   return {
     id: uid(),
     name: squadUnit?.name || 'Выживший',
-    kind: 'survivor',
+    kind: UNIT_TYPES.SURVIVOR,
     emoji: squadUnit?.emoji || PLAYER_STATS.emoji,
     x, y,
     hp: effectiveMaxHp,           // HP полный в начале боя
@@ -34,7 +34,7 @@ function mkPlayer(x, y, squadUnit) {
 function mkZombie(x, y) {
   return {
     id: uid(),
-    kind: 'zombie',
+    kind: UNIT_TYPES.ZOMBIE,
     emoji: ZOMBIE_STATS.emoji,
     x, y,
     hp: ZOMBIE_STATS.hp,

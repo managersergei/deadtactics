@@ -33,6 +33,8 @@ global.window.ITEMS = config.ITEMS;
 global.window.COLS = config.COLS;
 global.window.ROWS = config.ROWS;
 global.window.WEAPONS = config.WEAPONS;
+global.window.UNIT_TYPES = config.UNIT_TYPES;
+global.UNIT_TYPES = config.UNIT_TYPES;
 
 function run() {
   console.log('=== Running helpers tests ===');
