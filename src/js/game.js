@@ -148,14 +148,109 @@ function recalcHighlights() {
   }
 }
 
-function doMove(u, c, r) {
-  log(`▶ Переместился на [${c+1},${r+1}]`, 'move');
-  u.x = c; u.y = r;
-  u.moved = true;
+// Задержка между шагами движения (мс)
+const SURVIVOR_STEP_DELAY = 200;
+
+// Функция ожидания
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Плавное перемещение выжившего по клеткам
+async function doMove(u, c, r) {
+  const oldX = u.x, oldY = u.y;
+  if (oldX === c && oldY === r) return;
+  
+  // Вычисляем путь (простое движение по одной оси за раз)
+  const path = [];
+  let cx = oldX, cy = oldY;
+  
+  // Двигаемся по X
+  while (cx !== c) {
+    cx += (c > cx) ? 1 : -1;
+    path.push({ x: cx, y: cy });
+  }
+  // Двигаемся по Y
+  while (cy !== r) {
+    cy += (r > cy) ? 1 : -1;
+    path.push({ x: cx, y: cy });
+  }
+  
+  // Ограничиваем длину пути moveRange
+  const maxSteps = u.moveRange || 4;
+  const actualPath = path.slice(0, maxSteps);
+  
+  if (actualPath.length === 0) {
+    u.x = c; u.y = r;
+    u.moved = true;
+    render();
+    return;
+  }
+  
+  // Пауза для анимации
+  animationPaused = true;
   playFootstep();
-  state.clearHighlights(); // после движения атаки нет
+  
+  // Найти img элемент выжившего
+  const oldCell = cell(u.x, u.y);
+  const oldUnit = oldCell ? oldCell.querySelector('.unit.survivor') : null;
+  const moveImg = oldUnit ? oldUnit.querySelector('img') : null;
+  
+  // Включить анимацию move
+  if (moveImg) {
+    const weaponId = u.weapon || u.equipment?.weapon || 'pistol';
+    moveImg.dataset.animated = `src/assets/units/survivor/${weaponId}/move_right/`;
+    moveImg.dataset.animState = 'move';
+    moveImg.dataset.maxFrames = 3;
+  }
+  
+  // Двигаемся по клеткам
+  for (const pos of actualPath) {
+    u.x = pos.x;
+    u.y = pos.y;
+    u.moving = true;
+    
+    // Обновить direction
+    u.direction = pos.x > oldX ? 'right' : pos.x < oldX ? 'left' : u.direction;
+    
+    // Переместить img в новую клетку
+    _moveSurvivorImage(u, oldUnit);
+    
+    log(`▶ → [${pos.x+1},${pos.y+1}]`, 'move');
+    await sleep(SURVIVOR_STEP_DELAY);
+  }
+  
+  // Вернуть idle анимацию
+  if (moveImg) {
+    const weaponId = u.weapon || u.equipment?.weapon || 'pistol';
+    moveImg.dataset.animated = `src/assets/units/survivor/${weaponId}/idle_right/`;
+    moveImg.dataset.animState = 'idle';
+    moveImg.dataset.maxFrames = 3;
+  }
+  
+  u.moving = false;
+  u.moved = true;
+  animationPaused = false;
+  
+  state.clearHighlights();
   render();
   checkEnd();
+}
+
+// Переместить unit выжившего в новую клетку (без полного рендера)
+function _moveSurvivorImage(u, unit) {
+  if (!unit) {
+    render();
+    return;
+  }
+  const newCell = cell(u.x, u.y);
+  if (newCell) {
+    const existingUnit = newCell.querySelector('.unit');
+    if (existingUnit) {
+      newCell.removeChild(existingUnit);
+    }
+    newCell.appendChild(unit);
+  }
 }
 
 function doAttack(attacker, target) {
