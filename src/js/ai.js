@@ -139,9 +139,9 @@ function zombieAttack(z, target) {
   const hasPoisonBlock = armor?.blockPoison === true;
   
   // Заражаем только если нет защиты от яда
-  const wasPoison = target.poisoned;
+  const wasPoison = hasEffect(target, 'poison');
   if (!hasPoisonBlock) {
-    target.poisoned = true;
+    addEffect(target, 'poison'); // Используем систему эффектов
   }
   playBite();
 
