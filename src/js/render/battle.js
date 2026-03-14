@@ -86,6 +86,14 @@ function startAnimation() {
         frame = (animationFrame % maxFrames) + 1;
       }
 
+      // Fallback для left-спрайтов — зеркаливаем right
+      if (base.includes('_left_')) {
+        img.onerror = function() {
+          this.src = this.src.replace('_left_', '_right_');
+          this.style.transform = 'scaleX(-1)';
+        };
+      }
+      
       img.src = `${base}${animState}_${frame}.png`;
     });
   }, ANIMATION_SPEED);
@@ -98,6 +106,49 @@ function stopAnimation() {
 
 function resetAnimCounter(unitId) {
   delete animFrameCounters[unitId];
+}
+
+// УНИФИКАЦИЯ ОТЗЕРКАЛИВАНИЯ
+// ==========================
+
+// Получить базовое направление спрайтов для типа юнита
+function getBaseDir(kind) {
+  return kind === UNIT_TYPES.ZOMBIE ? 'left' : 'right';
+}
+
+// Универсальная функция определения визуального направления
+// Зомби: динамически смотрит на ближайшего игрока (через getDirection)
+// Выживший: использует сохранённое направление движения (u.direction)
+function getVisualDirection(u) {
+  if (u.kind === UNIT_TYPES.ZOMBIE) {
+    return getDirection(u); // динамически к ближайшему игроку
+  } else {
+    return u.direction || 'right'; // статически - куда последний раз двигался
+  }
+}
+
+// Применить отзеркаливание на основе визуального направления
+// Возвращает: { base, needsMirror }
+function computeSpritePath(u, state, direction) {
+  const baseDir = getBaseDir(u.kind);
+  const needsMirror = direction !== baseDir;
+  
+  let base;
+  if (u.kind === UNIT_TYPES.ZOMBIE) {
+    base = `src/assets/units/zombie/${state}_${baseDir}/`;
+  } else {
+    const weaponId = u.weapon || u.equipment?.weapon || 'pistol';
+    const folder = state === 'die' ? 'die/' : `${state}_${direction}/`;
+    base = `src/assets/units/survivor/${weaponId}/${folder}`;
+    
+    // Fallback для выжившего: если нужны left-спрайты, используем right + mirror
+    if (direction === 'left') {
+      base = base.replace(`_${direction}_`, '_right_')
+                 .replace('/die_left/', '/die/');
+    }
+  }
+  
+  return { base, needsMirror };
 }
 
 // ── РЕНДЕР ────────────────────────────────────────────────
@@ -220,19 +271,15 @@ function syncUnitsWithDOM() {
       resetAnimCounter(u.id);
     }
 
-    // Вычислить путь к папке спрайтов
-    let base, maxFrames;
-    if (u.kind === UNIT_TYPES.ZOMBIE) {
-      const dir = getDirection(u);
-      base = `src/assets/units/zombie/${newState}_${dir}/`;
-      maxFrames = ZOMBIE_FRAMES[newState] || 1;
-    } else {
-      const dir = u.direction || 'right';
-      const weaponId = u.weapon || u.equipment?.weapon || 'pistol';
-      const folder = newState === 'die' ? 'die/' : `${newState}_${dir}/`;
-      base = `src/assets/units/survivor/${weaponId}/${folder}`;
-      maxFrames = SURVIVOR_FRAMES[newState] || 1;
-    }
+    // Унифицированное вычисление пути к спрайтам
+    const dir = getVisualDirection(u);
+    const { base, needsMirror } = computeSpritePath(u, newState, dir);
+    const maxFrames = u.kind === UNIT_TYPES.ZOMBIE 
+      ? ZOMBIE_FRAMES[newState] || 1 
+      : SURVIVOR_FRAMES[newState] || 1;
+
+    // Применить отзеркаливание если нужно
+    img.style.transform = needsMirror ? 'scaleX(-1)' : '';
 
     img.dataset.animated = base;
     img.dataset.animState = newState;
@@ -257,23 +304,16 @@ function _buildUnitEl(u, isDead = false) {
   const visual = document.createElement('div');
   visual.className = 'unit-visual';
 
-  const direction = isDead ? 'left' : (u.direction || 'right');
-
   if (u.kind === UNIT_TYPES.ZOMBIE || u.kind === UNIT_TYPES.SURVIVOR) {
     const img = document.createElement('img');
 
     // Начальный спрайт — первый кадр idle
-    let base, animState, maxFrames;
-    if (u.kind === UNIT_TYPES.ZOMBIE) {
-      animState = isDead ? 'killed' : 'idle';
-      maxFrames = ZOMBIE_FRAMES[animState] || 1;
-      base = `src/assets/units/zombie/${animState}_${direction}/`;
-    } else {
-      animState = 'idle';
-      maxFrames = SURVIVOR_FRAMES.idle;
-      const weaponId = u.weapon || u.equipment?.weapon || 'pistol';
-      base = `src/assets/units/survivor/${weaponId}/idle_${direction}/`;
-    }
+    const animState = isDead ? (u.kind === UNIT_TYPES.ZOMBIE ? 'killed' : 'die') : 'idle';
+    const direction = isDead ? 'left' : getVisualDirection(u);
+    const { base, needsMirror } = computeSpritePath(u, animState, direction);
+    const maxFrames = u.kind === UNIT_TYPES.ZOMBIE 
+      ? ZOMBIE_FRAMES[animState] || 1 
+      : SURVIVOR_FRAMES[animState] || 1;
 
     img.src = `${base}${animState}_1.png`;
     img.dataset.animated = base;
@@ -281,6 +321,10 @@ function _buildUnitEl(u, isDead = false) {
     img.dataset.maxFrames = maxFrames;
     img.dataset.unitId = u.id;
     img.style.cssText = 'width:100px;height:100px;object-fit:contain;pointer-events:none;display:block;';
+    // Применить отзеркаливание
+    img.style.transform = needsMirror ? 'scaleX(-1)' : '';
+    
+    // Fallback: если нет спрайта — показываем emoji
     img.onerror = function() {
       this.style.display = 'none';
       const em = document.createElement('span');
