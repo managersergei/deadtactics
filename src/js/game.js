@@ -100,19 +100,11 @@ function doGrenade(attacker, targetX, targetY) {
     const grenade = ITEMS.grenade;
     aliveZombies().forEach(z => {
       if (manhattan({x:targetX,y:targetY}, z) <= grenade.splashRange) {
-        z.hp -= grenade.damage;
-        state.recordDamageDealt(grenade.damage);
-        
-        // Проверка ярости зомби (HP = 1)
-        if (z.hp <= 1 && z.alive && !z.raged) {
-          z.raged = true;
-          log(`⚡ Зомби в ярости!`, 'zombie-act');
-        }
+        // Используем централизованную функцию
+        const result = takeDamage(z, grenade.damage, 'grenade');
         
         log(`💣 Граната → зомби [${z.x+1},${z.y+1}] −${grenade.damage}HP`, 'dmg');
-        if (z.hp <= 0) {
-          z.dying = true;
-          setTimeout(() => { z.alive = false; z.dying = false; resetAnimFrame(z.id); render(); checkEnd(); }, 600);
+        if (result.died) {
           state.recordKill();
           log(`💀 Зомби уничтожен!`, 'dmg');
         }
@@ -279,7 +271,7 @@ function doAttack(attacker, target) {
   const weaponId = getEffectiveStat(attacker, 'weapon');
   const damageArr = calcDamage(weaponId);
   const damage = damageArr ? damageArr[0] : 0;
-  const isCrit = damage === ITEMS[weaponId]?.critDmg;
+  const isCrit = damage >= 2; // крит = 2+ урона
   
   // Анимация атаки выжившего
   if (attacker.kind === 'survivor') {
@@ -291,14 +283,8 @@ function doAttack(attacker, target) {
   
   // Наносим урон после небольшой задержки для анимации
   setTimeout(() => {
-    target.hp -= damage;
-    state.recordDamageDealt(damage);
-    
-    // Проверка ярости зомби (HP = 1)
-    if (target.kind === 'zombie' && target.hp <= 1 && target.alive && !target.raged) {
-      target.raged = true;
-      log(`⚡ Зомби в ярости!`, 'zombie-act');
-    }
+    // Используем централизованную функцию — она сама поставит damagedFlash
+    const result = takeDamage(target, damage, 'player');
     
     attacker.attacked = true;
     
@@ -323,29 +309,15 @@ function doAttack(attacker, target) {
       }
     }
     
-    // Анимация: если крит - cr_damaged, иначе damaged
-    if (target.hp > 0) {
-      target.damagedFlash = true;
-      if (isCrit) {
-        target.critFlash = true;
-        setTimeout(() => { target.critFlash = false; render(); }, 300);
-      }
-      setTimeout(() => { target.damagedFlash = false; render(); }, 300);
-    } else {
-      // Зомби умирает
-      target.dying = true;
-      setTimeout(() => {
-        target.alive = false;
-        target.dying = false;
-        render();
-        checkEnd();
-      }, 600);
+    playShot();
+    
+    // Лог результата
+    if (result.died) {
       log(`💀 Зомби уничтожен!`, 'dmg');
       state.recordKill();
+    } else {
+      log(`💥 Атака${isCrit ? ' (КРИТ!)' : ''} → зомби [${target.x+1},${target.y+1}] — ${target.hp}/${target.maxHp}HP`, 'dmg');
     }
-    
-    playShot();
-    log(`💥 Атака${isCrit ? ' (КРИТ!)' : ''} → зомби [${target.x+1},${target.y+1}] — ${target.hp}/${target.maxHp}HP`, 'dmg');
 
     state.clearHighlights();
     state.setSelected(null);
@@ -453,6 +425,77 @@ function startPlayerTurn() {
     log(`════ Ход ${state.getTurnNum()} · Ваши действия ════`, 'sys');
     render();
   }
+}
+
+// ── ЦЕНТРАЛИЗОВАННАЯ СИСТЕМА УРОНА ─────────────────────
+
+// Единая функция для нанесения урона — ставит флаги анимаций сама
+// target: юнит которому наносим урон
+// amount: количество урона
+// source: 'player' | 'zombie' | 'grenade' | 'effect'
+// returns: { died: boolean }
+function takeDamage(target, amount, source) {
+  const oldHp = target.hp;
+  target.hp -= amount;
+  
+  // Записываем урон в статистику
+  if (source === 'player' || source === 'grenade') {
+    state.recordDamageDealt(amount);
+  } else if (source === 'zombie') {
+    recordDamageTaken(amount);
+  }
+  
+  // Анимация повреждения (только если юнит выжил)
+  if (target.hp > 0) {
+    target.damagedFlash = true;
+    
+    // Для критического урона от игрока
+    if (source === 'player' && amount >= 2) {
+      target.critFlash = true;
+    }
+    
+    // Сброс после анимации
+    setTimeout(() => {
+      target.damagedFlash = false;
+      if (target.critFlash) {
+        target.critFlash = false;
+      }
+      render();
+    }, 300);
+  }
+  
+  // Проверка смерти
+  if (target.hp <= 0) {
+    if (target.kind === UNIT_TYPES.SURVIVOR) {
+      // Survivor — анимация падения (killed)
+      target.dyingAnim = true;
+      setTimeout(() => {
+        target.alive = false;
+        target.dyingAnim = false;
+        render();
+        checkEnd();
+      }, 600);
+    } else {
+      // Zombie — анимация смерти
+      target.dying = true;
+      setTimeout(() => {
+        target.alive = false;
+        target.dying = false;
+        resetAnimFrame(target.id);
+        render();
+        checkEnd();
+      }, 600);
+    }
+    return { died: true };
+  }
+  
+  // Проверка ярости для зомби (HP = 1)
+  if (target.kind === UNIT_TYPES.ZOMBIE && target.hp === 1 && !target.raged) {
+    target.raged = true;
+    log(`⚡ Зомби в ярости!`, 'zombie-act');
+  }
+  
+  return { died: false };
 }
 
 // ── Конец боя ────────────────────────────────────────────

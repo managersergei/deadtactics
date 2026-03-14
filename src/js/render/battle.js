@@ -220,9 +220,14 @@ function _drawHighlights() {
 
 // Обновить визуальные элементы юнита (HP bar) без пересоздания DOM
 function updateUnitVisuals(u, el) {
-  if (!u.alive) return;
-  
   const statusEl = el.querySelector('.unit-status');
+  
+  // Если юнит мёртв — удаляем status элемент полностью
+  if (!u.alive) {
+    if (statusEl) statusEl.remove();
+    return;
+  }
+  
   if (!statusEl) return;
   
   // Найти HP bar

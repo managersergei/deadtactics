@@ -28,26 +28,26 @@ async function runZombies() {
     if (dist <= z.atkRange) {
       // Враг в зоне атаки — сразу кусаем
       if (z.raged) {
-        // Rage: атакуем 2 раза подряд (после анимации первой атаки)
-        zombieAttack(z, target);
+        // Rage: атакуем 2 раза подряд (с ожиданием анимации)
+        await zombieAttack(z, target);
         if (checkEnd()) break;
-        await sleep(750); // ждём окончания анимации атаки (5 кадров × 150ms)
-        zombieAttack(z, target);
+        await sleep(500); // пауза между ударами
+        await zombieAttack(z, target);
       } else {
-        zombieAttack(z, target);
+        await zombieAttack(z, target);
       }
     } else {
       // Идём к цели, потом пробуем атаковать
       await zombieMove(z, target);
       if (manhattan(z, target) <= z.atkRange) {
         if (z.raged) {
-          // Rage: атакуем 2 раза подряд (после анимации первой атаки)
-          zombieAttack(z, target);
+          // Rage: атакуем 2 раза подряд (с ожиданием анимации)
+          await zombieAttack(z, target);
           if (checkEnd()) break;
-          await sleep(750); // ждём окончания анимации атаки (5 кадров × 150ms)
-          zombieAttack(z, target);
+          await sleep(500); // пауза между ударами
+          await zombieAttack(z, target);
         } else {
-          zombieAttack(z, target);
+          await zombieAttack(z, target);
         }
       }
     }
@@ -124,14 +124,18 @@ async function zombieMove(z, target) {
 }
 
 // Зомби атакует игрока: урон + заражение
-function zombieAttack(z, target) {
+async function zombieAttack(z, target) {
   // Анимация атаки
   z.attacking = true;
   render();
-  setTimeout(() => { z.attacking = false; render(); }, 300);
   
-  target.hp -= z.atkDmg;
-  recordDamageTaken(z.atkDmg);
+  // Ждём окончания анимации атаки
+  await new Promise(resolve => setTimeout(resolve, ZOMBIE_FRAMES.attack * ANIMATION_SPEED));
+  
+  z.attacking = false;
+  
+  // Используем централизованную функцию — она сама поставит damagedFlash
+  const result = takeDamage(target, z.atkDmg, 'zombie');
   
   // Проверить есть ли броня с защитой от яда
   const armorId = target.equipment?.armor;
@@ -155,11 +159,9 @@ function zombieAttack(z, target) {
     log(`🧟 Укус! Выживший → ${target.hp}/${target.maxHp}HP`, 'zombie-act');
   }
 
-  if (target.hp <= 0) {
-    target.alive = false;
+  if (result.died) {
     log(`💀 Выживший пал!`, 'dmg');
   }
-  checkEnd();
 }
 
 // Найти ближайшего игрока к зомби
