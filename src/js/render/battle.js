@@ -152,6 +152,27 @@ function _drawHighlights() {
   });
 }
 
+// Обновить визуальные элементы юнита (HP bar) без пересоздания DOM
+function updateUnitVisuals(u, el) {
+  if (!u.alive) return;
+  
+  const statusEl = el.querySelector('.unit-status');
+  if (!statusEl) return;
+  
+  // Найти HP bar
+  const hpFill = statusEl.querySelector('.hp-fill');
+  if (!hpFill) return;
+  
+  // Обновить ширину
+  const pct = Math.max(0, u.hp / u.maxHp);
+  hpFill.style.width = (pct * 100) + '%';
+  
+  // Обновить класс цвета
+  hpFill.className = 'hp-fill';
+  if (pct <= 0.34) hpFill.classList.add('low');
+  else if (pct <= 0.67) hpFill.classList.add('med');
+}
+
 // Синхронизировать DOM с state — перемещает элементы, не пересоздаёт
 function syncUnitsWithDOM() {
   const units = state.getUnits();
@@ -180,6 +201,9 @@ function syncUnitsWithDOM() {
     // Обновить классы
     el.classList.toggle('selected-unit', !!(selected && selected.id === u.id));
     el.classList.toggle('dead', !u.alive);
+
+    // Обновить визуальные элементы (HP bar)
+    updateUnitVisuals(u, el);
 
     // Обновить анимацию через dataset — аниматор подхватит на следующем тике
     const img = el.querySelector('img[data-animated]');
