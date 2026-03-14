@@ -201,3 +201,58 @@ div.unit.{kind}#unit-{id}
 4. Добавить флаг в объект юнита в `units.js`
 5. Добавить проверку в `getZombieAnimState()` или `getSurvivorAnimState()` с нужным приоритетом
 6. Добавить логику включения/выключения флага в `game.js` или `ai.js`
+
+---
+
+## 15. Обновление HP bar
+
+При изменении HP юнита (атака, граната, эффекты) визуализация обновляется через цепочку вызовов:
+
+```
+doAttack() / doGrenade() / processEffectsOnTurnStart()
+    ↓
+render()
+    ↓
+syncUnitsWithDOM()
+    ↓
+updateUnitVisuals(u, el)
+```
+
+### Функция `updateUnitVisuals(u, el)`
+
+Находится в `battle.js`. Обновляет визуальные элементы юнита без пересоздания DOM:
+
+```javascript
+function updateUnitVisuals(u, el) {
+  if (!u.alive) return;
+  
+  const statusEl = el.querySelector('.unit-status');
+  if (!statusEl) return;
+  
+  const hpFill = statusEl.querySelector('.hp-fill');
+  if (!hpFill) return;
+  
+  // Обновить ширину
+  const pct = Math.max(0, u.hp / u.maxHp);
+  hpFill.style.width = (pct * 100) + '%';
+  
+  // Обновить класс цвета
+  hpFill.className = 'hp-fill';
+  if (pct <= 0.34) hpFill.classList.add('low');
+  else if (pct <= 0.67) hpFill.classList.add('med');
+}
+```
+
+### Почему это важно
+
+- HP bar создаётся один раз в `_buildUnitEl()` при появлении юнита
+- При каждом `render()` вызывается `syncUnitsWithDOM()`, который вызывает `updateUnitVisuals()`
+- Это гарантирует что HP bar всегда отражает актуальное значение `u.hp / u.maxHp`
+- Обновление только стилей (без пересоздания DOM) избегает визуального мигания
+
+### Принцип Single Responsibility
+
+Обновление визуализации вынесено в отдельную функцию `updateUnitVisuals()`, а не находится внутри `syncUnitsWithDOM()`. Это:
+- Упрощает поддержку кода
+- Позволяет легко добавить другие визуальные обновления
+- Сохраняет `syncUnitsWithDOM()` чистой (только перемещение элементов)
