@@ -10,7 +10,7 @@ const initialState = {
   placedCount: 0,
   turnNum: 1,
   turnsSurvived: 0,
-  highlights: { move: new Set(), attack: new Set() },
+  highlights: { move: new Set(), attack: new Set(), throw: new Set() },
   selectedSquadUnitId: null,
   stats: {
     zombiesKilled: 0,
@@ -55,7 +55,7 @@ const incrementTurnsSurvived = () => { state.turnsSurvived++; };
 
 const getHighlights = () => state.highlights;
 const setHighlights = (h) => { state.highlights = h; };
-const clearHighlights = () => { state.highlights = { move: new Set(), attack: new Set() }; };
+const clearHighlights = () => { state.highlights = { move: new Set(), attack: new Set(), throw: new Set() }; };
 
 const getStats = () => state.stats;
 
@@ -78,7 +78,7 @@ const resetState = () => {
   state.placedCount = 0;
   state.turnNum = 1;
   state.turnsSurvived = 0;
-  state.highlights = { move: new Set(), attack: new Set() };
+  state.highlights = { move: new Set(), attack: new Set(), throw: new Set() };
   state.selectedSquadUnitId = null;
   state.stats = { ...initialState.stats };
   state._uid = 0;

@@ -125,7 +125,19 @@ function buyItem(unitId, itemId) {
   if (!unit.equipment) {
     unit.equipment = { weapon: 'pistol', armor: null, boots: null };
   }
-  unit.equipment[item.type] = itemId;
+  
+  // Расходники - не экипируются, а добавляются в inventory
+  if (item.type === 'consumable') {
+    if (!unit.inventory) unit.inventory = {};
+    unit.inventory[itemId] = (unit.inventory[itemId] || 0) + 1;
+  } else {
+    // Обычные предметы - экипируем
+    if (item.type === 'weapon') {
+      unit.equipment.weapon = itemId;
+    } else {
+      unit.equipment[item.type] = itemId;
+    }
+  }
   
   return { success: true };
 }

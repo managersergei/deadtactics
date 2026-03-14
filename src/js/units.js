@@ -23,7 +23,8 @@ function mkPlayer(x, y, squadUnit) {
     atkRange: PLAYER_STATS.atkRange,
     weapon: 'pistol',             // Base weapon (actual used is in equipment)
     equipment: eq,                 // Снаряжение из squad
-    poisoned: false,              // заражён укусом зомби
+    inventory: squadUnit?.inventory || {}, // Инвентарь с расходниками
+    effects: {},                  // статусные эффекты { poison: {duration: null, stacks: 1}, ... }
     moved: false,                 // уже переместился в этот ход
     attacked: false,              // уже атаковал в этот ход
     shotsFired: 0,               // количество выстрелов (для перезарядки)

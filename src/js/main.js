@@ -1,6 +1,8 @@
-import * as uiConstants from './config/ui-constants.js';
-import * as gameConfig from './config/game-config.js';
-import * as state from './core/state.js';
-import * as helpers from './core/helpers.js';
+import { uiConstants, gameConfig } from './config/ui-constants.js';
+import { state, helpers } from './core/state.js';
 
-Object.assign(window, uiConstants, gameConfig, state, helpers);
+// Используйте импортированные объекты напрямую
+console.log(uiConstants.SOME_CONSTANT);
+console.log(gameConfig.SOME_CONFIG);
+console.log(state.someStateVariable);
+console.log(helpers.someHelperFunction());

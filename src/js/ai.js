@@ -6,7 +6,7 @@
 // Функции state доступны через window.state
 
 // Задержка между шагами движения (мс)
-const ZOMBIE_STEP_DELAY = 250;
+const ZOMBIE_STEP_DELAY = ZOMBIE_FRAMES.move * ANIMATION_SPEED; // 6 * 150 = 900
 
 // Функция ожидания
 function sleep(ms) {
@@ -27,12 +27,28 @@ async function runZombies() {
 
     if (dist <= z.atkRange) {
       // Враг в зоне атаки — сразу кусаем
-      zombieAttack(z, target);
+      if (z.hp <= 1) {
+        // Rage: атакуем 2 раза подряд (после анимации первой атаки)
+        zombieAttack(z, target);
+        if (checkEnd()) break;
+        await sleep(750); // ждём окончания анимации атаки (5 кадров × 150ms)
+        zombieAttack(z, target);
+      } else {
+        zombieAttack(z, target);
+      }
     } else {
       // Идём к цели, потом пробуем атаковать
       await zombieMove(z, target);
       if (manhattan(z, target) <= z.atkRange) {
-        zombieAttack(z, target);
+        if (z.hp <= 1) {
+          // Rage: атакуем 2 раза подряд (после анимации первой атаки)
+          zombieAttack(z, target);
+          if (checkEnd()) break;
+          await sleep(750); // ждём окончания анимации атаки (5 кадров × 150ms)
+          zombieAttack(z, target);
+        } else {
+          zombieAttack(z, target);
+        }
       }
     }
     render();
@@ -54,9 +70,7 @@ async function zombieMove(z, target) {
     units.filter(u => u.alive && u.id !== z.id).map(u => `${u.x},${u.y}`)
   );
   let cx = z.x, cy = z.y;
-  let stepsMoved = 0;
 
-  // Вычисляем путь заранее
   const path = [];
   for (let step = 0; step < z.moveRange; step++) {
     if (manhattan({ x: cx, y: cy }, target) <= 1) break;
@@ -78,71 +92,34 @@ async function zombieMove(z, target) {
       cx = nx; cy = ny;
       occupied.add(`${cx},${cy}`);
       moved = true;
-      stepsMoved++;
       break;
     }
     if (!moved) break;
   }
 
-  // Если есть куда идти — перемещаем по клеткам с задержкой
   if (path.length > 0) {
-    animationPaused = true; // Пауза циклической анимации
-    playZombieMove(); // Один раз в начале
-    
-    // Найти div.unit зомби и img
-    const oldCell = cell(z.x, z.y);
-    const oldUnit = oldCell ? oldCell.querySelector('.unit.zombie') : null;
-    const moveImg = oldUnit ? oldUnit.querySelector('img') : null;
-    
-    // Включить анимацию move перед началом движения
-    if (moveImg) {
-      // Меняем и base, и animState
-      const direction = getDirection(z);
-      moveImg.dataset.animated = `src/assets/units/zombie/move_${direction}/`;
-      moveImg.dataset.animState = 'move';
-      moveImg.dataset.maxFrames = 4;
-    }
-    
+    animationPaused = true;
+    z.moving = true;
+    playZombieMove();
+
+    // Запустить анимацию один раз
+    startAnimation();
+
     for (const pos of path) {
       z.x = pos.x;
       z.y = pos.y;
-      z.moving = true;
-      
-      // Переместить unit в новую клетку без полного render()
-      _moveZombieImage(z, oldUnit);
-      
+      z.direction = pos.x > z.x ? 'right' : 'left';
       log(`🧟 Зомби → [${pos.x+1},${pos.y+1}]`, 'zombie-act');
+
+      syncUnitsWithDOM();
+      _drawHighlights();
+
       await sleep(ZOMBIE_STEP_DELAY);
     }
-    
-    // Переключить обратно на idle после завершения движения
-    if (moveImg) {
-      const direction = getDirection(z);
-      moveImg.dataset.animated = `src/assets/units/zombie/idle_${direction}/`;
-      moveImg.dataset.animState = 'idle';
-      moveImg.dataset.maxFrames = 4;
-    }
-    
-    z.moving = false;
-    animationPaused = false; // Возобновить циклическую анимацию
-    render(); // Полный рендер после завершения движения
-  }
-}
 
-// Переместить unit зомби в новую клетку (без полного перерендера)
-function _moveZombieImage(z, unit) {
-  if (!unit) {
+    z.moving = false;
+    animationPaused = false;
     render();
-    return;
-  }
-  // Найти новую клетку через cell()
-  const newCell = cell(z.x, z.y);
-  if (newCell) {
-    const existingUnit = newCell.querySelector('.unit');
-    if (existingUnit) {
-      newCell.removeChild(existingUnit);
-    }
-    newCell.appendChild(unit);
   }
 }
 

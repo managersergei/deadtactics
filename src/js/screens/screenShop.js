@@ -10,8 +10,8 @@ function renderShopScreen() {
   
   updateShopUnitSelector();
   renderShopSection('shop-weapons', 'weapon');
-  renderShopSection('shop-armors', 'armor');
-  renderShopSection('shop-boots', 'boots');
+  renderShopDefense();
+  renderShopSection('shop-accessories', 'boots');
 }
 
 function updateShopUnitSelector() {
@@ -73,6 +73,51 @@ function renderShopSection(containerId, type) {
   });
 }
 
+// Рендерит объединённую секцию "Защита и лечение" (броня + расходники)
+function renderShopDefense() {
+  const container = document.getElementById('shop-defense');
+  if (!container) return;
+  
+  // Получаем броню и расходники
+  const armorItems = Object.entries(ITEMS).filter(([id, item]) => item.type === 'armor');
+  const consumableItems = Object.entries(ITEMS).filter(([id, item]) => item.type === 'consumable');
+  
+  const allItems = [...armorItems, ...consumableItems];
+  
+  container.innerHTML = allItems.map(([id, item]) => {
+    let isOwned = false;
+    if (shopSelectedUnitId) {
+      const unit = getUnitById(shopSelectedUnitId);
+      if (unit) {
+        // Для брони - проверяем equipment.armor
+        if (item.type === 'armor' && unit.equipment && unit.equipment.armor === id) {
+          isOwned = true;
+        }
+        // Для расходников - проверяем inventory
+        if (item.type === 'consumable' && unit.inventory && unit.inventory[id] > 0) {
+          isOwned = true;
+        }
+      }
+    }
+    
+    return `
+      <div class="shop-item ${isOwned ? 'owned' : ''}">
+        <div class="shop-item-name">${item.emoji} ${item.name}</div>
+        <div class="shop-item-price">💰 ${item.price}</div>
+        <div class="shop-item-stats">${getItemStatsText(item)}</div>
+      </div>
+    `;
+  }).join('');
+  
+  // Добавляем event listeners после создания элементов
+  container.querySelectorAll('.shop-item').forEach((itemEl, idx) => {
+    const itemId = allItems[idx][0];
+    itemEl.addEventListener('click', () => {
+      buyItemFromShop(itemId);
+    });
+  });
+}
+
 function getItemStatsText(item) {
   const stats = [];
   if (item.baseDmg) {
@@ -94,8 +139,8 @@ function getItemStatsText(item) {
 function shopSelectUnit(unitId) {
   shopSelectedUnitId = unitId ? parseInt(unitId) : null;
   renderShopSection('shop-weapons', 'weapon');
-  renderShopSection('shop-armors', 'armor');
-  renderShopSection('shop-boots', 'boots');
+  renderShopDefense();
+  renderShopSection('shop-accessories', 'boots');
 }
 
 function buyItemFromShop(itemId) {

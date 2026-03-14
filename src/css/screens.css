@@ -56,6 +56,18 @@
   color: #5a8a54;
 }
 
+/* Кнопка "Старт" */
+.btn-start {
+  width: auto;
+  min-width: 200px;
+  max-width: 280px;
+  padding: 12px 24px;
+}
+
+.btn-start:hover {
+  opacity: 0.9;
+}
+
 /* ── ЭКРАН ИНТРО ── */
 #screen-intro {
   display: none;
@@ -409,10 +421,6 @@
   margin-left: 24px;
 }
 
-.btn-start:hover {
-  opacity: 0.9;
-}
-
 /* Кнопка подтверждения (в интро) */
 .btn-confirm {
   padding: 10px 30px;
@@ -431,14 +439,10 @@
 
 /* Кнопка "Далее" (в интро) */
 .btn-next {
-  padding: 10px 30px;
-  font-size: 16px;
-  background: var(--green);
-  color: var(--bg);
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
+  width: auto;
+  min-width: 150px;
+  max-width: 200px;
+  padding: 10px 24px;
 }
 
 .btn-next:hover {

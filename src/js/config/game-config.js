@@ -9,17 +9,6 @@ const UNIT_TYPES = {
   ZOMBIE: 'zombie',
 };
 
-// Состояния анимации
-const ANIM_STATES = {
-  IDLE:      { folder: 'idle',      frames: 4 },
-  MOVE:      { folder: 'move',      frames: 4 },
-  ATTACK:    { folder: 'attack',    frames: 3 },
-  DAMAGED:   { folder: 'damaged',   frames: 2 },
-  CR_DAMAGED:{ folder: 'cr_damaged',frames: 3 },
-  DIE:       { folder: 'die',       frames: 4 },
-  KILLED:    { folder: 'killed',    frames: 1 },
-};
-
 // Делаем переменные глобальными для браузера
 if (typeof window !== 'undefined') {
   window.CONFIG = {};
@@ -249,12 +238,11 @@ if (typeof window !== 'undefined') {
     COLS, ROWS, PLACE_COLS, PLAYER_UNIT_COUNT, ZOMBIE_SPAWN_POSITIONS,
     PLAYER_STATS, WEAPONS, ITEM_TYPES, ITEMS, RECRUITS, ZOMBIE_TYPES,
     ZOMBIE_STATS, ZOMBIE_ACTION_DELAY, ZOMBIE_TURN_END_DELAY, LORE_MESSAGES, LEVELS,
-    UNIT_TYPES, ANIM_STATES,
+    UNIT_TYPES,
   };
   
-  // Константы типов и анимации — в глобальную видимость
+  // Константы типов — в глобальную видимость
   window.UNIT_TYPES = UNIT_TYPES;
-  window.ANIM_STATES = ANIM_STATES;
 }
 
 // Экспорт для Node.js (тесты)
@@ -263,6 +251,6 @@ if (typeof module !== 'undefined' && module.exports) {
     COLS, ROWS, PLACE_COLS, PLAYER_UNIT_COUNT, ZOMBIE_SPAWN_POSITIONS,
     PLAYER_STATS, WEAPONS, ITEM_TYPES, ITEMS, RECRUITS, ZOMBIE_TYPES,
     ZOMBIE_STATS, ZOMBIE_ACTION_DELAY, ZOMBIE_TURN_END_DELAY, LORE_MESSAGES, LEVELS,
-    UNIT_TYPES, ANIM_STATES,
+    UNIT_TYPES,
   };
 }

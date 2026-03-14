@@ -61,7 +61,10 @@ function _sidebarUnit(ui, btn) {
   const selected = state.getSelected();
   if (selected && selected.kind === 'survivor') {
     const u = selected;
-    const poisonBadge = u.poisoned ? ' <span class="text-poison">☠</span>' : '';
+    
+    // Эффекты - унифицированная система
+    const effectIcons = getEffectIcons(u);
+    const effectBadges = effectIcons.map(e => `<span class="text-poison">${e.icon}</span>`).join(' ');
 
     // Оружие - берём из equipment
     const weaponId = u.equipment?.weapon || 'pistol';
@@ -93,14 +96,15 @@ function _sidebarUnit(ui, btn) {
       <div class="stat-row" style="font-size: 9px; color: #4a7a44;">${typeDesc}</div>
       <div class="stat-row">
         <span class="stat-label">HP</span>
-        <span class="stat-val">${u.hp}/${u.maxHp}${poisonBadge}</span>
+        <span class="stat-val">${u.hp}/${u.maxHp}${effectBadges ? ' ' + effectBadges : ''}</span>
       </div>
       <div class="stat-row">
         <span class="stat-label">Оружие</span>
         <span class="stat-val">${weaponName} (${weaponDmg} урон, ${weaponRange} кл.)</span>
       </div>
       <div class="stat-row" style="font-size: 9px; color: #4a7a44;">${weaponDesc}</div>
-      ${itemsHtml}`;
+      ${itemsHtml}
+      ${phase === 'player' ? '<button class="btn-items" onclick="showUnitItemsModal()">🎒 Предметы</button>' : ''}`;
   } else if (selected && selected.kind === 'zombie') {
     // Информация о зомби
     const z = selected;
@@ -224,5 +228,110 @@ function recruitFromUI(type) {
     renderSquadScreen();
   } else {
     alert(result.reason || 'Не удалось нанять юнита');
+  }
+}
+
+// ── МОДАЛКА ПРЕДМЕТОВ ЮНИТА ─────────────────────────────────────────
+
+function showUnitItemsModal() {
+  const selected = state.getSelected();
+  if (!selected || selected.kind !== 'survivor') return;
+  
+  const u = selected;
+  const inventory = u.inventory || {};
+  
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay';
+  overlay.id = 'unit-items-modal';
+  
+  // Формируем список предметов - универсальный цикл по всем расходникам
+  let itemsContent = '';
+  
+  // Получаем все расходники из ITEMS
+  const consumables = Object.entries(ITEMS).filter(([id, item]) => item.type === 'consumable');
+  
+  consumables.forEach(([itemId, item]) => {
+    const count = inventory[itemId] || 0;
+    if (count <= 0) return;
+    
+    // Проверяем можно ли использовать предмет
+    let canUse = false;
+    let useReason = '';
+    
+    // Логика использования для каждого типа предмета
+    if (itemId === 'antidote') {
+      // Антидот - только если есть отравление
+      canUse = hasEffect(u, 'poison');
+      useReason = canUse ? 'Использовать' : 'Нет яда';
+    } else if (itemId === 'grenade') {
+      // Граната - только если еще не атаковал
+      canUse = !u.attacked;
+      useReason = canUse ? 'Бросить' : 'Уже атаковал';
+    } else {
+      // Для неизвестных предметов - всегда можно использовать
+      canUse = true;
+      useReason = 'Использовать';
+    }
+    
+    // Стиль для разных типов предметов
+    const itemColor = itemId === 'antidote' ? 'rgba(57,255,20,0.1)' : 'rgba(255,140,0,0.1)';
+    const btnColor = itemId === 'antidote' ? '' : 'background: orange;';
+    const btnDisabled = canUse ? '' : 'opacity: 0.5;';
+    
+    itemsContent += `
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: ${itemColor}; border-radius: 4px; margin-bottom: 8px;">
+        <div>
+          <div style="font-weight: bold;">${item.emoji} ${item.name} (${count})</div>
+          <div style="font-size: 10px; color: #888;">${item.desc || ''}</div>
+        </div>
+        <button class="btn-items" style="margin: 0; width: auto; padding: 4px 12px; ${btnDisabled} ${btnColor}" 
+          ${!canUse ? 'disabled' : ''} 
+          onclick="useItemFromModal('${itemId}')">
+          ${useReason}
+        </button>
+      </div>
+    `;
+  });
+  
+  if (!itemsContent) {
+    itemsContent = '<div style="color: #888; text-align: center;">Нет доступных предметов</div>';
+  }
+  
+  overlay.innerHTML = `
+    <div class="overlay-box" style="min-width: 250px;">
+      <h2 style="margin: 0 0 15px 0; color: var(--green);">🎒 Предметы</h2>
+      <div style="margin-bottom: 15px;">
+        ${itemsContent}
+      </div>
+      <button class="recruit-cancel" onclick="this.closest('.overlay').remove()">ЗАКРЫТЬ</button>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+}
+
+// Функция для использования предмета из модалки
+function useItemFromModal(itemId) {
+  const selected = state.getSelected();
+  if (!selected || selected.kind !== 'survivor') return;
+  
+  // Для гранаты - особая логика
+  if (itemId === 'grenade') {
+    const modal = document.getElementById('unit-items-modal');
+    if (modal) modal.remove();
+    activateGrenade(selected);
+    return;
+  }
+  
+  const result = useItem(selected, itemId);
+  
+  if (result.success) {
+    // Закрыть модалку и обновить UI
+    const modal = document.getElementById('unit-items-modal');
+    if (modal) modal.remove();
+    render();
+    updateSidebar();
+  } else {
+    alert(result.reason || 'Не удалось использовать предмет');
   }
 }
