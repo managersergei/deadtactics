@@ -254,28 +254,23 @@ function showUnitItemsModal() {
     const count = inventory[itemId] || 0;
     if (count <= 0) return;
     
-    // Проверяем можно ли использовать предмет
-    let canUse = false;
-    let useReason = '';
+    // Универсальная ля использования предогика условимета
+    let canUse = true;
+    let useReason = 'Использовать';
     
-    // Логика использования для каждого типа предмета
-    if (itemId === 'antidote') {
-      // Антидот - только если есть отравление
+    const condition = item.useCondition;
+    if (condition === 'hasPoison') {
       canUse = hasEffect(u, 'poison');
       useReason = canUse ? 'Использовать' : 'Нет яда';
-    } else if (itemId === 'grenade') {
-      // Граната - только если еще не атаковал
+    } else if (condition === 'notAttacked') {
       canUse = !u.attacked;
       useReason = canUse ? 'Бросить' : 'Уже атаковал';
-    } else {
-      // Для неизвестных предметов - всегда можно использовать
-      canUse = true;
-      useReason = 'Использовать';
     }
     
-    // Стиль для разных типов предметов
-    const itemColor = itemId === 'antidote' ? 'rgba(57,255,20,0.1)' : 'rgba(255,140,0,0.1)';
-    const btnColor = itemId === 'antidote' ? '' : 'background: orange;';
+    // Стиль для разных типов предметов - по useAction
+    const isHealing = item.useAction === 'useItem';
+    const itemColor = isHealing ? 'rgba(57,255,20,0.1)' : 'rgba(255,140,0,0.1)';
+    const btnColor = isHealing ? '' : 'background: orange;';
     const btnDisabled = canUse ? '' : 'opacity: 0.5;';
     
     itemsContent += `
@@ -315,8 +310,10 @@ function useItemFromModal(itemId) {
   const selected = state.getSelected();
   if (!selected || selected.kind !== 'survivor') return;
   
-  // Для гранаты - особая логика
-  if (itemId === 'grenade') {
+  const item = ITEMS[itemId];
+  
+  // Универсальная обработка по useAction
+  if (item.useAction === 'throw') {
     const modal = document.getElementById('unit-items-modal');
     if (modal) modal.remove();
     activateGrenade(selected);

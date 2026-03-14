@@ -67,6 +67,32 @@ const ITEMS = {
   
   // ОБУВЬ
   shoes:   { id: 'shoes',   name: 'Кроссовки', type: 'boots',  price: 40,  moveBonus: 1, isRanged: false, desc: '+1 клетка движения' },
+  
+  // РАСХОДНИКИ
+  antidote: { 
+    id: 'antidote', 
+    name: 'Антидот', 
+    type: 'consumable', 
+    price: 30,
+    emoji: '💉',
+    desc: 'Снимает отравление',
+    useAction: 'useItem',
+    useCondition: 'hasPoison',
+    removesPoison: true,
+  },
+  grenade: { 
+    id: 'grenade', 
+    name: 'Граната', 
+    type: 'consumable', 
+    price: 50,
+    emoji: '💣',
+    desc: 'Бросить на 3 клетки. Урон 1 HP по площади.',
+    useAction: 'throw',
+    useCondition: 'notAttacked',
+    throwRange: 3,
+    splashRange: 1,
+    damage: 1,
+  },
 };
 
 // РЕКРУТЫ
