@@ -53,6 +53,7 @@ const ITEM_TYPES = {
   WEAPON: 'weapon',
   ARMOR:  'armor',
   BOOTS:  'boots',
+  CONSUMABLE: 'consumable',
 };
 
 const ITEMS = {
