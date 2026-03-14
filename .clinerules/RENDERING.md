@@ -19,11 +19,14 @@
 |--------------|----------|-------------------|
 | `move`       | все      | `u.moving`        |
 | `attack`     | все      | `u.attacking`     |
-| `damaged`    | zombie   | `u.damagedFlash`  |
+| `damaged`    | все     | `u.damagedFlash`  |
 | `cr_damaged` | zombie   | `u.critFlash`     |
 | `reload`     | survivor | `u.reloading`     |
 | `poisoned`   | survivor | `u.poisonFlash`   |
+| `antidote`   | survivor | `u.usingAntidote` |
+| `grenade`    | survivor | `u.usingGrenade`  |
 | `die`        | все      | `u.dying`         |
+| `killed`     | survivor | `u.dyingAnim`     |
 | `killed`     | zombie   | `!u.alive`        |
 
 ---
@@ -32,7 +35,7 @@
 
 Активно только одно состояние — с наивысшим приоритетом.
 
-**Survivor:** `die > reload > poisoned > attack > move > idle`
+**Survivor:** `die > killed > reload > poisoned > antidote > grenade > damaged > attack > move > idle`
 
 **Zombie:** `die > killed > cr_damaged > damaged > attack > raged > move > idle`
 

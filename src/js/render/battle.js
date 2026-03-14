@@ -23,16 +23,20 @@ const ZOMBIE_FRAMES = {
 
 // Количество кадров для выживших
 const SURVIVOR_FRAMES = {
-  idle: 3,
-  move: 3,
-  attack: 2,
-  poisoned: 2,
-  reload: 3,
-  die: 4
+  idle: 6,
+  move: 6,
+  attack: 3,
+  poisoned: 4,
+  reload: 6,
+  die: 1,
+  killed: 4,
+  damaged: 5,
+  antidote: 5,
+  grenade: 4
 };
 
 // Анимации которые играют один раз и замирают на последнем кадре
-const ONE_SHOT_ANIMS = new Set(['attack', 'damaged', 'cr_damaged', 'die', 'killed', 'reload', 'poisoned']);
+const ONE_SHOT_ANIMS = new Set(['attack', 'damaged', 'cr_damaged', 'die', 'killed', 'reload', 'poisoned', 'antidote', 'grenade']);
 
 // Индивидуальные счётчики для one-shot анимаций { unitId: frame }
 const animFrameCounters = {};
@@ -51,11 +55,16 @@ function getZombieAnimState(u) {
 }
 
 function getSurvivorAnimState(u) {
-  if (u.dying)       return 'die';
-  if (u.reloading)   return 'reload';
-  if (u.poisonFlash) return 'poisoned';
-  if (u.attacking)   return 'attack';
-  if (u.moving)      return 'move';
+  // Приоритет: die > killed > reload > poisoned > antidote > grenade > damaged > attack > move > idle
+  if (u.dying)          return 'die';       // статика — труп лежит
+  if (u.dyingAnim)     return 'killed';    // анимация падения
+  if (u.reloading)     return 'reload';
+  if (u.poisonFlash)  return 'poisoned';
+  if (u.usingAntidote) return 'antidote'; // использование антидота
+  if (u.usingGrenade) return 'grenade';   // бросок гранаты
+  if (u.damagedFlash)  return 'damaged';   // получение урона
+  if (u.attacking)     return 'attack';
+  if (u.moving)        return 'move';
   return 'idle';
 }
 
@@ -141,9 +150,17 @@ function computeSpritePath(u, state, direction) {
     base = `src/assets/units/zombie/${state}_${baseDir}/`;
   } else {
     // Выживший: всегда используем baseDir (right), зеркаливаем если нужно
-    const weaponId = u.weapon || u.equipment?.weapon || 'pistol';
-    const folder = state === 'die' ? 'die/' : `${state}_${baseDir}/`;
-    base = `src/assets/units/survivor/${weaponId}/${folder}`;
+    
+    // Antidote и grenade — общие папки (без оружия)
+    if (state === 'antidote' || state === 'grenade') {
+      base = `src/assets/units/survivor/${state}_${baseDir}/`;
+    } else {
+      // Обычное оружие
+      const weaponId = u.weapon || u.equipment?.weapon || 'pistol';
+      // die и killed — папки без направления
+      const folder = (state === 'die' || state === 'killed') ? `${state}/` : `${state}_${baseDir}/`;
+      base = `src/assets/units/survivor/${weaponId}/${folder}`;
+    }
   }
   
   return { base, needsMirror };

@@ -31,6 +31,11 @@ function mkPlayer(x, y, squadUnit) {
     reloading: false,             // идёт перезарядка
     alive: true,
     direction: 'right',           // направление взгляда
+    // Флаги анимаций
+    usingAntidote: false,        // анимация использования антидота
+    usingGrenade: false,         // анимация броска гранаты
+    damagedFlash: false,         // получение урона
+    dyingAnim: false,            // анимация падения (killed)
   };
 }
 

@@ -87,33 +87,46 @@ function activateGrenade(u) {
 
 // Бросок гранаты
 function doGrenade(attacker, targetX, targetY) {
-  const grenade = ITEMS.grenade;
-  aliveZombies().forEach(z => {
-    if (manhattan({x:targetX,y:targetY}, z) <= grenade.splashRange) {
-      z.hp -= grenade.damage;
-      state.recordDamageDealt(grenade.damage);
-      
-      // Проверка ярости зомби (HP = 1)
-      if (z.hp <= 1 && z.alive && !z.raged) {
-        z.raged = true;
-        log(`⚡ Зомби в ярости!`, 'zombie-act');
-      }
-      
-      log(`💣 Граната → зомби [${z.x+1},${z.y+1}] −${grenade.damage}HP`, 'dmg');
-      if (z.hp <= 0) {
-        z.dying = true;
-        setTimeout(() => { z.alive = false; z.dying = false; resetAnimFrame(z.id); render(); checkEnd(); }, 600);
-        state.recordKill();
-        log(`💀 Зомби уничтожен!`, 'dmg');
-      }
-    }
-  });
-  attacker.inventory.grenade--;
-  attacker.attacked = true;
-  state.clearHighlights();
-  state.setSelected(null);
+  // Анимация броска гранаты
+  attacker.usingGrenade = true;
+  attacker.target = { x: targetX, y: targetY };
+  animationPaused = true;
   render();
-  checkEnd();
+  
+  // Ждём окончания анимации grenade, затем наносим урон
+  setTimeout(() => {
+    attacker.usingGrenade = false;
+    
+    const grenade = ITEMS.grenade;
+    aliveZombies().forEach(z => {
+      if (manhattan({x:targetX,y:targetY}, z) <= grenade.splashRange) {
+        z.hp -= grenade.damage;
+        state.recordDamageDealt(grenade.damage);
+        
+        // Проверка ярости зомби (HP = 1)
+        if (z.hp <= 1 && z.alive && !z.raged) {
+          z.raged = true;
+          log(`⚡ Зомби в ярости!`, 'zombie-act');
+        }
+        
+        log(`💣 Граната → зомби [${z.x+1},${z.y+1}] −${grenade.damage}HP`, 'dmg');
+        if (z.hp <= 0) {
+          z.dying = true;
+          setTimeout(() => { z.alive = false; z.dying = false; resetAnimFrame(z.id); render(); checkEnd(); }, 600);
+          state.recordKill();
+          log(`💀 Зомби уничтожен!`, 'dmg');
+        }
+      }
+    });
+    
+    attacker.inventory.grenade--;
+    attacker.attacked = true;
+    animationPaused = false;
+    state.clearHighlights();
+    state.setSelected(null);
+    render();
+    checkEnd();
+  }, 4 * 150); // 4 кадра анимации grenade
 }
 
 // ── ХОД ИГРОКА ─────────────────────────────────────────
@@ -208,7 +221,7 @@ function recalcHighlights() {
 }
 
 // Задержка между шагами движения (мс)
-const SURVIVOR_STEP_DELAY = SURVIVOR_FRAMES.move * ANIMATION_SPEED; // 3 * 150 = 450
+const SURVIVOR_STEP_DELAY = SURVIVOR_FRAMES.move * ANIMATION_SPEED; // 6 * 150 = 900
 
 // Функция ожидания
 function sleep(ms) {
@@ -297,14 +310,14 @@ function doAttack(attacker, target) {
         attacker.reloading = true;
         attacker.shotsFired = 0;
         log(`🔄 Перезарядка...`, 'sys');
-        // Анимация перезарядки - пауза на 1 секунду
+        // Анимация перезарядки - пауза на 6 кадров
         animationPaused = true;
         render();
         setTimeout(() => {
           attacker.reloading = false;
           animationPaused = false;
           render();
-        }, 450); // 3 кадра × 150ms
+        }, 6 * 150); // 6 кадров × 150ms
       } else {
         animationPaused = false;
       }
@@ -519,7 +532,14 @@ function useItem(unit, itemId) {
     const hadPoison = hasEffect(unit, 'poison');
     if (hadPoison) {
       removeEffect(unit, 'poison');
-      log(`💉 ${unit.name} использовал антидот — яд снят!`, 'sys');
+      // Анимация использования антидота
+      unit.usingAntidote = true;
+      render();
+      setTimeout(() => {
+        unit.usingAntidote = false;
+        log(`💉 ${unit.name} использовал антидот — яд снят!`, 'sys');
+        render();
+      }, 5 * 150); // 5 кадров анимации
     } else {
       return { success: false, reason: 'Нет отравления' };
     }
