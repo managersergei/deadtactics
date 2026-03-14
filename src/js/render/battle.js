@@ -69,7 +69,13 @@ function startAnimation() {
       const maxFrames = parseInt(img.dataset.maxFrames) || 1;
       const unitId = img.dataset.unitId;
       const base = img.dataset.animated;
+      const direction = img.dataset.direction || 'right';
+      const baseDir = img.dataset.baseDir || 'right';
       if (!base || !animState) return;
+
+      // Пересчитываем отзеркаливание при каждом кадре
+      const needsMirror = direction !== baseDir;
+      img.style.transform = needsMirror ? 'scaleX(-1)' : '';
 
       let frame;
       if (ONE_SHOT_ANIMS.has(animState)) {
@@ -275,6 +281,8 @@ function syncUnitsWithDOM() {
     img.dataset.animated = base;
     img.dataset.animState = newState;
     img.dataset.maxFrames = maxFrames;
+    img.dataset.direction = dir; // сохраняем направление для аниматора
+    img.dataset.baseDir = getBaseDir(u.kind); // базовое направление для спрайтов
   });
 
   // Убрать из DOM тех кого нет в state
