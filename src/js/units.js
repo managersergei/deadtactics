@@ -49,6 +49,7 @@ function mkZombie(x, y) {
     moved: false,
     attacked: false,
     alive: true,
+    raged: false,  // ярость активируется при HP = 1
     direction: 'left',  // зомби обычно появляются справа и смотрят влево
   };
 }

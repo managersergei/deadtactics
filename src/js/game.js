@@ -92,6 +92,13 @@ function doGrenade(attacker, targetX, targetY) {
     if (manhattan({x:targetX,y:targetY}, z) <= grenade.splashRange) {
       z.hp -= grenade.damage;
       state.recordDamageDealt(grenade.damage);
+      
+      // Проверка ярости зомби (HP = 1)
+      if (z.hp <= 1 && z.alive && !z.raged) {
+        z.raged = true;
+        log(`⚡ Зомби в ярости!`, 'zombie-act');
+      }
+      
       log(`💣 Граната → зомби [${z.x+1},${z.y+1}] −${grenade.damage}HP`, 'dmg');
       if (z.hp <= 0) {
         z.dying = true;
@@ -272,6 +279,13 @@ function doAttack(attacker, target) {
   setTimeout(() => {
     target.hp -= damage;
     state.recordDamageDealt(damage);
+    
+    // Проверка ярости зомби (HP = 1)
+    if (target.kind === 'zombie' && target.hp <= 1 && target.alive && !target.raged) {
+      target.raged = true;
+      log(`⚡ Зомби в ярости!`, 'zombie-act');
+    }
+    
     attacker.attacked = true;
     
     // Логика перезарядки (для выживших)

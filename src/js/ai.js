@@ -27,7 +27,7 @@ async function runZombies() {
 
     if (dist <= z.atkRange) {
       // Враг в зоне атаки — сразу кусаем
-      if (z.hp <= 1) {
+      if (z.raged) {
         // Rage: атакуем 2 раза подряд (после анимации первой атаки)
         zombieAttack(z, target);
         if (checkEnd()) break;
@@ -40,7 +40,7 @@ async function runZombies() {
       // Идём к цели, потом пробуем атаковать
       await zombieMove(z, target);
       if (manhattan(z, target) <= z.atkRange) {
-        if (z.hp <= 1) {
+        if (z.raged) {
           // Rage: атакуем 2 раза подряд (после анимации первой атаки)
           zombieAttack(z, target);
           if (checkEnd()) break;

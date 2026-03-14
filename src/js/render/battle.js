@@ -38,13 +38,14 @@ const ONE_SHOT_ANIMS = new Set(['attack', 'damaged', 'cr_damaged', 'die', 'kille
 const animFrameCounters = {};
 
 function getZombieAnimState(u) {
+  // Приоритет: die > killed > raged > cr_damaged > damaged > attack > move > idle
   if (u.dying)        return 'die';
   if (!u.alive)       return 'killed';
+  if (u.raged)        return 'raged';
   if (u.critFlash)    return 'cr_damaged';
   if (u.damagedFlash) return 'damaged';
   if (u.attacking)    return 'attack';
   if (u.moving)       return 'move';
-  if (u.raged)        return 'raged';
   return 'idle';
 }
 
