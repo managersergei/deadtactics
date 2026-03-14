@@ -117,14 +117,9 @@ function getBaseDir(kind) {
 }
 
 // Универсальная функция определения визуального направления
-// Зомби: динамически смотрит на ближайшего игрока (через getDirection)
-// Выживший: использует сохранённое направление движения (u.direction)
+// Все юниты динамически смотрят на ближайшего врага через getDirection(u)
 function getVisualDirection(u) {
-  if (u.kind === UNIT_TYPES.ZOMBIE) {
-    return getDirection(u); // динамически к ближайшему игроку
-  } else {
-    return u.direction || 'right'; // статически - куда последний раз двигался
-  }
+  return getDirection(u);
 }
 
 // Применить отзеркаливание на основе визуального направления
