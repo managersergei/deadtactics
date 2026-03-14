@@ -175,6 +175,10 @@ function getDirection(unit, target) {
   
   // Для выжившего - ближайший зомби
   if (unit.kind === UNIT_TYPES.SURVIVOR) {
+    // Во время атаки - смотрим на цель
+    if (unit.attacking && unit.target) {
+      return (unit.target.x < unit.x) ? 'left' : 'right';
+    }
     // Во время движения - смотрим куда движемся
     if (unit.moving) {
       return unit.direction || 'right';

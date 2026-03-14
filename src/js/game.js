@@ -271,6 +271,7 @@ function doAttack(attacker, target) {
   // Анимация атаки выжившего
   if (attacker.kind === 'survivor') {
     attacker.attacking = true;
+    attacker.target = target; // сохраняем цель для поворота
     animationPaused = true;
     render();
   }
