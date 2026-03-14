@@ -154,8 +154,7 @@ function getEffectiveStat(unit, stat) {
 
 // Определить направление взгляда юнита
 // Если есть target - смотрим на него
-// Если нет и это зомби - смотрим на ближайшего игрока
-// Иначе - возвращаем текущее направление
+// Если нет: зомби → ближайший игрок, выживший → ближайший зомби
 function getDirection(unit, target) {
   // Если есть конкретная цель - смотрим на неё
   if (target) {
@@ -174,8 +173,19 @@ function getDirection(unit, target) {
     }
   }
   
-  // Иначе - текущее направление или 'right' по умолчанию
-  return unit.direction || 'right';
+  // Для выжившего - ближайший зомби
+  if (unit.kind === UNIT_TYPES.SURVIVOR) {
+    const zombies = aliveZombies();
+    if (zombies.length > 0) {
+      const nearest = zombies.reduce((a, b) => 
+        manhattan(unit, a) < manhattan(unit, b) ? a : b
+      );
+      return (nearest.x < unit.x) ? 'left' : 'right';
+    }
+  }
+  
+  // Иначе - 'right' по умолчанию
+  return 'right';
 }
 
 // экспорт для тестов (Node environment)
