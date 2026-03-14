@@ -108,17 +108,17 @@ computeSpritePath(u, state, direction) // → { base, needsMirror }
 - Направление хранится в `u.direction` — устанавливается при движении
 - Если `direction = 'left'` → `needsMirror = true` → `transform: scaleX(-1)`
 
-### Fallback логика
+### Fallback логика (onerror)
 
-Когда персонаж должен смотреть в сторону где нет спрайтов:
+Это **крайний случай** — когда нужного спрайта вообще нет в обеих папках:
 
 1. **Zombie:** всегда использует `*_left/`, зеркалит когда нужно смотреть вправо
-2. **Survivor:** всегда использует `*_right/`, зеркалит когда нужно смотреть влево
+2. **Survivor:** использует `*_right/` (базовые спрайты), зеркалит когда нужно смотреть влево
 
-Это реализовано через `computeSpritePath()`:
-- Функция возвращает `{ base, needsMirror }`
-- Если `needsMirror = true` → применяется `transform: scaleX(-1)`
-- Для выжившего: fallback автоматически заменяет путь на right-папку
+Логика в `computeSpritePath()`:
+- Всегда использует `baseDir` в пути (left для зомби, right для выжившего)
+- `needsMirror = true` → применяется `transform: scaleX(-1)`
+- Если файл не найден (`onerror`) — показывается emoji юнита
 
 ### Пример работы
 
@@ -258,8 +258,14 @@ div.unit.{kind}#unit-{id}
 
 ## 14. Добавление нового состояния анимации
 
-1. Добавить папки спрайтов: `{состояние}_{left}/` и `{состояние}_{right}/`
-2. Добавить количество кадров в `ZOMBIE_FRAMES` или `SURVIVOR_FRAMES` в `battle.js`
+**Для Zombie:**
+1. Добавить папки спрайтов: `{состояние}_left/` и `{состояние}_right/`
+2. Добавить количество кадров в `ZOMBIE_FRAMES` в `battle.js`
+
+**Для Survivor:**
+1. Добавить папки спрайтов: `{состояние}_right/` (только right — left получается зеркалированием)
+2. Добавить количество кадров в `SURVIVOR_FRAMES` в `battle.js`
+
 3. Если one-shot — добавить в `ONE_SHOT_ANIMS` в `battle.js`
 4. Добавить флаг в объект юнита в `units.js`
 5. Добавить проверку в `getZombieAnimState()` или `getSurvivorAnimState()` с нужным приоритетом
