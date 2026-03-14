@@ -219,6 +219,19 @@ function updateUnitVisuals(u, el) {
   hpFill.className = 'hp-fill';
   if (pct <= 0.34) hpFill.classList.add('low');
   else if (pct <= 0.67) hpFill.classList.add('med');
+
+  // Обновить иконки эффектов - удалить старые и добавить новые
+  const existingIcons = statusEl.querySelectorAll('.status-icon');
+  existingIcons.forEach(icon => icon.remove());
+
+  const effectIcons = getEffectIcons(u);
+  effectIcons.forEach(effect => {
+    const si = document.createElement('div');
+    si.className = 'status-icon';
+    si.textContent = effect.icon;
+    si.title = effect.name + (effect.duration !== null ? ` (${effect.duration} ход.)` : '');
+    statusEl.appendChild(si);
+  });
 }
 
 // Синхронизировать DOM с state — перемещает элементы, не пересоздаёт
