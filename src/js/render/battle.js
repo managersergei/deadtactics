@@ -135,17 +135,13 @@ function computeSpritePath(u, state, direction) {
   
   let base;
   if (u.kind === UNIT_TYPES.ZOMBIE) {
+    // Зомби: всегда используем baseDir (left), зеркаливаем если нужно
     base = `src/assets/units/zombie/${state}_${baseDir}/`;
   } else {
+    // Выживший: всегда используем baseDir (right), зеркаливаем если нужно
     const weaponId = u.weapon || u.equipment?.weapon || 'pistol';
-    const folder = state === 'die' ? 'die/' : `${state}_${direction}/`;
+    const folder = state === 'die' ? 'die/' : `${state}_${baseDir}/`;
     base = `src/assets/units/survivor/${weaponId}/${folder}`;
-    
-    // Fallback для выжившего: если нужны left-спрайты, используем right + mirror
-    if (direction === 'left') {
-      base = base.replace(`_${direction}_`, '_right_')
-                 .replace('/die_left/', '/die/');
-    }
   }
   
   return { base, needsMirror };
