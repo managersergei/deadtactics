@@ -175,6 +175,11 @@ function getDirection(unit, target) {
   
   // Для выжившего - ближайший зомби
   if (unit.kind === UNIT_TYPES.SURVIVOR) {
+    // Во время движения - смотрим куда движемся
+    if (unit.moving) {
+      return unit.direction || 'right';
+    }
+    // Иначе - ближайший зомби
     const zombies = aliveZombies();
     if (zombies.length > 0) {
       const nearest = zombies.reduce((a, b) => 
