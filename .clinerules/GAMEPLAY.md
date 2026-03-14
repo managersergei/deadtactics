@@ -73,7 +73,7 @@ Survivor не атакует сам — атака определяется па
 
 ## 4. Эффекты
 
-Вся система в `src/js/config/effects.js` (планируется переезд в `core/`).
+Вся система в `src/js/core/effects.js` .
 
 **API:**
 - `addEffect(unit, effectId, duration)` — наложить эффект

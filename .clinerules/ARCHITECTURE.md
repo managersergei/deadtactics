@@ -29,11 +29,12 @@ dead-tactics/
     └── js/
         ├── config/
         │   ├── game-config.js        ← константы, баланс, UNIT_TYPES, ITEMS, LEVELS
-        │   └── ui-constants.js       ← константы карты мира
+        │   ├── ui-constants.js       ← константы карты мира
+        │   └── generate-frames.js    ← генерация кадров спрайтов
         ├── core/
         │   ├── state.js              ← стейт боя (единственный источник правды)
         │   └── helpers.js            ← чистые утилиты, экспортируются для тестов
-        │   └── effects.js            ← система эффектов (планируется → core/)
+        │   └── effects.js            ← система эффектов
         ├── render/
         │   ├── render.js             ← построение грида, функция cell()
         │   └── battle.js             ← рендер боя, анимация, syncUnitsWithDOM
@@ -64,7 +65,7 @@ dead-tactics/
 ```
 game-config.js      ← UNIT_TYPES, ITEMS, LEVELS, WEAPONS
 ui-constants.js     ← MAP_POSITIONS, MAP_COLORS
-effects.js          ← EFFECTS, addEffect, removeEffect
+core/effects.js     ← EFFECTS, addEffect, removeEffect
 state.js            ← state, uid()
 data.js             ← gameData, buyItem, recruitUnit
 
