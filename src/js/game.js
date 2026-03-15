@@ -75,7 +75,9 @@ function activateGrenade(u) {
   const grenade = ITEMS.grenade;
   for (let c = 0; c < COLS; c++) {
     for (let r = 0; r < ROWS; r++) {
-      if (manhattan(u, {x:c, y:r}) <= grenade.throwRange) {
+      // Используем chessboard distance (учитывает диагонали)
+      const dist = Math.max(Math.abs(u.x - c), Math.abs(u.y - r));
+      if (dist <= grenade.throwRange) {
         h.throw.add(`${c},${r}`);
       }
     }
@@ -121,9 +123,10 @@ async function doGrenade(attacker, targetX, targetY) {
   
   const grenade = ITEMS.grenade;
   
-  // АТАКА ПО ЗОМБИ
+  // АТАКА ПО ЗОМБИ (chessboard distance)
   for (const z of aliveZombies()) {
-    if (manhattan({x:targetX,y:targetY}, z) <= grenade.splashRange) {
+    const dist = Math.max(Math.abs(targetX - z.x), Math.abs(targetY - z.y));
+    if (dist <= grenade.splashRange) {
       const result = takeDamage(z, grenade.damage, 'grenade');
       await waitForDamageAnimation(z);
       
@@ -135,9 +138,10 @@ async function doGrenade(attacker, targetX, targetY) {
     }
   }
   
-  // FRIENDLY FIRE — атака по союзникам (без исключений)
+  // FRIENDLY FIRE — атака по союзникам (без исключений, chessboard distance)
   for (const p of alivePlayers()) {
-    if (manhattan({x:targetX,y:targetY}, p) <= grenade.splashRange) {
+    const dist = Math.max(Math.abs(targetX - p.x), Math.abs(targetY - p.y));
+    if (dist <= grenade.splashRange) {
       const result = takeDamage(p, grenade.damage, 'grenade');
       await waitForDamageAnimation(p);
       
