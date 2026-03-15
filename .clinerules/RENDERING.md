@@ -222,13 +222,57 @@ ZOMBIE_STEP_DELAY   = ZOMBIE_FRAMES.move   * ANIMATION_SPEED
 
 ---
 
-## 8. `animationPaused`
+## 8. Блокировка: `animationPaused` vs `clicksBlocked`
 
-`animationPaused = true` блокирует:
-- клики игрока (`onCellClick` возвращает сразу)
-- перезапуск интервала в `render()`
+Две разные переменные для разных целей:
 
-Устанавливается в начале движения. **Обязательно снять** (`animationPaused = false`) после завершения. Незакрытая пауза замораживает всю игру.
+| Переменная | Назначение | Где используется |
+|-----------|-----------|----------------|
+| `animationPaused` | Остановка интервала анимации | `render()`, `startAnimation()` |
+| `clicksBlocked` | Блокировка кликов игрока | `onCellClick()` |
+
+**Правило:** `startAnimation()` должен крутиться всегда. Блокировка кликов — через `clicksBlocked`.
+
+### Использование
+
+```js
+// В game.js — блокируем клики, но анимация работает
+clicksBlocked = true;
+// ... действие ...
+clicksBlocked = false;
+```
+
+**Важно:** Никогда не используй `animationPaused` для блокировки кликов — это остановит анимацию!
+
+---
+
+## 8a. Правила анимаций (уроки бага)
+
+### Render != Logic
+Никогда не останавливай цикл рендеринга (`startAnimation`) ради того, чтобы остановить логику (`onCellClick`). Это разные системы!
+
+- `startAnimation()` — должен крутиться всегда
+- Блокировка кликов — через отдельную переменную (`clicksBlocked`)
+
+### Sequentiality (Последовательность)
+Если два действия идут друг за другом (атака → перезарядка), между ними **обязательно** должен быть `await` на время анимации первого:
+
+```js
+attacker.attacking = true;
+render();
+await sleep(SURVIVOR_FRAMES.attack * ANIMATION_SPEED);
+// Теперь можно следующее действие
+attacker.reloading = true;
+render();
+await sleep(SURVIVOR_FRAMES.reload * ANIMATION_SPEED);
+attacker.reloading = false;
+clicksBlocked = false;
+```
+
+Без `await` второе действие "съест" первое — игрок не увидит анимацию.
+
+### Status Visibility
+Логи типа `[ANIM] frame X/Y` — лучший способ понять, что видит игрок. Используй для отладки, но убирай из продакшена.
 
 ---
 
@@ -236,7 +280,7 @@ ZOMBIE_STEP_DELAY   = ZOMBIE_FRAMES.move   * ANIMATION_SPEED
 
 ```js
 // game.js — doMove / ai.js — zombieMove
-animationPaused = true;
+clicksBlocked = true;
 u.moving = true;
 startAnimation(); // один раз — запускает move анимацию
 
@@ -249,7 +293,7 @@ for (const pos of path) {
 }
 
 u.moving = false;
-animationPaused = false;
+clicksBlocked = false;
 render(); // один раз в конце
 ```
 
