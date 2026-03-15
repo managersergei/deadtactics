@@ -86,7 +86,7 @@ function activateGrenade(u) {
 }
 
 // Бросок гранаты
-function doGrenade(attacker, targetX, targetY) {
+async function doGrenade(attacker, targetX, targetY) {
   // Анимация броска гранаты
   attacker.usingGrenade = true;
   attacker.target = { x: targetX, y: targetY };
@@ -94,31 +94,29 @@ function doGrenade(attacker, targetX, targetY) {
   render();
   
   // Ждём окончания анимации grenade, затем наносим урон
-  setTimeout(() => {
-    attacker.usingGrenade = false;
-    
-    const grenade = ITEMS.grenade;
-    aliveZombies().forEach(z => {
-      if (manhattan({x:targetX,y:targetY}, z) <= grenade.splashRange) {
-        // Используем централизованную функцию
-        const result = takeDamage(z, grenade.damage, 'grenade');
-        
-        log(`💣 Граната → зомби [${z.x+1},${z.y+1}] −${grenade.damage}HP`, 'dmg');
-        if (result.died) {
-          state.recordKill();
-          log(`💀 Зомби уничтожен!`, 'dmg');
-        }
+  attacker.usingGrenade = false;
+  
+  const grenade = ITEMS.grenade;
+  for (const z of aliveZombies()) {
+    if (manhattan({x:targetX,y:targetY}, z) <= grenade.splashRange) {
+      // AWAITABLE DAMAGE - ждём окончания анимации
+      const result = await takeDamage(z, grenade.damage, 'grenade');
+      
+      log(`💣 Граната → зомби [${z.x+1},${z.y+1}] −${grenade.damage}HP`, 'dmg');
+      if (result.died) {
+        state.recordKill();
+        log(`💀 Зомби уничтожен!`, 'dmg');
       }
-    });
-    
-    attacker.inventory.grenade--;
-    attacker.attacked = true;
-    animationPaused = false;
-    state.clearHighlights();
-    state.setSelected(null);
-    render();
-    checkEnd();
-  }, 4 * 150); // 4 кадра анимации grenade
+    }
+  }
+  
+  attacker.inventory.grenade--;
+  attacker.attacked = true;
+  animationPaused = false;
+  state.clearHighlights();
+  state.setSelected(null);
+  render();
+  checkEnd();
 }
 
 // ── ХОД ИГРОКА ─────────────────────────────────────────
@@ -438,7 +436,8 @@ function startPlayerTurn() {
 // amount: количество урона
 // source: 'player' | 'zombie' | 'grenade' | 'effect'
 // returns: { died: boolean }
-function takeDamage(target, amount, source) {
+// ПРИМЕЧАНИЕ: Функция async - при вызове нужно awaitить для правильной синхронизации анимаций
+async function takeDamage(target, amount, source) {
   const oldHp = target.hp;
   target.hp -= amount;
   
@@ -465,14 +464,14 @@ function takeDamage(target, amount, source) {
       : (window.SURVIVOR_FRAMES?.damaged || 5);
     const delay = frames * ANIMATION_SPEED;
     
-    // Сброс после анимации - ровно столько сколько длится анимация
-    setTimeout(() => {
-      target.damagedFlash = false;
-      if (target.critFlash) {
-        target.critFlash = false;
-      }
-      render();
-    }, delay);
+    // AWAITABLE ANIMATION - ждём окончания анимации damaged перед возвратом
+    await new Promise(resolve => setTimeout(resolve, delay));
+    
+    target.damagedFlash = false;
+    if (target.critFlash) {
+      target.critFlash = false;
+    }
+    render();
   }
   
   // Проверка смерти
