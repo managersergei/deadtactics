@@ -492,7 +492,7 @@ function takeDamage(target, amount, source) {
       setTimeout(() => {
         target.alive = false;
         target.dying = false;
-        resetAnimFrame(target.id);
+        resetAnimCounter(target.id);
         render();
         checkEnd();
       }, 600);
