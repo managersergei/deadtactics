@@ -124,6 +124,7 @@ async function doGrenade(attacker, targetX, targetY) {
   if (!attacker || attacker.kind !== 'survivor' || attacker.id !== grenadeAttackerId) {
     log('Выбери юнита который бросает гранату', 'sys');
     state.setGrenadeAttackerId(null);
+    state.setGrenadePreview(null);
     state.clearHighlights();
     state.setSelected(null);
     render();
@@ -134,6 +135,7 @@ async function doGrenade(attacker, targetX, targetY) {
   if (!attacker.inventory || !attacker.inventory.grenade || attacker.inventory.grenade <= 0) {
     log('Нет гранат!', 'sys');
     state.setGrenadeAttackerId(null);
+    state.setGrenadePreview(null);
     state.clearHighlights();
     state.setSelected(null);
     render();
@@ -186,6 +188,7 @@ async function doGrenade(attacker, targetX, targetY) {
   attacker.attacked = true;
   animationPaused = false;
   state.setGrenadeAttackerId(null); // Сбрасываем ID после использования
+  state.setGrenadePreview(null);
   state.clearHighlights();
   state.setSelected(null);
   render();
@@ -209,6 +212,7 @@ function handlePlayer(c, r) {
       if (!selected || selected.id !== grenadeAttackerId) {
         log('Выбери юнита который бросает гранату', 'sys');
         state.setGrenadeAttackerId(null);
+        state.setGrenadePreview(null);
         state.clearHighlights();
         state.setSelected(null);
         render();
@@ -218,6 +222,7 @@ function handlePlayer(c, r) {
       // НЕЛЬЗЯ бросать на СЕБЯ - это отмена
       if (clicked && clicked.kind === 'survivor' && clicked.id === grenadeAttackerId) {
         state.setGrenadeAttackerId(null);
+        state.setGrenadePreview(null);
         state.clearHighlights();
         state.setSelected(null);
         log('Бросок гранаты отменён', 'sys');
@@ -238,6 +243,7 @@ function handlePlayer(c, r) {
     // 1. Клик на СВОЕГО (того же) survivor → ОТМЕНА гранаты
     if (clicked && clicked.kind === 'survivor' && clicked.id === grenadeAttackerId) {
       state.setGrenadeAttackerId(null);
+      state.setGrenadePreview(null);
       state.clearHighlights();
       state.setSelected(null);
       log('Бросок гранаты отменён', 'sys');
@@ -248,6 +254,7 @@ function handlePlayer(c, r) {
     // 2. Клик на ДРУГОГО survivor → ОТМЕНА + выбор нового
     if (clicked && clicked.kind === 'survivor' && clicked.id !== grenadeAttackerId) {
       state.setGrenadeAttackerId(null);
+      state.setGrenadePreview(null);
       state.clearHighlights();
       state.setSelected(clicked);
       recalcHighlights();
@@ -259,6 +266,7 @@ function handlePlayer(c, r) {
     // 3. Клик на ЗОМБИ (вне throw-зоны) → ОТМЕНА + выбрать зомби (инфа в сайдбар)
     if (clicked && clicked.kind === 'zombie') {
       state.setGrenadeAttackerId(null);
+      state.setGrenadePreview(null);
       state.clearHighlights();
       state.setSelected(clicked);
       log('Бросок гранаты отменён', 'sys');
@@ -269,6 +277,7 @@ function handlePlayer(c, r) {
     // 4. Клик на ПУСТУЮ клетку (вне throw-зоны) → ОТМЕНА
     if (!clicked) {
       state.setGrenadeAttackerId(null);
+      state.setGrenadePreview(null);
       state.clearHighlights();
       state.setSelected(null);
       log('Бросок гранаты отменён', 'sys');

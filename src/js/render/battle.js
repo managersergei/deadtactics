@@ -174,6 +174,7 @@ function render() {
   if (!animationPaused) stopAnimation();
 
   _clearCells();
+  _clearUnitHighlights();
   _drawPlacementZone();
   _drawHighlights();
   syncUnitsWithDOM();
@@ -184,10 +185,17 @@ function render() {
   }
 }
 
-// Очищаем только классы клеток — юниты НЕ трогаем
+// Очищаем классы highlight с клеток — НЕ трогаем базовый класс .cell
 function _clearCells() {
   document.querySelectorAll('.cell').forEach(el => {
-    el.className = 'cell';
+    el.classList.remove('move-range', 'attack-range', 'throw-range', 'splash-range');
+  });
+}
+
+// Очищаем классы highlight с юнитов
+function _clearUnitHighlights() {
+  document.querySelectorAll('.unit').forEach(el => {
+    el.classList.remove('in-splash-zone');
   });
 }
 
