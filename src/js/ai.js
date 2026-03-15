@@ -31,7 +31,13 @@ async function runZombies() {
         // Rage: атакуем 2 раза подряд (с ожиданием анимации)
         await zombieAttack(z, target);
         if (checkEnd()) break;
-        await sleep(500); // пауза между ударами
+        
+        // Динамическая пауза с учётом типа цели
+        const delay = target.alive 
+          ? (target.kind === UNIT_TYPES.SURVIVOR ? SURVIVOR_FRAMES.damaged : ZOMBIE_FRAMES.damaged) * ANIMATION_SPEED
+          : 500;
+        await sleep(delay);
+        
         await zombieAttack(z, target);
       } else {
         await zombieAttack(z, target);
@@ -44,7 +50,13 @@ async function runZombies() {
           // Rage: атакуем 2 раза подряд (с ожиданием анимации)
           await zombieAttack(z, target);
           if (checkEnd()) break;
-          await sleep(500); // пауза между ударами
+          
+          // Динамическая пауза с учётом типа цели
+          const delay = target.alive 
+            ? (target.kind === UNIT_TYPES.SURVIVOR ? SURVIVOR_FRAMES.damaged : ZOMBIE_FRAMES.damaged) * ANIMATION_SPEED
+            : 500;
+          await sleep(delay);
+          
           await zombieAttack(z, target);
         } else {
           await zombieAttack(z, target);
