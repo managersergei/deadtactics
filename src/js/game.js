@@ -70,6 +70,7 @@ function spawnZombiesForLevel(levelNum) {
 // Активировать режим броска гранаты
 function activateGrenade(u) {
   state.clearHighlights();
+  state.setGrenadeAttackerId(u.id); // Сохраняем ID юнита который бросает гранату
   const h = state.getHighlights();
   const grenade = ITEMS.grenade;
   for (let c = 0; c < COLS; c++) {
@@ -87,6 +88,27 @@ function activateGrenade(u) {
 
 // Бросок гранаты
 async function doGrenade(attacker, targetX, targetY) {
+  // Валидация: проверяем что attacker - это тот же survivor который активировал гранату
+  const grenadeAttackerId = state.getGrenadeAttackerId();
+  if (!attacker || attacker.kind !== 'survivor' || attacker.id !== grenadeAttackerId) {
+    log('Выбери юнита который бросает гранату', 'sys');
+    state.setGrenadeAttackerId(null);
+    state.clearHighlights();
+    state.setSelected(null);
+    render();
+    return;
+  }
+  
+  // Проверяем что граната есть в инвентаре
+  if (!attacker.inventory || !attacker.inventory.grenade || attacker.inventory.grenade <= 0) {
+    log('Нет гранат!', 'sys');
+    state.setGrenadeAttackerId(null);
+    state.clearHighlights();
+    state.setSelected(null);
+    render();
+    return;
+  }
+  
   // Анимация броска гранаты
   attacker.usingGrenade = true;
   attacker.target = { x: targetX, y: targetY };
@@ -114,6 +136,7 @@ async function doGrenade(attacker, targetX, targetY) {
   attacker.inventory.grenade--;
   attacker.attacked = true;
   animationPaused = false;
+  state.setGrenadeAttackerId(null); // Сбрасываем ID после использования
   state.clearHighlights();
   state.setSelected(null);
   render();
@@ -127,8 +150,76 @@ function handlePlayer(c, r) {
   const key = `${c},${r}`;
   const selected = state.getSelected();
   const highlights = state.getHighlights();
+  const grenadeAttackerId = state.getGrenadeAttackerId(); // ID юнита который активировал гранату
 
-  // 0. Бросок гранаты
+  // === РЕЖИМ ГРАНАТЫ АКТИВЕН ===
+  if (grenadeAttackerId) {
+    // 0. Бросок на подсвеченную клетку (throw-зона)
+    if (highlights.throw.has(key)) {
+      // Проверяем что выбран правильный survivor
+      if (!selected || selected.id !== grenadeAttackerId) {
+        log('Выбери юнита который бросает гранату', 'sys');
+        state.setGrenadeAttackerId(null);
+        state.clearHighlights();
+        state.setSelected(null);
+        render();
+        return;
+      }
+      
+      // Предупреждение для союзника
+      if (clicked && clicked.kind === 'survivor' && clicked.id !== grenadeAttackerId) {
+        log('⚠️ Бросок по союзнику!', 'sys');
+      }
+      
+      doGrenade(selected, c, r);
+      return;
+    }
+
+    // 1. Клик на СВОЕГО (того же) survivor → ОТМЕНА гранаты
+    if (clicked && clicked.kind === 'survivor' && clicked.id === grenadeAttackerId) {
+      state.setGrenadeAttackerId(null);
+      state.clearHighlights();
+      state.setSelected(null);
+      log('Бросок гранаты отменён', 'sys');
+      render();
+      return;
+    }
+
+    // 2. Клик на ДРУГОГО survivor → ОТМЕНА + выбор нового
+    if (clicked && clicked.kind === 'survivor' && clicked.id !== grenadeAttackerId) {
+      state.setGrenadeAttackerId(null);
+      state.clearHighlights();
+      state.setSelected(clicked);
+      recalcHighlights();
+      log('Бросок гранаты отменён', 'sys');
+      render();
+      return;
+    }
+
+    // 3. Клик на ЗОМБИ (вне throw-зоны) → ОТМЕНА + выбрать зомби (инфа в сайдбар)
+    if (clicked && clicked.kind === 'zombie') {
+      state.setGrenadeAttackerId(null);
+      state.clearHighlights();
+      state.setSelected(clicked);
+      log('Бросок гранаты отменён', 'sys');
+      render();
+      return;
+    }
+
+    // 4. Клик на ПУСТУЮ клетку (вне throw-зоны) → ОТМЕНА
+    if (!clicked) {
+      state.setGrenadeAttackerId(null);
+      state.clearHighlights();
+      state.setSelected(null);
+      log('Бросок гранаты отменён', 'sys');
+      render();
+      return;
+    }
+  }
+
+  // === ОБЫЧНЫЙ РЕЖИМ (grenadeAttackerId === null) ===
+
+  // 0. Бросок гранаты (еслиthrow-зона активна, ноgrenadeAttackerId сброшен)
   if (highlights.throw.has(key)) {
     doGrenade(selected, c, r);
     return;

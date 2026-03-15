@@ -11,6 +11,7 @@ const initialState = {
   turnNum: 1,
   turnsSurvived: 0,
   highlights: { move: new Set(), attack: new Set(), throw: new Set() },
+  grenadeAttackerId: null, // ID survivor который активировал гранату
   selectedSquadUnitId: null,
   stats: {
     zombiesKilled: 0,
@@ -57,6 +58,9 @@ const getHighlights = () => state.highlights;
 const setHighlights = (h) => { state.highlights = h; };
 const clearHighlights = () => { state.highlights = { move: new Set(), attack: new Set(), throw: new Set() }; };
 
+const getGrenadeAttackerId = () => state.grenadeAttackerId;
+const setGrenadeAttackerId = (id) => { state.grenadeAttackerId = id; };
+
 const getStats = () => state.stats;
 
 // Функции для статистики
@@ -79,6 +83,7 @@ const resetState = () => {
   state.turnNum = 1;
   state.turnsSurvived = 0;
   state.highlights = { move: new Set(), attack: new Set(), throw: new Set() };
+  state.grenadeAttackerId = null;
   state.selectedSquadUnitId = null;
   state.stats = { ...initialState.stats };
   state._uid = 0;
@@ -112,6 +117,8 @@ if (typeof window !== 'undefined') {
   state.getHighlights = getHighlights;
   state.setHighlights = setHighlights;
   state.clearHighlights = clearHighlights;
+  state.getGrenadeAttackerId = getGrenadeAttackerId;
+  state.setGrenadeAttackerId = setGrenadeAttackerId;
   state.getStats = getStats;
   state.recordKill = recordKill;
   state.recordDamageDealt = recordDamageDealt;
