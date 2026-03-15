@@ -423,3 +423,13 @@ function _buildHpBar(u) {
   bar.appendChild(fill);
   return bar;
 }
+
+// Экспорт констант для тестов
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    ANIMATION_SPEED,
+    ZOMBIE_FRAMES,
+    SURVIVOR_FRAMES,
+    ONE_SHOT_ANIMS,
+  };
+}

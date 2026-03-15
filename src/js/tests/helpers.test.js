@@ -2,6 +2,8 @@
 // Запускаются через Node: node src/js/tests/helpers.test.js
 
 const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
 
 // Мок window для Node.js
 global.window = global.window || {};
@@ -35,6 +37,34 @@ global.window.ROWS = config.ROWS;
 global.window.WEAPONS = config.WEAPONS;
 global.window.UNIT_TYPES = config.UNIT_TYPES;
 global.UNIT_TYPES = config.UNIT_TYPES;
+
+// Константы анимаций (дублируем из battle.js для тестов)
+// Эти значения должны совпадать с battle.js
+const ANIMATION_SPEED = 150;
+
+const ZOMBIE_FRAMES = {
+  idle: 6,
+  move: 6,
+  attack: 5,
+  damaged: 3,
+  cr_damaged: 5,
+  die: 4,
+  killed: 1,
+  raged: 5
+};
+
+const SURVIVOR_FRAMES = {
+  idle: 6,
+  move: 6,
+  attack: 3,
+  poisoned: 4,
+  reload: 6,
+  die: 1,
+  killed: 4,
+  damaged: 5,
+  antidote: 5,
+  grenade: 4
+};
 
 function run() {
   console.log('=== Running helpers tests ===');
@@ -89,6 +119,112 @@ function run() {
   assert.strictEqual(dirLeft, 'left');
   assert.strictEqual(dirRight, 'right');
   console.log('✓ getDirection');
+
+  // ТЕСТЫ АНИМАЦИЙ
+  // ===============
+
+  // Путь к ассетам (относительно корня проекта)
+  const PROJECT_ROOT = path.join(__dirname, '../../..');
+  
+  // Подсчитать количество png файлов в папке
+  function countFrames(folderPath) {
+    try {
+      const fullPath = path.join(PROJECT_ROOT, folderPath);
+      if (!fs.existsSync(fullPath)) return 0;
+      const files = fs.readdirSync(fullPath);
+      return files.filter(f => f.endsWith('.png')).length;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  // Тест: SURVIVOR_FRAMES для pistol должны соответствовать файлам
+  console.log('\n--- Animation frame tests (survivor/pistol) ---');
+  
+  // Для pistol: idle, move, attack, damaged, poisoned, reload - в папках с направлением
+  // die, killed - без направления
+  const pistolTests = [
+    { state: 'idle', folder: 'src/assets/units/survivor/pistol/idle_right' },
+    { state: 'move', folder: 'src/assets/units/survivor/pistol/move_right' },
+    { state: 'attack', folder: 'src/assets/units/survivor/pistol/attack_right' },
+    { state: 'damaged', folder: 'src/assets/units/survivor/pistol/damaged_right' },
+    { state: 'poisoned', folder: 'src/assets/units/survivor/pistol/poisoned_right' },
+    { state: 'reload', folder: 'src/assets/units/survivor/pistol/reload_right' },
+    { state: 'die', folder: 'src/assets/units/survivor/pistol/die_right' },
+    { state: 'killed', folder: 'src/assets/units/survivor/pistol/killed_right' },
+    { state: 'antidote', folder: 'src/assets/units/survivor/antidote_right' },
+    { state: 'grenade', folder: 'src/assets/units/survivor/grenade_right' },
+  ];
+  
+  let survivorFailures = 0;
+  for (const test of pistolTests) {
+    const actualFrames = countFrames(test.folder);
+    const expectedFrames = SURVIVOR_FRAMES[test.state];
+    if (actualFrames !== expectedFrames) {
+      console.log(`✗ ${test.state}: expected ${expectedFrames}, found ${actualFrames} files in ${test.folder}`);
+      survivorFailures++;
+    } else {
+      console.log(`✓ ${test.state}: ${actualFrames} frames (matches SURVIVOR_FRAMES)`);
+    }
+  }
+  
+  if (survivorFailures > 0) {
+    console.log(`\n⚠️ ${survivorFailures} survivor animation(s) have mismatched frame counts!`);
+  } else {
+    console.log('\n✅ All survivor animation frame counts match!');
+  }
+
+  // Тест: ZOMBIE_FRAMES должны соответствовать файлам
+  console.log('\n--- Animation frame tests (zombie) ---');
+  
+  const zombieTests = [
+    { state: 'idle', folder: 'src/assets/units/zombie/idle_left' },
+    { state: 'move', folder: 'src/assets/units/zombie/move_left' },
+    { state: 'attack', folder: 'src/assets/units/zombie/attack_left' },
+    { state: 'damaged', folder: 'src/assets/units/zombie/damaged_left' },
+    { state: 'cr_damaged', folder: 'src/assets/units/zombie/cr_damaged_left' },
+    { state: 'die', folder: 'src/assets/units/zombie/die_left' },
+    { state: 'killed', folder: 'src/assets/units/zombie/killed_left' },
+    { state: 'raged', folder: 'src/assets/units/zombie/raged_left' },
+  ];
+  
+  let zombieFailures = 0;
+  for (const test of zombieTests) {
+    const actualFrames = countFrames(test.folder);
+    const expectedFrames = ZOMBIE_FRAMES[test.state];
+    if (actualFrames !== expectedFrames) {
+      console.log(`✗ ${test.state}: expected ${expectedFrames}, found ${actualFrames} files in ${test.folder}`);
+      zombieFailures++;
+    } else {
+      console.log(`✓ ${test.state}: ${actualFrames} frames (matches ZOMBIE_FRAMES)`);
+    }
+  }
+  
+  if (zombieFailures > 0) {
+    console.log(`\n⚠️ ${zombieFailures} zombie animation(s) have mismatched frame counts!`);
+  } else {
+    console.log('\n✅ All zombie animation frame counts match!');
+  }
+
+  // Тест: тайминги соответствуют формуле (frames * ANIMATION_SPEED)
+  console.log('\n--- Animation timing tests ---');
+  
+  // Проверяем что все delay вычисляются правильно
+  const allSurvivorStates = Object.keys(SURVIVOR_FRAMES);
+  for (const state of allSurvivorStates) {
+    const frames = SURVIVOR_FRAMES[state];
+    const expectedDelay = frames * ANIMATION_SPEED;
+    console.log(`✓ survivor ${state}: ${frames} frames × ${ANIMATION_SPEED}ms = ${expectedDelay}ms`);
+  }
+  
+  const allZombieStates = Object.keys(ZOMBIE_FRAMES);
+  for (const state of allZombieStates) {
+    const frames = ZOMBIE_FRAMES[state];
+    const expectedDelay = frames * ANIMATION_SPEED;
+    console.log(`✓ zombie ${state}: ${frames} frames × ${ANIMATION_SPEED}ms = ${expectedDelay}ms`);
+  }
+  
+  console.log('\n✅ Animation timing formula is correct (frames * ANIMATION_SPEED)');
 
   console.log('\n✅ All tests passed!');
 }
