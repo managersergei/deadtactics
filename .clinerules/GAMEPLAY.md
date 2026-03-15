@@ -17,6 +17,7 @@
 Только survivor:
 - `u.reloading` — идёт перезарядка
 - `u.poisonFlash` — временный флаг для анимации яда (~300ms)
+- `u.dyingAnim` — воспроизводится анимация падения (переходное состояние)
 - `u.effects` — активные эффекты `{ poison: { duration, stacks } }`
 - `u.shotsFired` — счётчик выстрелов для перезарядки
 - `u.inventory` — расходники `{ antidote: 2, grenade: 1 }`
@@ -145,11 +146,34 @@ Survivor не атакует сам — атака определяется па
 
 ## 7. Атака и урон
 
+### Централизованная функция takeDamage()
+
+**ВАЖНО:** ВСЕГДА используйте `takeDamage()` для нанесения урона! НЕЛЬЗЯ менять HP напрямую (`u.hp -= X`).
+
+```javascript
+takeDamage(target, amount, source)
+// target: юнит которому наносим урон
+// amount: количество урона
+// source: 'player' | 'zombie' | 'grenade' | 'effect'
+// returns: { died: boolean }
+```
+
+**Что делает takeDamage():**
+1. Вычитает HP: `target.hp -= amount`
+2. Записывает урон в статистику
+3. Ставит флаг `damagedFlash = true` (анимация повреждения)
+4. Для source='player' и amount >= 2 ставит `critFlash = true`
+5. При смерти (hp <= 0):
+   - Для survivor: ставит `dyingAnim = true` (анимация падения)
+   - Для zombie: ставит `dying = true` (анимация смерти)
+6. Проверяет ярость зомби: если hp === 1 → `raged = true`
+
 ### Основные функции
 
 | Функция | Файл | Назначение |
 |---------|------|------------|
-| `doAttack(attacker, target)` | `game.js` | Основная логика атаки выжившего |
+| `takeDamage(target, amount, source)` | `game.js` | **Централизованное нанесение урона** |
+| `doAttack(attacker, target)` | `game.js` | Логика атаки выжившего |
 | `calcDamage(weaponId)` | `helpers.js` | Расчёт урона с учётом крита |
 | `getEffectiveStat(unit, stat)` | `helpers.js` | Получение статов с учётом снаряжения |
 | `zombieAttack(z, target)` | `ai.js` | Атака зомби (укус) |
@@ -159,20 +183,21 @@ Survivor не атакует сам — атака определяется па
 1. **Проверка:** юнит может атаковать (`!u.attacked`)
 2. **Оружие:** определяется через `getEffectiveStat(attacker, 'weapon')`
 3. **Урон:** рассчитывается через `calcDamage(weaponId)` → массив [dmg1, dmg2]
-4. **Нанесение:** `target.hp -= damage`
-5. **Проверка смерти:** `target.hp <= 0`
-6. **Анимация:** `damagedFlash` (обычный) или `critFlash` (критический)
-7. **Ярость:** если `target.hp === 1` → `target.raged = true`
+4. **Нанесение:** `takeDamage(target, damage, 'player')` — ВСЕГДА через takeDamage!
+5. **Анимация и смерть:** обрабатываются внутри takeDamage()
 
 ### Визуализация урона
 
 После изменения HP вызывается `render()`:
 - `render()` → `syncUnitsWithDOM()` → `updateUnitVisuals()`
-- Функция `updateUnitVisuals()` обновляет ширину и класс цвета HP bar
-- Не пересоздаёт DOM-элемент — избегает визуального мигания
+- Функция `updateUnitVisuals()`:
+  - Обновляет ширину и класс цвета HP bar
+  - Удаляет HP bar при смерти юнита
+  - Не пересоздаёт DOM-элемент — избегает визуального мигания
 
 ### Важно
 
+- **НЕЛЬЗЯ** менять `u.hp` напрямую — только через `takeDamage()`
 - Урон всегда через `calcDamage()` — **никогда не хардкодить числа**
 - HP зомби отображается в sidebar при клике на зомби
 - HP bar обновляется автоматически через `updateUnitVisuals()`
