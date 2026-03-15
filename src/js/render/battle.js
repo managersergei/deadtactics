@@ -7,6 +7,7 @@
 let animationInterval = null;
 let animationFrame = 0;
 let animationPaused = false;
+let clicksBlocked = false;
 const ANIMATION_SPEED = 150;
 
 // Количество кадров для каждого состояния (ЗОМБИ)
@@ -70,7 +71,7 @@ function getSurvivorAnimState(u) {
 }
 
 function startAnimation() {
-  if (animationPaused) return;
+  // Анимация крутится всегда - клики блокируются через clicksBlocked
   if (animationInterval) clearInterval(animationInterval);
   animationInterval = setInterval(() => {
     animationFrame++;

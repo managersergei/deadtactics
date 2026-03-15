@@ -8,7 +8,7 @@
 // ── Обработчик клика по клетке ────────────────────────────
 
 function onCellClick(c, r) {
-  if (animationPaused) return; // Блокируем клики во время движения
+  if (clicksBlocked) return; // Блокируем клики во время движения/атаки
 const phase = state.getPhase();
   if (phase === 'placement') handlePlacement(c, r);
   else if (phase === 'player') handlePlayer(c, r);
@@ -236,7 +236,7 @@ async function doMove(u, c, r) {
     return;
   }
 
-  animationPaused = true;  // блокируем клики и перезапуск интервала
+  clicksBlocked = true;  // блокируем клики
   u.moving = true;
   playFootstep();
 
@@ -258,7 +258,7 @@ async function doMove(u, c, r) {
 
   u.moving = false;
   u.moved = true;
-  animationPaused = false;
+  clicksBlocked = false;
 
   state.clearHighlights();
   render();  // финальный рендер — переключает на idle
@@ -272,11 +272,11 @@ async function doAttack(attacker, target) {
   const damage = damageArr ? damageArr[0] : 0;
   const isCrit = damage >= 2; // крит = 2+ урона
   
-  // Анимация атаки выжившего
+  // Анимация атаки выжившего - блокируем клики но НЕ анимацию
   if (attacker.kind === 'survivor') {
     attacker.attacking = true;
     attacker.target = target; // сохраняем цель для поворота
-    animationPaused = true;
+    clicksBlocked = true;
     render();
   }
   
@@ -299,16 +299,14 @@ async function doAttack(attacker, target) {
       attacker.reloading = true;
       attacker.shotsFired = 0;
       log(`🔄 Перезарядка...`, 'sys');
-      // Анимация перезарядки - пауза на 6 кадров
-      animationPaused = true;
       render();
-      setTimeout(() => {
-        attacker.reloading = false;
-        animationPaused = false;
-        render();
-      }, 6 * 150); // 6 кадров × 150ms
+      // Анимация перезарядки - ждём 6 кадров
+      await new Promise(resolve => setTimeout(resolve, SURVIVOR_FRAMES.reload * ANIMATION_SPEED));
+      attacker.reloading = false;
+      clicksBlocked = false;
+      render();
     } else {
-      animationPaused = false;
+      clicksBlocked = false;
     }
   }
   
