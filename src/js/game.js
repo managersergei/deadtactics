@@ -110,7 +110,8 @@ async function doGrenade(attacker, targetX, targetY) {
     return;
   }
   
-  // Анимация броска гранаты
+  // Анимация броска гранаты — устанавливаем направление
+  attacker.direction = getDirection(attacker, {x: targetX, y: targetY});
   attacker.usingGrenade = true;
   attacker.target = { x: targetX, y: targetY };
   animationPaused = true;
