@@ -146,8 +146,11 @@ async function zombieAttack(z, target) {
   
   z.attacking = false;
   
-  // AWAITABLE DAMAGE - ждём окончания анимации damaged у цели
-  const result = await takeDamage(target, z.atkDmg, 'zombie');
+  // Нанесение урона - запускает анимацию повреждения
+  const result = takeDamage(target, z.atkDmg, 'zombie');
+  
+  // Ждём окончания анимации повреждения
+  await waitForDamageAnimation(target);
   
   // Проверить есть ли броня с защитой от яда
   const armorId = target.equipment?.armor;

@@ -100,8 +100,8 @@ async function doGrenade(attacker, targetX, targetY) {
   const grenade = ITEMS.grenade;
   for (const z of aliveZombies()) {
     if (manhattan({x:targetX,y:targetY}, z) <= grenade.splashRange) {
-      // AWAITABLE DAMAGE - ждём окончания анимации
-      const result = await takeDamage(z, grenade.damage, 'grenade');
+      const result = takeDamage(z, grenade.damage, 'grenade');
+      await waitForDamageAnimation(z);
       
       log(`💣 Граната → зомби [${z.x+1},${z.y+1}] −${grenade.damage}HP`, 'dmg');
       if (result.died) {
@@ -280,12 +280,14 @@ async function doAttack(attacker, target) {
     render();
   }
   
-  // Ждём окончания анимации атаки (2 кадра × 150ms = 300ms)
+  // Ждём окончания анимации атаки (3 кадра × 150ms = 450ms)
   await new Promise(resolve => setTimeout(resolve, SURVIVOR_FRAMES.attack * ANIMATION_SPEED));
   
   // Используем централизованную функцию — она сама поставит damagedFlash
-  // AWAITABLE DAMAGE - ждём окончания анимации damaged
-  const result = await takeDamage(target, damage, 'player');
+  const result = takeDamage(target, damage, 'player');
+  
+  // Ждём окончания анимации повреждения
+  await waitForDamageAnimation(target);
   
   attacker.attacked = true;
   
@@ -433,13 +435,18 @@ function startPlayerTurn() {
 
 // ── ЦЕНТРАЛИЗОВАННАЯ СИСТЕМА УРОНА ─────────────────────
 
+// Функция ожидания для анимации
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // Единая функция для нанесения урона — ставит флаги анимаций сама
+// Включает damagedFlash, но НЕ ждёт окончания анимации
 // target: юнит которому наносим урон
 // amount: количество урона
 // source: 'player' | 'zombie' | 'grenade' | 'effect'
 // returns: { died: boolean }
-// ПРИМЕЧАНИЕ: Функция async - при вызове нужно awaitить для правильной синхронизации анимаций
-async function takeDamage(target, amount, source) {
+function takeDamage(target, amount, source) {
   const oldHp = target.hp;
   target.hp -= amount;
   
@@ -453,27 +460,12 @@ async function takeDamage(target, amount, source) {
   // Анимация повреждения (только если юнит выжил)
   if (target.hp > 0) {
     target.damagedFlash = true;
+    render();  // СРАЗУ запускаем анимацию
     
     // Для критического урона от игрока
     if (source === 'player' && amount >= 2) {
       target.critFlash = true;
     }
-    
-    // Вычисляем длительность анимации на основе кадров
-    // Zombie: 3 кадра × 150ms = 450ms, Survivor: 5 кадров × 150ms = 750ms
-    const frames = target.kind === UNIT_TYPES.ZOMBIE 
-      ? (window.ZOMBIE_FRAMES?.damaged || 3) 
-      : (window.SURVIVOR_FRAMES?.damaged || 5);
-    const delay = frames * ANIMATION_SPEED;
-    
-    // AWAITABLE ANIMATION - ждём окончания анимации damaged перед возвратом
-    await new Promise(resolve => setTimeout(resolve, delay));
-    
-    target.damagedFlash = false;
-    if (target.critFlash) {
-      target.critFlash = false;
-    }
-    render();
   }
   
   // Проверка смерти
@@ -508,6 +500,26 @@ async function takeDamage(target, amount, source) {
   }
   
   return { died: false };
+}
+
+// Отдельная функция для ожидания окончания анимации повреждения
+// Вызывается ПОСЛЕ takeDamage() когда нужно дождаться окончания анимации
+async function waitForDamageAnimation(target) {
+  if (!target.damagedFlash) return;  // Если нет анимации - не ждём
+  
+  // Вычисляем длительность анимации на основе кадров
+  const frames = target.kind === UNIT_TYPES.ZOMBIE 
+    ? (window.ZOMBIE_FRAMES?.damaged || 3) 
+    : (window.SURVIVOR_FRAMES?.damaged || 5);
+  const delay = frames * ANIMATION_SPEED;
+  
+  await sleep(delay);
+  
+  target.damagedFlash = false;
+  if (target.critFlash) {
+    target.critFlash = false;
+  }
+  render();
 }
 
 // ── Конец боя ────────────────────────────────────────────
