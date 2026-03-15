@@ -93,7 +93,8 @@ async function doGrenade(attacker, targetX, targetY) {
   animationPaused = true;
   render();
   
-  // Ждём окончания анимации grenade, затем наносим урон
+  // Ждём окончания анимации grenade (4 кадра × 150ms = 600ms)
+  await new Promise(resolve => setTimeout(resolve, SURVIVOR_FRAMES.grenade * ANIMATION_SPEED));
   attacker.usingGrenade = false;
   
   const grenade = ITEMS.grenade;
@@ -279,8 +280,8 @@ async function doAttack(attacker, target) {
     render();
   }
   
-  // Ждём окончания анимации атаки
-  await new Promise(resolve => setTimeout(resolve, 200));
+  // Ждём окончания анимации атаки (2 кадра × 150ms = 300ms)
+  await new Promise(resolve => setTimeout(resolve, SURVIVOR_FRAMES.attack * ANIMATION_SPEED));
   
   // Используем централизованную функцию — она сама поставит damagedFlash
   // AWAITABLE DAMAGE - ждём окончания анимации damaged
