@@ -264,7 +264,7 @@ async function doMove(u, c, r) {
   checkEnd();
 }
 
-function doAttack(attacker, target) {
+async function doAttack(attacker, target) {
   // Получаем эффективное оружие из снаряжения
   const weaponId = getEffectiveStat(attacker, 'weapon');
   const damageArr = calcDamage(weaponId);
@@ -279,48 +279,49 @@ function doAttack(attacker, target) {
     render();
   }
   
-  // Наносим урон после небольшой задержки для анимации
-  setTimeout(() => {
-    // Используем централизованную функцию — она сама поставит damagedFlash
-    const result = takeDamage(target, damage, 'player');
-    
-    attacker.attacked = true;
-    
-    // Логика перезарядки (для выживших)
-    if (attacker.kind === 'survivor') {
-      attacker.attacking = false;
-      attacker.shotsFired = (attacker.shotsFired || 0) + 1;
-      if (attacker.shotsFired >= 3) {
-        attacker.reloading = true;
-        attacker.shotsFired = 0;
-        log(`🔄 Перезарядка...`, 'sys');
-        // Анимация перезарядки - пауза на 6 кадров
-        animationPaused = true;
-        render();
-        setTimeout(() => {
-          attacker.reloading = false;
-          animationPaused = false;
-          render();
-        }, 6 * 150); // 6 кадров × 150ms
-      } else {
+  // Ждём окончания анимации атаки
+  await new Promise(resolve => setTimeout(resolve, 200));
+  
+  // Используем централизованную функцию — она сама поставит damagedFlash
+  // AWAITABLE DAMAGE - ждём окончания анимации damaged
+  const result = await takeDamage(target, damage, 'player');
+  
+  attacker.attacked = true;
+  
+  // Логика перезарядки (для выживших)
+  if (attacker.kind === 'survivor') {
+    attacker.attacking = false;
+    attacker.shotsFired = (attacker.shotsFired || 0) + 1;
+    if (attacker.shotsFired >= 3) {
+      attacker.reloading = true;
+      attacker.shotsFired = 0;
+      log(`🔄 Перезарядка...`, 'sys');
+      // Анимация перезарядки - пауза на 6 кадров
+      animationPaused = true;
+      render();
+      setTimeout(() => {
+        attacker.reloading = false;
         animationPaused = false;
-      }
-    }
-    
-    playShot();
-    
-    // Лог результата
-    if (result.died) {
-      log(`💀 Зомби уничтожен!`, 'dmg');
-      state.recordKill();
+        render();
+      }, 6 * 150); // 6 кадров × 150ms
     } else {
-      log(`💥 Атака${isCrit ? ' (КРИТ!)' : ''} → зомби [${target.x+1},${target.y+1}] — ${target.hp}/${target.maxHp}HP`, 'dmg');
+      animationPaused = false;
     }
+  }
+  
+  playShot();
+  
+  // Лог результата
+  if (result.died) {
+    log(`💀 Зомби уничтожен!`, 'dmg');
+    state.recordKill();
+  } else {
+    log(`💥 Атака${isCrit ? ' (КРИТ!)' : ''} → зомби [${target.x+1},${target.y+1}] — ${target.hp}/${target.maxHp}HP`, 'dmg');
+  }
 
-    state.clearHighlights();
-    state.setSelected(null);
-    render();
-  }, 200);
+  state.clearHighlights();
+  state.setSelected(null);
+  render();
 }
 
 // ── Смена хода ────────────────────────────────────────────
