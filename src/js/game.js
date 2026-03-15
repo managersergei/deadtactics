@@ -15,7 +15,7 @@ function onCellHover(c, r) {
   if (!grenadeAttackerId) {
     if (state.getGrenadePreview()) {
       state.setGrenadePreview(null);
-      _drawHighlights();
+      render();  // Полный цикл Clear → Draw
     }
     return;
   }
@@ -31,10 +31,11 @@ function onCellHover(c, r) {
       state.setGrenadePreview(null);
     }
   } else {
+    // mouseleave — жёсткий сброс
     state.setGrenadePreview(null);
   }
   
-  _drawHighlights();
+  render();  // Полный цикл Clear → Draw
 }
 
 function onCellClick(c, r) {

@@ -185,10 +185,10 @@ function render() {
   }
 }
 
-// Очищаем классы highlight с клеток — НЕ трогаем базовый класс .cell
+// Очищаем классы highlight с клеток — сбрасываем к базовому классу
 function _clearCells() {
   document.querySelectorAll('.cell').forEach(el => {
-    el.classList.remove('move-range', 'attack-range', 'throw-range', 'splash-range');
+    el.className = 'cell';  // Полный сброс к базовому классу
   });
 }
 

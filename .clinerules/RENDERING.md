@@ -555,3 +555,82 @@ for (const z of targets) {
 }
 await waitForDamageAnimation(target[0]); // Ждём одну анимацию
 ```
+
+---
+
+## 17. Система подсветки клеток (Clear → Draw)
+
+### 17.1 Цикл Clear → Draw
+
+Все изменения визуализации проходят через полный цикл:
+
+```
+onCellHover() / onCellClick()
+    ↓
+setState() / clearState()  
+    ↓
+render()
+    ↓
+_clearCells()           ← Очищает ВСЕ классы
+_clearUnitHighlights()  ← Очищает классы юнитов
+_drawPlacementZone()   ← Рисует зону расстановки
+_drawHighlights()       ← Рисует зоны подсветки
+```
+
+**Важно:** Всегда вызывать `render()`, а не `_drawHighlights()` напрямую!
+
+### 17.2 Функция _clearCells()
+
+"Глупая" функция очистки — сбрасывает клетку к базовому классу:
+
+```js
+function _clearCells() {
+  document.querySelectorAll('.cell').forEach(el => {
+    el.className = 'cell';  // Полный сброс
+  });
+}
+```
+
+**Почему не выборочно:**
+- Если добавить новый класс подсветки — забудешь добавить в список → баг
+- Функция "умничает" → сложнее поддерживать
+- Всегда сбрасывает к `.cell` → никаких сюрпризов
+
+### 17.3 Функция _clearUnitHighlights()
+
+Очищает классы `.in-splash-zone` с юнитов:
+
+```js
+function _clearUnitHighlights() {
+  document.querySelectorAll('.unit').forEach(el => {
+    el.classList.remove('in-splash-zone');
+  });
+}
+```
+
+### 17.4 CSS классы клеток
+
+| Класс | Назначение |
+|-------|-----------|
+| `.cell` | Базовый класс клетки |
+| `.placement-zone` | Зона расстановки (зелёная) |
+| `.move-range` | Зона движения (синяя) |
+| `.attack-range` | Зона атаки (красная) |
+| `.throw-range` | Зона броска гранаты (оранжевая) |
+| `.splash-range` | Зона поражения гранаты (красная preview) |
+
+### 17.5 Grenade Splash Preview
+
+При наведении курсора на throw-клетку:
+1. `onCellHover(c, r)` → `state.setGrenadePreview({x, y})`
+2. `render()` → `_clearCells()` (сброс) → `_drawHighlights()` (рисует splash)
+3. При отведении: `onCellHover(null, null)` → `setGrenadePreview(null)` → `render()`
+
+### 17.6 Чеклист
+
+При добавлении новой подсветки:
+- [ ] Описать CSS классы в таблице выше
+- [ ] Использовать `className = 'cell'` в _clearCells()
+- [ ] onCellHover должен вызывать render(), а не _drawHighlights()
+- [ ] Проверить очистку при mouseleave (c=null, r=null)
+- [ ] Проверить очистку классов с юнитов (_clearUnitHighlights)
