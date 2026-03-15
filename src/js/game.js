@@ -7,6 +7,36 @@
 
 // ── Обработчик клика по клетке ────────────────────────────
 
+// Обработчик наведения мыши на клетку (для preview гранаты)
+function onCellHover(c, r) {
+  const grenadeAttackerId = state.getGrenadeAttackerId();
+  
+  // Если не в режиме гранаты — сбрасываем preview
+  if (!grenadeAttackerId) {
+    if (state.getGrenadePreview()) {
+      state.setGrenadePreview(null);
+      _drawHighlights();
+    }
+    return;
+  }
+  
+  const highlights = state.getHighlights();
+  
+  // Если передана клетка и она в throw-зоне — показываем splash preview
+  if (c !== null && r !== null) {
+    const key = `${c},${r}`;
+    if (highlights.throw.has(key)) {
+      state.setGrenadePreview({x: c, y: r});
+    } else {
+      state.setGrenadePreview(null);
+    }
+  } else {
+    state.setGrenadePreview(null);
+  }
+  
+  _drawHighlights();
+}
+
 function onCellClick(c, r) {
   if (clicksBlocked) return; // Блокируем клики во время движения/атаки
 const phase = state.getPhase();

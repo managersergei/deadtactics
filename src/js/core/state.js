@@ -12,6 +12,7 @@ const initialState = {
   turnsSurvived: 0,
   highlights: { move: new Set(), attack: new Set(), throw: new Set() },
   grenadeAttackerId: null, // ID survivor который активировал гранату
+  grenadePreview: null, // {x, y} - позиция для preview зоны взрыва
   selectedSquadUnitId: null,
   stats: {
     zombiesKilled: 0,
@@ -60,6 +61,9 @@ const clearHighlights = () => { state.highlights = { move: new Set(), attack: ne
 
 const getGrenadeAttackerId = () => state.grenadeAttackerId;
 const setGrenadeAttackerId = (id) => { state.grenadeAttackerId = id; };
+
+const getGrenadePreview = () => state.grenadePreview;
+const setGrenadePreview = (pos) => { state.grenadePreview = pos; };
 
 const getStats = () => state.stats;
 
@@ -119,6 +123,8 @@ if (typeof window !== 'undefined') {
   state.clearHighlights = clearHighlights;
   state.getGrenadeAttackerId = getGrenadeAttackerId;
   state.setGrenadeAttackerId = setGrenadeAttackerId;
+  state.getGrenadePreview = getGrenadePreview;
+  state.setGrenadePreview = setGrenadePreview;
   state.getStats = getStats;
   state.recordKill = recordKill;
   state.recordDamageDealt = recordDamageDealt;

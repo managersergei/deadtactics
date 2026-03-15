@@ -203,6 +203,8 @@ function _drawPlacementZone() {
 
 function _drawHighlights() {
   const highlights = state.getHighlights();
+  const grenadePreview = state.getGrenadePreview();
+  
   highlights.move.forEach(k => {
     const [c, r] = k.split(',').map(Number);
     const el = cell(c, r);
@@ -218,6 +220,39 @@ function _drawHighlights() {
     const el = cell(c, r);
     if (el) el.classList.add('throw-range');
   });
+  
+  // Preview зоны взрыва гранаты (splash)
+  if (grenadePreview) {
+    const splashRange = ITEMS.grenade.splashRange;
+    const px = grenadePreview.x;
+    const py = grenadePreview.y;
+    
+    // Подсвечиваем все клетки в splash-зоне (chessboard distance)
+    for (let dc = -splashRange; dc <= splashRange; dc++) {
+      for (let dr = -splashRange; dr <= splashRange; dr++) {
+        const dist = Math.max(Math.abs(dc), Math.abs(dr));
+        if (dist <= splashRange) {
+          const c = px + dc;
+          const r = py + dr;
+          if (c >= 0 && c < COLS && r >= 0 && r < ROWS) {
+            const el = cell(c, r);
+            if (el) el.classList.add('splash-range');
+          }
+        }
+      }
+    }
+    
+    // Добавляем класс юнитам в splash-зоне
+    const units = state.getUnits();
+    units.forEach(u => {
+      if (!u.alive) return;
+      const dist = Math.max(Math.abs(px - u.x), Math.abs(py - u.y));
+      if (dist <= splashRange) {
+        const el = document.getElementById(`unit-${u.id}`);
+        if (el) el.classList.add('in-splash-zone');
+      }
+    });
+  }
 }
 
 // Обновить визуальные элементы юнита (HP bar) без пересоздания DOM

@@ -19,7 +19,7 @@
 |--------------|----------|-------------------|
 | `move`       | все      | `u.moving`        |
 | `attack`     | все      | `u.attacking`     |
-| `damaged`    | все     | `u.damagedFlash`  |
+| `damaged`    | все      | `u.damagedFlash`  |
 | `cr_damaged` | zombie   | `u.critFlash`     |
 | `reload`     | survivor | `u.reloading`     |
 | `poisoned`   | survivor | `u.poisonFlash`   |
@@ -28,6 +28,16 @@
 | `die`        | все      | `u.dying`         |
 | `killed`     | survivor | `u.dyingAnim`     |
 | `killed`     | zombie   | `!u.alive`        |
+
+### Grenade Splash Preview
+
+При наведении курсора на throw-клетку (зона броска гранаты) отображается preview зоны поражения (splash):
+
+- `state.grenadePreview` — позиция для preview (`{x, y}` или `null`)
+- При наведении на throw-клетку: `onCellHover()` в `game.js` устанавливает `grenadePreview`
+- `_drawHighlights()` в `battle.js` рисует splash-зону (красная подсветка)
+- CSS класс `.splash-range` — подсветка клеток в зоне поражения
+- CSS класс `.in-splash-zone` — подсветка юнитов в зоне поражения (яркость + иконка 💥)
 
 ---
 

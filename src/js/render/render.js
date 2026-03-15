@@ -24,6 +24,8 @@ function buildGrid() {
       el.dataset.c = c;
       el.dataset.r = r;
       el.addEventListener('click', () => onCellClick(c, r));
+      el.addEventListener('mouseenter', () => onCellHover(c, r));
+      el.addEventListener('mouseleave', () => onCellHover(null, null));
       g.appendChild(el);
     }
   }
