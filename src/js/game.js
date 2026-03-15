@@ -135,11 +135,8 @@ async function doGrenade(attacker, targetX, targetY) {
     }
   }
   
-  // FRIENDLY FIRE — атака по союзникам
+  // FRIENDLY FIRE — атака по союзникам (без исключений)
   for (const p of alivePlayers()) {
-    // Не атакуем того кто бросил гранату
-    if (p.id === attacker.id) continue;
-    
     if (manhattan({x:targetX,y:targetY}, p) <= grenade.splashRange) {
       const result = takeDamage(p, grenade.damage, 'grenade');
       await waitForDamageAnimation(p);
