@@ -75,9 +75,8 @@ function activateGrenade(u) {
   const grenade = ITEMS.grenade;
   for (let c = 0; c < COLS; c++) {
     for (let r = 0; r < ROWS; r++) {
-      // Используем chessboard distance (учитывает диагонали)
-      const dist = Math.max(Math.abs(u.x - c), Math.abs(u.y - r));
-      if (dist <= grenade.throwRange) {
+      // throwRange использует manhattan (только горизонталь/вертикаль)
+      if (manhattan(u, {x:c, y:r}) <= grenade.throwRange) {
         h.throw.add(`${c},${r}`);
       }
     }
