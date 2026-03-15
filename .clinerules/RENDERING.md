@@ -399,3 +399,101 @@ function updateUnitVisuals(u, el) {
 - Упрощает поддержку кода
 - Позволяет легко добавить другие визуальные обновления
 - Сохраняет `syncUnitsWithDOM()` чистой (только перемещение элементов)
+
+---
+
+## 16. Анимация повреждения (damaged)
+
+### Принцип Атомарности Урона
+
+`takeDamage()` только меняет цифры и включает флаг анимации. Она **не имеет права знать о времени**.
+
+```js
+function takeDamage(target, amount, source) {
+  target.hp -= amount;
+  target.damagedFlash = true;  // ВКЛЮЧАЕМ анимацию
+  render();                      // СРАЗУ запускаем
+  return { died: ... };
+}
+```
+
+### Принцип Вычисляемых Таймингов
+
+**Запрещено использовать магические числа вроде `500ms`.**
+
+Правило:
+```
+Задержка = Количество_кадров * ANIMATION_SPEED
+```
+
+Пример:
+```js
+const delay = SURVIVOR_FRAMES.damaged * ANIMATION_SPEED; // 5 * 150 = 750ms
+```
+
+Если кто-то впишет число вручную — это **баг**.
+
+### Золотое Правило Кадра
+
+> Никогда не используйте `await` сразу после изменения визуального флага без вызова `render()`, если флаг должен быть снят в конце этой же функции.
+
+❌ **Неправильно:**
+```js
+target.damagedFlash = true;
+await new Promise(r => setTimeout(r, 500)); // render() не вызван!
+target.damagedFlash = false; // Анимация не успела отобразиться
+```
+
+✅ **Правильно:**
+```js
+target.damagedFlash = true;
+render(); // СРАЗУ запускаем анимацию
+await new Promise(r => setTimeout(r, delay));
+target.damagedFlash = false;
+```
+
+### Правильная последовательность вызовов
+
+```js
+// В doAttack(), doGrenade(), zombieAttack():
+takeDamage(target, damage, source);      // 1. Нанесение урона + запуск анимации
+await waitForDamageAnimation(target);    // 2. Ожидание окончания анимации
+```
+
+### Функция waitForDamageAnimation()
+
+```js
+async function waitForDamageAnimation(target) {
+  if (!target.damagedFlash) return;  // Если нет анимации - не ждём
+  
+  const frames = target.kind === UNIT_TYPES.ZOMBIE 
+    ? ZOMBIE_FRAMES.damaged 
+    : SURVIVOR_FRAMES.damaged;
+  const delay = frames * ANIMATION_SPEED;
+  
+  await sleep(delay);
+  
+  target.damagedFlash = false;
+  render();
+}
+```
+
+### Правило Группового Урона
+
+При нанесении урона нескольким целям (граната):
+
+❌ **Неправильно:** await для каждого врага по очереди
+```js
+for (const z of targets) {
+  await takeDamage(z, dmg, 'grenade');      // Ждём 750ms
+  await waitForDamageAnimation(z);           // Ещё 750ms
+}
+```
+
+✅ **Правильно:** Запустить урон для всех, дождаться одной общей анимации
+```js
+for (const z of targets) {
+  takeDamage(z, dmg, 'grenade');  // Запускаем для всех сразу
+}
+await waitForDamageAnimation(target[0]); // Ждём одну анимацию
+```
