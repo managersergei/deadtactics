@@ -403,7 +403,11 @@ function startPlayerTurn() {
       playPoison();
       render();
 
-      // Через 300ms выключаем анимацию
+      // Вычисляем длительность анимации poisoned: 4 кадра × 150ms = 600ms
+      const poisonFrames = window.SURVIVOR_FRAMES?.poisoned || 4;
+      const poisonDelay = poisonFrames * ANIMATION_SPEED;
+      
+      // Выключаем анимацию после её окончания
       setTimeout(() => {
         unitsWithDamage.forEach(u => {
           u.poisonFlash = false;
@@ -412,7 +416,7 @@ function startPlayerTurn() {
         state.setPhase('player');
         log(`════ Ход ${state.getTurnNum()} · Ваши действия ════`, 'sys');
         render();
-      }, 300);
+      }, poisonDelay);
     } else {
       // Есть эффекты но без урона (например заморозка) - сразу продолжаем
       state.setPhase('player');
@@ -454,14 +458,21 @@ function takeDamage(target, amount, source) {
       target.critFlash = true;
     }
     
-    // Сброс после анимации
+    // Вычисляем длительность анимации на основе кадров
+    // Zombie: 3 кадра × 150ms = 450ms, Survivor: 5 кадров × 150ms = 750ms
+    const frames = target.kind === UNIT_TYPES.ZOMBIE 
+      ? (window.ZOMBIE_FRAMES?.damaged || 3) 
+      : (window.SURVIVOR_FRAMES?.damaged || 5);
+    const delay = frames * ANIMATION_SPEED;
+    
+    // Сброс после анимации - ровно столько сколько длится анимация
     setTimeout(() => {
       target.damagedFlash = false;
       if (target.critFlash) {
         target.critFlash = false;
       }
       render();
-    }, 300);
+    }, delay);
   }
   
   // Проверка смерти

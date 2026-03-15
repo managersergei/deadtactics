@@ -42,28 +42,29 @@ const ONE_SHOT_ANIMS = new Set(['attack', 'damaged', 'cr_damaged', 'die', 'kille
 const animFrameCounters = {};
 
 function getZombieAnimState(u) {
-  // Приоритет: die > killed > cr_damaged > damaged > attack > raged > move > idle
-  // Правило: Action > State — состояния с действиями (attack, damaged) важнее чем passive (raged)
+  // Приоритет: die > killed > cr_damaged > attack > damaged > raged > move > idle
+  // ПРАВИЛО: Action > State — состояния с действиями (attack, damaged) важнее чем passive (raged)
   if (u.dying)        return 'die';
   if (!u.alive)       return 'killed';
   if (u.critFlash)    return 'cr_damaged';
+  if (u.attacking)    return 'attack';     // Action важнее чем State
   if (u.damagedFlash) return 'damaged';
-  if (u.attacking)    return 'attack';
   if (u.raged)        return 'raged';
   if (u.moving)       return 'move';
   return 'idle';
 }
 
 function getSurvivorAnimState(u) {
-  // Приоритет: die > killed > reload > poisoned > antidote > grenade > damaged > attack > move > idle
+  // Приоритет: die > killed > reload > poisoned > antidote > grenade > attack > damaged > move > idle
+  // ПРАВИЛО: Action > State — атака важнее чем получение урона
   if (u.dying)          return 'die';       // статика — труп лежит
   if (u.dyingAnim)     return 'killed';    // анимация падения
   if (u.reloading)     return 'reload';
   if (u.poisonFlash)  return 'poisoned';
   if (u.usingAntidote) return 'antidote'; // использование антидота
   if (u.usingGrenade) return 'grenade';   // бросок гранаты
+  if (u.attacking)     return 'attack';    // Action важнее чем State
   if (u.damagedFlash)  return 'damaged';   // получение урона
-  if (u.attacking)     return 'attack';
   if (u.moving)        return 'move';
   return 'idle';
 }
