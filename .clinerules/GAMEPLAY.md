@@ -162,6 +162,29 @@ Survivor не атакует сам — атака определяется па
 2. `attacker.id === grenadeAttackerId` — должен быть тот же survivor который активировал гранату
 3. `attacker.inventory.grenade > 0` — должна быть граната в инвентаре
 
+#### Анимация броска
+
+**Важно:** Перед запуском анимации гранаты нужно установить направление!
+
+```javascript
+// 1. Установить направление (используем getDirection из helpers.js)
+attacker.direction = getDirection(attacker, {x: targetX, y: targetY});
+
+// 2. Запустить анимацию
+attacker.usingGrenade = true;
+attacker.target = { x: targetX, y: targetY };
+animationPaused = true;
+render();
+
+// 3. Ждать окончания анимации
+await new Promise(resolve => setTimeout(resolve, SURVIVOR_FRAMES.grenade * ANIMATION_SPEED));
+attacker.usingGrenade = false;
+
+// ... нанесение урона ...
+```
+
+**Порядок важен:** `direction` → `usingGrenade` → `target` → `render()`
+
 ---
 
 ## 6. Бой — фазы и порядок хода

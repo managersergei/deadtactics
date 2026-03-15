@@ -203,8 +203,12 @@ computeSpritePath(u, state, direction) // → { base, needsMirror }
 
 Задержка между шагами = `количество_кадров_move × ANIMATION_SPEED`:
 ```js
-SURVIVOR_STEP_DELAY = SURVIVOR_FRAMES.move * ANIMATION_SPEED
-ZOMBIE_STEP_DELAY   = ZOMBIE_FRAMES.move   * ANIMATION_SPEED
+// Вычислить путь к спрайтам и необходимость зеркаливания
+computeSpritePath(u, state, direction) // → { base, needsMirror }
+
+// Универсальная функция определения направления взгляда
+// Используется для любых анимаций с направлением (attack, move, grenade и т.д.)
+getDirection(unit, target) // → 'left' | 'right'
 ```
 
 После достижения финальной клетки: `u.moving = false` → юнит автоматически возвращается в `idle`.
