@@ -25,7 +25,7 @@ const ZOMBIE_FRAMES = {
 const SURVIVOR_FRAMES = {
   idle: 6,
   move: 6,
-  attack: 2,  // only attack_1.png and attack_2.png exist
+  attack: 3,  // 3 animation frames
   poisoned: 4,
   reload: 6,
   die: 1,
