@@ -171,6 +171,10 @@
 .tooltip-hp { color: var(--text); }
 
 .tooltip-atk { color: #ffcc00; font-size: 9px; }
+.tooltip-warning { color: #ff4444; font-weight: bold; font-size: 9px; display: block; }
+
+/* Режим гранаты — запрещающий курсор при наведении на союзника */
+.unit.survivor.grenade-target:hover { cursor: not-allowed; }
 
 /* ── HP БАР ── */
 .hp-bar {

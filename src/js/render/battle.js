@@ -287,6 +287,10 @@ function syncUnitsWithDOM() {
     // Обновить классы
     el.classList.toggle('selected-unit', !!(selected && selected.id === u.id));
     el.classList.toggle('dead', !u.alive);
+    
+    // Режим гранаты — добавляем класс для запрещающего курсора
+    const grenadeActive = state.getGrenadeAttackerId();
+    el.classList.toggle('grenade-target', !!(grenadeActive && u.kind === UNIT_TYPES.SURVIVOR));
 
     // Обновить визуальные элементы (HP bar)
     updateUnitVisuals(u, el);
@@ -402,6 +406,12 @@ function _buildUnitEl(u, isDead = false) {
       const moveStatus = u.moved ? 'Сходил' : 'Может идти';
       const atkStatus = u.attacked ? 'Атаковал' : 'Может атаковать';
       tooltipHTML += `<span class="tooltip-type">Выживший</span>`;
+      
+      // Если режим гранаты активен — показываем предупреждение
+      if (state.getGrenadeAttackerId()) {
+        tooltipHTML += `<span class="tooltip-warning">[ЦЕЛЬ ЗАБЛОКИРОВАНА]</span>`;
+      }
+      
       tooltipHTML += `<span class="tooltip-move">${moveStatus}</span>`;
       tooltipHTML += `<span class="tooltip-atk">${atkStatus}</span>`;
     }

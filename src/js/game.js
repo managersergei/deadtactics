@@ -176,9 +176,10 @@ function handlePlayer(c, r) {
         return;
       }
       
-      // Предупреждение для союзника (другого)
-      if (clicked && clicked.kind === 'survivor' && clicked.id !== grenadeAttackerId) {
-        log('⚠️ Бросок по союзнику!', 'sys');
+      // Блокировка броска в союзников
+      if (clicked && clicked.kind === 'survivor') {
+        log('⚠️ Нельзя бросать гранату в своих!', 'sys');
+        return;
       }
       
       doGrenade(selected, c, r);
