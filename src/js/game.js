@@ -120,6 +120,8 @@ async function doGrenade(attacker, targetX, targetY) {
   attacker.usingGrenade = false;
   
   const grenade = ITEMS.grenade;
+  
+  // АТАКА ПО ЗОМБИ
   for (const z of aliveZombies()) {
     if (manhattan({x:targetX,y:targetY}, z) <= grenade.splashRange) {
       const result = takeDamage(z, grenade.damage, 'grenade');
@@ -129,6 +131,22 @@ async function doGrenade(attacker, targetX, targetY) {
       if (result.died) {
         state.recordKill();
         log(`💀 Зомби уничтожен!`, 'dmg');
+      }
+    }
+  }
+  
+  // FRIENDLY FIRE — атака по союзникам
+  for (const p of alivePlayers()) {
+    // Не атакуем того кто бросил гранату
+    if (p.id === attacker.id) continue;
+    
+    if (manhattan({x:targetX,y:targetY}, p) <= grenade.splashRange) {
+      const result = takeDamage(p, grenade.damage, 'grenade');
+      await waitForDamageAnimation(p);
+      
+      log(`💣 Граната → союзник [${p.x+1},${p.y+1}] −${grenade.damage}HP`, 'dmg');
+      if (result.died) {
+        log(`💀 ${p.name} погиб от гранаты!`, 'dmg');
       }
     }
   }
