@@ -177,11 +177,29 @@ function render() {
   _clearUnitHighlights();
   _drawPlacementZone();
   _drawHighlights();
+  _updateCursor();
   syncUnitsWithDOM();
   updateSidebar();
 
   if (state.getPhase() !== 'placement' && !animationPaused) {
     startAnimation();
+  }
+}
+
+// Обновить класс курсора на grid
+function _updateCursor() {
+  const grid = document.getElementById('grid');
+  if (!grid) return;
+  
+  // Удаляем все классы курсоров
+  grid.classList.remove('cursor-grenade', 'cursor-attack');
+  
+  // Добавляем класс на основе режима
+  const cursorMode = state.getCursorMode();
+  if (cursorMode === 'grenade') {
+    grid.classList.add('cursor-grenade');
+  } else if (cursorMode === 'attack') {
+    grid.classList.add('cursor-attack');
   }
 }
 

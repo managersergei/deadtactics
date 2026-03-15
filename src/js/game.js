@@ -7,32 +7,54 @@
 
 // ── Обработчик клика по клетке ────────────────────────────
 
-// Обработчик наведения мыши на клетку (для preview гранаты)
+// Обработчик наведения мыши на клетку (для preview гранаты и курсоров)
 function onCellHover(c, r) {
   const grenadeAttackerId = state.getGrenadeAttackerId();
+  const selected = state.getSelected();
+  const highlights = state.getHighlights();
+  let newCursorMode = 'default';
   
+  // ОПРЕДЕЛЕНИЕ РЕЖИМА КУРСОРА
+  // Приоритет: граната > атака > default
+  
+  // 1. Режим гранаты активен
+  if (grenadeAttackerId) {
+    newCursorMode = 'grenade';
+  }
+  // 2. Выбран survivor и курсор на зомби в зоне атаки
+  else if (selected && selected.kind === 'survivor' && c !== null && r !== null) {
+    const key = `${c},${r}`;
+    const unitUnderCursor = unitAt(c, r);
+    if (unitUnderCursor && unitUnderCursor.kind === 'zombie' && highlights.attack.has(key)) {
+      newCursorMode = 'attack';
+    }
+  }
+  
+  // Обновляем режим курсора если изменился
+  const currentCursorMode = state.getCursorMode();
+  if (currentCursorMode !== newCursorMode) {
+    state.setCursorMode(newCursorMode);
+  }
+  
+  // ПРЕВЬЮ ГРАНАТЫ
   // Если не в режиме гранаты — сбрасываем preview
   if (!grenadeAttackerId) {
     if (state.getGrenadePreview()) {
       state.setGrenadePreview(null);
-      render();  // Полный цикл Clear → Draw
-    }
-    return;
-  }
-  
-  const highlights = state.getHighlights();
-  
-  // Если передана клетка и она в throw-зоне — показываем splash preview
-  if (c !== null && r !== null) {
-    const key = `${c},${r}`;
-    if (highlights.throw.has(key)) {
-      state.setGrenadePreview({x: c, y: r});
-    } else {
-      state.setGrenadePreview(null);
     }
   } else {
-    // mouseleave — жёсткий сброс
-    state.setGrenadePreview(null);
+    // Режим гранаты — обновляем preview
+    if (c !== null && r !== null) {
+      const key = `${c},${r}`;
+      if (highlights.throw.has(key)) {
+        state.setGrenadePreview({x: c, y: r});
+      } else {
+        state.setGrenadePreview(null);
+      }
+    } else {
+      // mouseleave — жёсткий сброс
+      state.setGrenadePreview(null);
+    }
   }
   
   render();  // Полный цикл Clear → Draw

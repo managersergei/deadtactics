@@ -634,3 +634,74 @@ function _clearUnitHighlights() {
 - [ ] onCellHover должен вызывать render(), а не _drawHighlights()
 - [ ] Проверить очистку при mouseleave (c=null, r=null)
 - [ ] Проверить очистку классов с юнитов (_clearUnitHighlights)
+
+---
+
+## 18. Система курсоров
+
+### 18.1 Режимы курсора
+
+Курсор меняется в зависимости от контекста:
+
+| Режим | Когда active | CSS класс | Изображение |
+|-------|--------------|-----------|-------------|
+| `grenade` | Активирована граната | `.cursor-grenade` | 💣 (граната) |
+| `attack` | Выбран survivor + курсор на зомби в зоне атаки | `.cursor-attack` | 🔫 (пистолет) |
+| `default` | Во всех остальных случаях | — | системный курсор |
+
+### 18.2 Как это работает
+
+1. **State:** `state.cursorMode` — хранит текущий режим (`'default' | 'grenade' | 'attack'`)
+2. **game.js:** `onCellHover(c, r)` — определяет какой курсор показывать
+3. **battle.js:** `_updateCursor()` — применяет CSS класс к `#grid`
+
+### 18.3 Логика определения курсора
+
+```js
+// В onCellHover() — приоритет: граната > атака > default
+
+// 1. Режим гранаты (высший приоритет)
+if (grenadeAttackerId) {
+  newCursorMode = 'grenade';
+}
+// 2. Атака (survivor выбран + зомби в зоне поражения)
+else if (selected && selected.kind === 'survivor') {
+  const unitUnderCursor = unitAt(c, r);
+  if (unitUnderCursor?.kind === 'zombie' && highlights.attack.has(key)) {
+    newCursorMode = 'attack';
+  }
+}
+// 3. Default
+else {
+  newCursorMode = 'default';
+}
+```
+
+### 18.4 CSS курсоры
+
+```css
+#grid.cursor-grenade {
+  cursor: url("data:image/svg+xml,...граната...") 16 16, pointer;
+}
+
+#grid.cursor-attack {
+  cursor: url("data:image/svg+xml,...пистолет...") 16 16, crosshair;
+}
+```
+
+### 18.5 Добавление нового курсора
+
+1. Добавить SVG курсор в `game.css` (`.cursor-{name}`)
+2. Добавить новое значение в `state.cursorMode` (state.js)
+3. Обновить логику в `onCellHover()` (game.js)
+4. Обновить `_updateCursor()` (battle.js)
+5. Добавить применение класса в render()
+
+### 18.6 Чеклист
+
+При добавлении нового курсора:
+- [ ] Добавить SVG в CSS
+- [ ] Добавить значение в state.cursorMode
+- [ ] Обновить onCellHover()
+- [ ] Обновить _updateCursor()
+- [ ] Проверить приоритет ( grenade > attack > default )

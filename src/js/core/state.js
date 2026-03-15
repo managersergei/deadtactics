@@ -14,6 +14,7 @@ const initialState = {
   grenadeAttackerId: null, // ID survivor который активировал гранату
   grenadePreview: null, // {x, y} - позиция для preview зоны взрыва
   selectedSquadUnitId: null,
+  cursorMode: 'default', // 'default' | 'grenade' | 'attack'
   stats: {
     zombiesKilled: 0,
     damageDealt: 0,
@@ -65,6 +66,9 @@ const setGrenadeAttackerId = (id) => { state.grenadeAttackerId = id; };
 const getGrenadePreview = () => state.grenadePreview;
 const setGrenadePreview = (pos) => { state.grenadePreview = pos; };
 
+const getCursorMode = () => state.cursorMode;
+const setCursorMode = (mode) => { state.cursorMode = mode; };
+
 const getStats = () => state.stats;
 
 // Функции для статистики
@@ -88,6 +92,8 @@ const resetState = () => {
   state.turnsSurvived = 0;
   state.highlights = { move: new Set(), attack: new Set(), throw: new Set() };
   state.grenadeAttackerId = null;
+  state.grenadePreview = null;
+  state.cursorMode = 'default';
   state.selectedSquadUnitId = null;
   state.stats = { ...initialState.stats };
   state._uid = 0;
@@ -125,6 +131,8 @@ if (typeof window !== 'undefined') {
   state.setGrenadeAttackerId = setGrenadeAttackerId;
   state.getGrenadePreview = getGrenadePreview;
   state.setGrenadePreview = setGrenadePreview;
+  state.getCursorMode = getCursorMode;
+  state.setCursorMode = setCursorMode;
   state.getStats = getStats;
   state.recordKill = recordKill;
   state.recordDamageDealt = recordDamageDealt;
