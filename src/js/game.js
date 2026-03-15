@@ -166,7 +166,17 @@ function handlePlayer(c, r) {
         return;
       }
       
-      // Предупреждение для союзника
+      // НЕЛЬЗЯ бросать на СЕБЯ - это отмена
+      if (clicked && clicked.kind === 'survivor' && clicked.id === grenadeAttackerId) {
+        state.setGrenadeAttackerId(null);
+        state.clearHighlights();
+        state.setSelected(null);
+        log('Бросок гранаты отменён', 'sys');
+        render();
+        return;
+      }
+      
+      // Предупреждение для союзника (другого)
       if (clicked && clicked.kind === 'survivor' && clicked.id !== grenadeAttackerId) {
         log('⚠️ Бросок по союзнику!', 'sys');
       }
