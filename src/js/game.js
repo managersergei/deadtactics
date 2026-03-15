@@ -194,10 +194,10 @@ function handlePlayer(c, r) {
         return;
       }
       
-      // Блокировка броска в союзников
+      // Блокировка броска в союзников (только лог, НЕ блокируем)
       if (clicked && clicked.kind === 'survivor') {
-        log('⚠️ Нельзя бросать гранату в своих!', 'sys');
-        return;
+        log('⚠️ Опасно! Бросок прямо в союзника!', 'sys');
+        // НЕ return — позволяем doGrenade выполниться!
       }
       
       doGrenade(selected, c, r);
