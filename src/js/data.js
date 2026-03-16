@@ -141,6 +141,26 @@ function buyItem(unitId, itemId) {
       unit.equipment.weapon = itemId;
     } else {
       unit.equipment[item.type] = itemId;
+      
+      // === Синхронизация HP при изменении лимита здоровья через экипировку ===
+      // Если меняем броню - учитываем разницу в extraHp
+      if (item.type === 'armor' && item.extraHp) {
+        const oldArmorId = unit.equipment.armor;
+        const oldArmor = oldArmorId ? ITEMS[oldArmorId] : null;
+        
+        const oldExtraHp = oldArmor?.extraHp || 0;
+        const newExtraHp = item.extraHp || 0;
+        const diff = newExtraHp - oldExtraHp;
+        
+        // Применяем разницу (может быть +2, +1, 0, -1)
+        if (diff !== 0) {
+          unit.hp = (unit.hp || PLAYER_STATS.hp) + diff;
+          // Обновляем maxHp если нужно
+          if (unit.maxHp < unit.hp) {
+            unit.maxHp = unit.hp;
+          }
+        }
+      }
     }
     
     // Если предмет имеет blockPoison и maxCharges - инициализировать charges
