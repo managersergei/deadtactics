@@ -141,7 +141,20 @@ function getEffectiveStat(unit, stat) {
   
   // maxHp: +extraHp от брони
   if (stat === 'maxHp' && eq.armor && ITEMS[eq.armor]) {
-    value += ITEMS[eq.armor].extraHp || 0;
+    const armor = ITEMS[eq.armor];
+    
+    // Если предмет "расходуемый" (breakWhenEmpty) - проверяем заряды
+    if (armor.breakWhenEmpty) {
+      const charges = eq.charges || {};
+      const remaining = charges[armor.id] || 0;
+      // Даём HP бонусы только если есть заряды
+      if (remaining > 0) {
+        value += armor.extraHp || 0;
+      }
+    } else {
+      // Обычная броня - всегда даём бонус
+      value += armor.extraHp || 0;
+    }
   }
   
   // moveRange: +moveBonus от обуви

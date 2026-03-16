@@ -16,13 +16,16 @@ function mkPlayer(x, y, squadUnit) {
   const effectiveMaxHp = getEffectiveStat(squadUnit, 'maxHp') || PLAYER_STATS.maxHp;
   const effectiveMoveRange = getEffectiveStat(squadUnit, 'moveRange') || PLAYER_STATS.moveRange;
   
+  // HP не должен превышать maxHp (например, если броня сломалась и maxHp уменьшился)
+  const currentHp = squadUnit?.hp || effectiveMaxHp;
+  
   return {
     id: uid(),
     name: squadUnit?.name || 'Выживший',
     kind: UNIT_TYPES.SURVIVOR,
     emoji: squadUnit?.emoji || PLAYER_STATS.emoji,
     x, y,
-    hp: effectiveMaxHp,           // HP полный в начале боя
+    hp: Math.min(effectiveMaxHp, currentHp),  // HP не больше maxHp
     maxHp: effectiveMaxHp,        // Макс. HP с учётом брони
     moveRange: effectiveMoveRange, // Диапазон движения с учётом ботинок
     atkRange: PLAYER_STATS.atkRange,

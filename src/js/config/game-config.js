@@ -64,7 +64,7 @@ const ITEMS = {
   rocket:  { id: 'rocket',  name: 'Ракетница', type: 'weapon', price: 200, baseDmg: 3, critDmg: 5, critChance: 0.20, splashRange: 1, shots: 1, isRanged: true,  atkRange: 3, desc: 'Урон по площади' },
   
   // БРОНЯ
-  vest:    { id: 'vest',    name: 'Броник',    type: 'armor',  price: 60,  extraHp: 2, blockPoison: true, maxCharges: 2, isRanged: false, desc: 'Защита +2 HP, блокирует яд 2 хода' },
+  vest:    { id: 'vest',    name: 'Броник',    type: 'armor',  price: 60,  extraHp: 2, blockPoison: true, maxCharges: 2, breakWhenEmpty: true, isRanged: false, desc: 'Защита +2 HP, блокирует яд 2 хода' },
   
   // ОБУВЬ
   shoes:   { id: 'shoes',   name: 'Кроссовки', type: 'boots',  price: 40,  moveBonus: 1, isRanged: false, desc: '+1 клетка движения' },
