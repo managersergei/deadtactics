@@ -196,6 +196,7 @@ function _updateCursor() {
   
   // Добавляем класс на основе режима
   const cursorMode = state.getCursorMode();
+  
   if (cursorMode === 'grenade') {
     grid.classList.add('cursor-grenade');
   } else if (cursorMode === 'attack') {

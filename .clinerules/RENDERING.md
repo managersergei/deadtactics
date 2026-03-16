@@ -679,15 +679,23 @@ else {
 
 ### 18.4 CSS курсоры
 
+**Важно:** SVG data URI работает не во всех браузерах. Используйте стандартные курсоры:
+
 ```css
-#grid.cursor-grenade {
-  cursor: url("data:image/svg+xml,...граната...") 16 16, pointer;
+/* Граната — точечно на throw-range и юнитах внутри */
+#grid.cursor-grenade .cell.throw-range,
+#grid.cursor-grenade .cell.throw-range .unit {
+  cursor: alias !important;
 }
 
-#grid.cursor-attack {
-  cursor: url("data:image/svg+xml,...пистолет...") 16 16, crosshair;
+/* Атака — точечно на attack-range и юнитах внутри */
+#grid.cursor-attack .cell.attack-range,
+#grid.cursor-attack .cell.attack-range .unit {
+  cursor: crosshair !important;
 }
 ```
+
+**Почему так:** Курсор дочернего элемента (`.unit`) всегда важнее чем у родителя (`.cell`). Нужно явно указать все промежуточные селекторы.
 
 ### 18.5 Добавление нового курсора
 
@@ -700,8 +708,10 @@ else {
 ### 18.6 Чеклист
 
 При добавлении нового курсора:
-- [ ] Добавить SVG в CSS
+- [ ] Добавить курсор в CSS (точечный селектор)
 - [ ] Добавить значение в state.cursorMode
 - [ ] Обновить onCellHover()
 - [ ] Обновить _updateCursor()
 - [ ] Проверить приоритет ( grenade > attack > default )
+- [ ] **Проверить CSS specificity** — курсор применяется к элементу под мышью
+- [ ] **Протестировать наведение на юнита** — курсор должен меняться

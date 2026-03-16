@@ -12,21 +12,16 @@
 }
 
 /* ── КУРСОРЫ ── */
-#grid.cursor-grenade {
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ctext y='24' font-size='24'%3E%F0%9F%92%A3%3C/text%3E%3C/svg%3E") 16 16, pointer;
+/* Граната — когда курсор на оранжевой клетке или на юните внутри неё */
+#grid.cursor-grenade .cell.throw-range,
+#grid.cursor-grenade .cell.throw-range .unit {
+  cursor: alias !important;
 }
 
-#grid.cursor-attack {
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ctext y='24' font-size='24'%3E%F0%9F%94%AB%3C/text%3E%3C/svg%3E") 16 16, crosshair;
-}
-
-/* Fallback для不支持 SVG курсоров браузеров */
-#grid.cursor-grenade-fallback {
-  cursor: pointer;
-}
-
-#grid.cursor-attack-fallback {
-  cursor: crosshair;
+/* Пистолет — когда курсор на красной клетке или на зомби внутри неё */
+#grid.cursor-attack .cell.attack-range,
+#grid.cursor-attack .cell.attack-range .unit {
+  cursor: crosshair !important;
 }
 
 /* ── КЛЕТКИ ── */

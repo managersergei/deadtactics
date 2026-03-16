@@ -152,21 +152,31 @@ async function zombieAttack(z, target) {
   // Ждём окончания анимации повреждения
   await waitForDamageAnimation(target);
   
-  // Проверить есть ли броня с защитой от яда
+  // Проверить есть ли броня с защитой от яда и сколько осталось зарядов
   const armorId = target.equipment?.armor;
   const armor = armorId ? ITEMS[armorId] : null;
   const hasPoisonBlock = armor?.blockPoison === true;
   
-  // Заражаем только если нет защиты от яда
+  // Получаем оставшиеся заряды из equipment
+  const charges = target.equipment?.charges || {};
+  const remainingBlocks = charges[armorId] || 0;
+  
+  // Проверяем: есть блок И есть оставшиеся заряды
+  const canBlock = hasPoisonBlock && remainingBlocks > 0;
+  
+  // Заражаем только если НЕ можем заблокировать
   const wasPoison = hasEffect(target, 'poison');
-  if (!hasPoisonBlock) {
+  if (!canBlock) {
     addEffect(target, 'poison'); // Используем систему эффектов
+  } else {
+    // Уменьшаем счётчик зарядов
+    target.equipment.charges[armorId]--;
   }
   playBite();
 
   if (!wasPoison) {
-    if (hasPoisonBlock) {
-      log(`🧟 Укус! Выживший → ${target.hp}/${target.maxHp}HP (броня защитила от яда!)`, 'zombie-act');
+    if (canBlock) {
+      log(`🛡️ Броня поглотила яд! Зарядов осталось: ${remainingBlocks - 1}`, 'defense');
     } else {
       log(`🧟 Укус! ☠ Выживший заражён — яд будет жечь каждый ход`, 'poison');
     }

@@ -5,7 +5,12 @@
 
 function mkPlayer(x, y, squadUnit) {
   // Получаем equipment из squadUnit или используем по умолчанию
-  const eq = squadUnit?.equipment || { weapon: 'pistol', armor: null, boots: null };
+  const eq = squadUnit?.equipment || { weapon: 'pistol', armor: null, boots: null, charges: {} };
+  
+  // Убедимся что charges существует (для старых сохранений)
+  if (!eq.charges) {
+    eq.charges = {};
+  }
   
   // Рассчитываем эффективные статы с учётом снаряжения
   const effectiveMaxHp = getEffectiveStat(squadUnit, 'maxHp') || PLAYER_STATS.maxHp;

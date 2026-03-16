@@ -60,7 +60,7 @@ function initializeNewGame() {
     moveRange: PLAYER_STATS.moveRange,
     atkRange: PLAYER_STATS.atkRange,
     weapon: 'pistol',
-    equipment: { armor: null, special: null, consumable: null },
+    equipment: { armor: null, special: null, consumable: null, charges: {} },
     personalStats: {  // статистика конкретного юнита
       zombiesKilled: 0,
       damageTaken: 0,
@@ -123,7 +123,12 @@ function buyItem(unitId, itemId) {
   
   // Экипировать предмет (создать equipment если нет)
   if (!unit.equipment) {
-    unit.equipment = { weapon: 'pistol', armor: null, boots: null };
+    unit.equipment = { weapon: 'pistol', armor: null, boots: null, charges: {} };
+  }
+  
+  // Инициализировать charges если его нет (для старых сохранений)
+  if (!unit.equipment.charges) {
+    unit.equipment.charges = {};
   }
   
   // Расходники - не экипируются, а добавляются в inventory
@@ -136,6 +141,15 @@ function buyItem(unitId, itemId) {
       unit.equipment.weapon = itemId;
     } else {
       unit.equipment[item.type] = itemId;
+    }
+    
+    // Если предмет имеет blockPoison и maxCharges - инициализировать charges
+    // Используем расширение объекта чтобы не затереть другие charges
+    if (item.blockPoison && item.maxCharges) {
+      unit.equipment.charges = {
+        ...unit.equipment.charges,
+        [item.id]: item.maxCharges
+      };
     }
   }
   
@@ -164,7 +178,7 @@ function recruitUnit(type) {
     maxHp: recruit.maxHp,
     moveRange: recruit.moveRange,
     atkRange: recruit.atkRange,
-    equipment: { weapon: 'pistol', armor: null, boots: null },
+    equipment: { weapon: 'pistol', armor: null, boots: null, charges: {} },
     personalStats: {
       zombiesKilled: 0,
       damageTaken: 0,
