@@ -140,15 +140,21 @@ function buyItem(unitId, itemId) {
     if (item.type === 'weapon') {
       unit.equipment.weapon = itemId;
     } else {
+      // === Синхронизация HP при изменении лимита здоровья через экипировку ===
+      // Сохраняем старую броню ДО записи новой!
+      let oldArmorId = null;
+      let oldExtraHp = 0;
+      if (item.type === 'armor' && item.extraHp) {
+        oldArmorId = unit.equipment.armor;
+        const oldArmor = oldArmorId ? ITEMS[oldArmorId] : null;
+        oldExtraHp = oldArmor?.extraHp || 0;
+      }
+      
+      // Записываем новую броню
       unit.equipment[item.type] = itemId;
       
-      // === Синхронизация HP при изменении лимита здоровья через экипировку ===
-      // Если меняем броню - учитываем разницу в extraHp
+      // Применяем разницу если это броня
       if (item.type === 'armor' && item.extraHp) {
-        const oldArmorId = unit.equipment.armor;
-        const oldArmor = oldArmorId ? ITEMS[oldArmorId] : null;
-        
-        const oldExtraHp = oldArmor?.extraHp || 0;
         const newExtraHp = item.extraHp || 0;
         const diff = newExtraHp - oldExtraHp;
         
