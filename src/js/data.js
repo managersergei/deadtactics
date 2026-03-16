@@ -141,32 +141,23 @@ function buyItem(unitId, itemId) {
       unit.equipment.weapon = itemId;
     } else {
       // === Синхронизация HP при изменении лимита здоровья через экипировку ===
-      // Сохраняем старую броню ДО записи новой!
-      let oldArmorId = null;
-      let oldExtraHp = 0;
+      // maxHp вычисляется в getEffectiveStat() в helpers.js - здесь только обновляем текущий HP
       if (item.type === 'armor' && item.extraHp) {
-        oldArmorId = unit.equipment.armor;
+        const oldArmorId = unit.equipment.armor;
         const oldArmor = oldArmorId ? ITEMS[oldArmorId] : null;
-        oldExtraHp = oldArmor?.extraHp || 0;
+        const oldExtraHp = oldArmor?.extraHp || 0;
+        const newExtraHp = item.extraHp || 0;
+        const diff = newExtraHp - oldExtraHp;
+        
+        // Применяем разницу к HP (может быть +2, +1, 0, -1)
+        if (diff !== 0) {
+          // maxHp НЕ обновляем - оно вычисляется в getEffectiveStat()!
+          unit.hp = (unit.hp || PLAYER_STATS.hp) + diff;
+        }
       }
       
       // Записываем новую броню
       unit.equipment[item.type] = itemId;
-      
-      // Применяем разницу если это броня
-      if (item.type === 'armor' && item.extraHp) {
-        const newExtraHp = item.extraHp || 0;
-        const diff = newExtraHp - oldExtraHp;
-        
-        // Применяем разницу (может быть +2, +1, 0, -1)
-        if (diff !== 0) {
-          unit.hp = (unit.hp || PLAYER_STATS.hp) + diff;
-          // Обновляем maxHp если нужно
-          if (unit.maxHp < unit.hp) {
-            unit.maxHp = unit.hp;
-          }
-        }
-      }
     }
     
     // Если предмет имеет blockPoison и maxCharges - инициализировать charges
