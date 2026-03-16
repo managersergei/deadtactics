@@ -220,6 +220,28 @@ function updateUnitStats(unitId, battleStats) {
   }
 }
 
+// Синхронизировать HP и charges юнитов после боя
+function syncSquadWithBattleState(battleUnits) {
+  // Итерируем с конца чтобы можно было удалять элементы
+  for (let i = gameData.squad.length - 1; i >= 0; i--) {
+    const squadUnit = gameData.squad[i];
+    const battleUnit = battleUnits.find(u => u.id === squadUnit.id);
+    
+    if (!battleUnit) continue; // юнит не был в бою
+    
+    if (battleUnit.alive) {
+      // Живой юнит - сохраняем HP и charges
+      squadUnit.hp = battleUnit.hp;
+      if (battleUnit.equipment?.charges) {
+        squadUnit.equipment.charges = { ...battleUnit.equipment.charges };
+      }
+    } else {
+      // Мёртвый юнит - удаляем из отряда
+      gameData.squad.splice(i, 1);
+    }
+  }
+}
+
 // Получить информацию о уровне
 function getLevelInfo(levelNum) {
   return {

@@ -146,6 +146,10 @@ function showEndOverlay(win) {
   const turnsSurvived = state.getTurnsSurvived();
   
   let levelReward = 0;
+  
+  // Сохраняем HP и charges после ЛЮБОГО боя (победа или поражение)
+  syncSquadWithBattleState(state.getUnits());
+  
   if (win && gameData.currentLevel) {
     levelReward = completeLevel(gameData.currentLevel, stats);
     
@@ -153,26 +157,6 @@ function showEndOverlay(win) {
     gameData.squad.forEach(unit => {
       updateUnitStats(unit.id, stats);
     });
-    
-    // === Сохраняем HP и charges юнитов после боя ===
-    // Используем for чтобы можно было удалять элементы во время итерации
-    for (let i = gameData.squad.length - 1; i >= 0; i--) {
-      const squadUnit = gameData.squad[i];
-      const battleUnit = state.getUnits().find(u => u.id === squadUnit.id);
-      
-      if (!battleUnit) continue;
-      
-      if (battleUnit.alive) {
-        // Живой юнит - сохраняем HP и charges
-        squadUnit.hp = battleUnit.hp;
-        if (battleUnit.equipment?.charges) {
-          squadUnit.equipment.charges = { ...battleUnit.equipment.charges };
-        }
-      } else {
-        // Мёртвый юнит - удаляем из отряда
-        gameData.squad.splice(i, 1);
-      }
-    }
   }
 
   const winClass = win ? 'win' : 'lose';
