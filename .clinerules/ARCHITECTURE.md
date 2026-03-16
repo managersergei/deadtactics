@@ -157,3 +157,46 @@ node src/js/tests/helpers.test.js
 Тестируется: `manhattan`, `unitAt`, `reachable`, `calcDamage`, `alivePlayers`, `aliveZombies`, `getDirection`.
 
 При добавлении новой утилиты в `helpers.js` — добавить тест. Моки создаются до подключения модулей.
+
+
+---
+
+## 9. Side Effects функций data.js
+
+| Функция | Side Effects |
+|---------|--------------|
+| `buyItem()` | Изменяет gold, equipment, HP |
+| `recruitUnit()` | Изменяет gold, добавляет в squad |
+| `syncSquadWithBattleState()` | Удаляет мёртвых юнитов из squad |
+| `completeLevel()` | Изменяет gold, levelProgress |
+
+---
+
+## 10. Важное правило: maxHp — только для чтения
+
+**ЗАПРЕЩЕНО** записывать бонусы от предметов в `unit.maxHp`.
+
+**ПРАВИЛЬНО:**
+- `maxHp` = базовое значение из RECRUITS (константа)
+- Бонусы считаются **на лету** через `getEffectiveStat()` в helpers.js
+
+**ПРИЧИНА:** Иначе происходит двойное начисление (баг 7/9 вместо 7/7).
+
+---
+
+## 11. Сохранение прогресса между боями
+
+### Функции
+
+| Функция | Файл | Назначение |
+|---------|------|------------|
+| `syncSquadWithBattleState()` | data.js | Сохраняет HP, charges после боя |
+| `mkPlayer()` | units.js | Читает HP из squad при старте боя |
+| `getEffectiveStat()` | helpers.js | Вычисляет maxHp с учётом брони |
+
+### Поток данных
+
+1. **Конец боя:** `syncSquadWithBattleState()` копирует HP в `gameData.squad`
+2. **Удаление трупов:** мёртвые юниты удаляются из squad
+3. **Старт боя:** `mkPlayer()` берёт `squadUnit.hp` для нового боевого юнита
+4. **maxHp:** вычисляется через `getEffectiveStat()` — не хранится в БД
