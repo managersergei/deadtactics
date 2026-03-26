@@ -22,10 +22,10 @@ function onCellHover(c, r) {
     newCursorMode = 'grenade';
   }
   // 2. Выбран survivor и курсор на зомби в зоне атаки
-  else if (selected && selected.kind === 'survivor' && c !== null && r !== null) {
+  else if (selected && selected.kind === UNIT_TYPES.SURVIVOR && c !== null && r !== null) {
     const key = `${c},${r}`;
     const unitUnderCursor = unitAt(c, r);
-    if (unitUnderCursor && unitUnderCursor.kind === 'zombie' && highlights.attack.has(key)) {
+    if (unitUnderCursor && unitUnderCursor.kind === UNIT_TYPES.ZOMBIE && highlights.attack.has(key)) {
       newCursorMode = 'attack';
     }
   }
@@ -144,7 +144,7 @@ function activateGrenade(u) {
 async function doGrenade(attacker, targetX, targetY) {
   // Валидация: проверяем что attacker - это тот же survivor который активировал гранату
   const grenadeAttackerId = state.getGrenadeAttackerId();
-  if (!attacker || attacker.kind !== 'survivor' || attacker.id !== grenadeAttackerId) {
+  if (!attacker || attacker.kind !== UNIT_TYPES.SURVIVOR || attacker.id !== grenadeAttackerId) {
     log('Выбери юнита который бросает гранату', 'sys');
     state.setGrenadeAttackerId(null);
     state.setGrenadePreview(null);
@@ -253,7 +253,7 @@ function handlePlayer(c, r) {
       }
       
       // НЕЛЬЗЯ бросать на СЕБЯ - это отмена
-      if (clicked && clicked.kind === 'survivor' && clicked.id === grenadeAttackerId) {
+      if (clicked && clicked.kind === UNIT_TYPES.SURVIVOR && clicked.id === grenadeAttackerId) {
         state.setGrenadeAttackerId(null);
         state.setGrenadePreview(null);
         state.clearHighlights();
