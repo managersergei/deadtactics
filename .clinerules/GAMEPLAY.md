@@ -149,7 +149,11 @@ Survivor не атакует сам — атака определяется па
 | Функция | Файл | Назначение |
 |---------|------|------------|
 | `activateGrenade(u)` | `game.js` | Активирует режим гранаты, сохраняет `grenadeAttackerId` |
-| `doGrenade(attacker, x, y)` | `game.js` | Выполняет бросок с анимацией и валидацией |
+| `validateGrenadeThrow(attacker)` | `game.js` | Валидация броска + сброс state при ошибке |
+| `collectGrenadeTargets(x, y)` | `game.js` | Сбор всех целей в splash-радиусе |
+| `logGrenadeResults(targets, damage)` | `game.js` | Логирование результатов для всех целей |
+| `resetGrenadeState()` | `game.js` | Сброс state после броска/отмены |
+| `doGrenade(attacker, x, y)` | `game.js` | Выполняет бросок (использует функции выше) |
 | `handlePlayer(c, r)` | `game.js` | Обрабатывает все клики с учётом режима гранаты |
 | `state.grenadeAttackerId` | `state.js` | ID survivor который активировал гранату |
 | `state.getGrenadeAttackerId()` | `state.js` | Геттер для получения ID |
@@ -157,7 +161,7 @@ Survivor не атакует сам — атака определяется па
 
 #### Валидация
 
-В `doGrenade()` выполняются проверки:
+В `validateGrenadeThrow()` (которую вызывает `doGrenade()`) выполняются проверки:
 1. `attacker.kind === 'survivor'` — атакующий должен быть survivor
 2. `attacker.id === grenadeAttackerId` — должен быть тот же survivor который активировал гранату
 3. `attacker.inventory.grenade > 0` — должна быть граната в инвентаре
@@ -235,6 +239,10 @@ takeDamage(target, amount, source)
 | Функция | Файл | Назначение |
 |---------|------|------------|
 | `takeDamage(target, amount, source)` | `game.js` | **Централизованное нанесение урона** |
+| `handleUnitDeath(target)` | `game.js` | Обработка смерти юнита (анимация + setTimeout) |
+| `checkAndApplyRage(target)` | `game.js` | Проверка и применение ярости зомби |
+| `recordDamageForSource(source, amount)` | `game.js` | Запись урона в статистику |
+| `waitForDamageAnimation(target)` | `game.js` | Ожидание окончания анимации повреждения |
 | `doAttack(attacker, target)` | `game.js` | Логика атаки выжившего |
 | `calcDamage(weaponId)` | `helpers.js` | Расчёт урона с учётом крита |
 | `getEffectiveStat(unit, stat)` | `helpers.js` | Получение статов с учётом снаряжения |
