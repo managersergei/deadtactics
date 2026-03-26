@@ -288,65 +288,22 @@ src/sounds/
     └── click.mp3                  ← звук кликов
 ```
 
-### Фоновые мелодии
+### Переменные состояния
 
-| Функция | Файл | Громкость | Когда играет |
-|---------|------|-----------|--------------|
-| `startMenuMusic()` | `system/menu.mp3` | 100% | Главное меню |
-| `startGameMusic()` | `system/game.mp3` | 35% | Карта, отряд, магазин, интро |
-| `startBattleMusic()` | `system/battle.mp3` | 35% | Битва |
+| Переменная | Тип | Назначение |
+|------------|-----|-----------|
+| `bgMusic` | `Audio \| null` | Текущий Audio-объект фоновой музыки |
+| `currentMusicType` | `string \| null` | Текущий тип: `'menu'` \| `'game'` \| `'battle'` |
+| `musicUnlocked` | `boolean` | Флаг блокировки до первого взаимодействия пользователя |
 
-### Функции audio.js
+### Autoplay Policy
 
-| Функция | Назначение |
-|---------|-----------|
-| `playSound(filename)` | Воспроизвести одноразовый звук |
-| `playShot()` | Выстрел из пистолета |
-| `playBite()` | Укус зомби |
-| `playFootstep()` | Шаги человека |
-| `playPoison()` | Эффект отравления |
-| `playZombieMove()` | Движение зомби |
-| `playMenuSelect()` | Звук наведения на кнопки меню |
-| `playClick()` | Звук кликов |
-| `startMenuMusic()` | Запустить музыку меню |
-| `startGameMusic()` | Запустить музыку игры |
-| `startBattleMusic()` | Запустить музыку битвы |
-| `stopMusic()` | Остановить любую фоновую музыку |
+Браузеры блокируют autoplay медиа-элементов до первого взаимодействия пользователя.
 
-### Управление музыкой
-
-Музыка переключается в `showScreen()` в `screens.js`:
-- Переход на START → `startMenuMusic()`
-- Переход на BATTLE → `startBattleMusic()`
-- Переход на другие экраны → `startGameMusic()`
-
-### Звук наведения на кнопки
-
-Добавляется через `addMenuHoverSound()` в `screenIntro.js`. Вызывается автоматически в `startMenuBackgroundAnimation()`.
-
-### Глобальный звук кликов
-
-Добавляется в `game.js` через `document.addEventListener('click')`. Исключаются клики на `#grid` (поле боя).
----
-
-## 13. Аудио система
-
-### Структура файлов
-
-```
-src/sounds/
-├── man_gun_pistol_shot_01.mp3    ← звуки выстрелов
-├── man_move_01.mp3               ← шаги человека
-├── man_effects_poisoned_01.mp3   ← звуки отравления
-├── zombie_bite_01.mp3             ← укус зомби
-├── zombie_move_01.mp3             ← движение зомби
-└── system/                       ← системные звуки и музыка
-    ├── menu.mp3                   ← фоновая музыка меню (100%)
-    ├── game.mp3                   ← фоновая музыка игры (35%)
-    ├── battle.mp3                 ← фоновая музыка битвы (35%)
-    ├── menu_select.mp3            ← звук наведения на кнопки
-    └── click.mp3                  ← звук кликов
-```
+**Реализация:**
+1. При загрузке `startXxxMusic()` устанавливает `currentMusicType` но НЕ запускает музыку
+2. При первом клике `unlockMusic()` снимает блокировку и запускает нужный трек
+3. `playBgMusic()` проверяет `musicUnlocked` перед созданием Audio
 
 ### Фоновые мелодии
 
@@ -368,10 +325,13 @@ src/sounds/
 | `playZombieMove()` | Движение зомби |
 | `playMenuSelect()` | Звук наведения на кнопки меню |
 | `playClick()` | Звук кликов |
+| `playBgMusic(filename, volume)` | Внутренняя функция запуска музыки (loop) |
+| `stopBgMusic()` | Остановить текущую музыку |
 | `startMenuMusic()` | Запустить музыку меню |
 | `startGameMusic()` | Запустить музыку игры |
 | `startBattleMusic()` | Запустить музыку битвы |
 | `stopMusic()` | Остановить любую фоновую музыку |
+| `unlockMusic()` | Разблокировать музыку после первого клика |
 
 ### Управление музыкой
 
@@ -380,6 +340,8 @@ src/sounds/
 - Переход на BATTLE → `startBattleMusic()`
 - Переход на другие экраны → `startGameMusic()`
 
+**Важно:** `startXxxMusic()` проверяет `bgMusic` — не перезапускает трек если он уже играет.
+
 ### Звук наведения на кнопки
 
 Добавляется через `addMenuHoverSound()` в `screenIntro.js`. Вызывается автоматически в `startMenuBackgroundAnimation()`.
@@ -387,3 +349,7 @@ src/sounds/
 ### Глобальный звук кликов
 
 Добавляется в `game.js` через `document.addEventListener('click')`. Исключаются клики на `#grid` (поле боя).
+
+### Разблокировка музыки
+
+`unlockMusic()` вызывается при первом клике в `game.js`. После разблокировки запускается нужный трек в зависимости от текущего `currentMusicType`.
