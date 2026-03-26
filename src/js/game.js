@@ -192,9 +192,9 @@ async function doGrenade(attacker, targetX, targetY) {
     takeDamage(u, grenade.damage, 'grenade');
   });
   
-  // Ждём окончания ОДНОЙ анимации (а не каждого)
+  // Ждём окончания анимаций для ВСЕХ (overload для массива)
   if (allTargets.length > 0) {
-    await waitForDamageAnimation(allTargets[0]);
+    await waitForDamageAnimation(allTargets);
   }
   
   // Логи для всех целей
@@ -695,7 +695,39 @@ function takeDamage(target, amount, source) {
 
 // Отдельная функция для ожидания окончания анимации повреждения
 // Вызывается ПОСЛЕ takeDamage() когда нужно дождаться окончания анимации
+// Принимает ОДИН таргет ИЛИ МАССИВ таргетов (для группового урона)
 async function waitForDamageAnimation(target) {
+  // OVERLOAD: Если передан массив — обрабатываем все
+  if (Array.isArray(target)) {
+    if (target.length === 0) return;
+    
+    // Находим максимальную длительность анимации среди всех целей
+    const delays = target.map(t => {
+      if (!t.damagedFlash) return 0;
+      const frames = t.kind === UNIT_TYPES.ZOMBIE 
+        ? (window.ZOMBIE_FRAMES?.damaged || 3) 
+        : (window.SURVIVOR_FRAMES?.damaged || 5);
+      return frames * ANIMATION_SPEED;
+    });
+    
+    const maxDelay = Math.max(...delays);
+    if (maxDelay === 0) return;  // Никто не имеет анимации
+    
+    await sleep(maxDelay);
+    
+    // Снимаем флаги для ВСЕХ
+    target.forEach(t => {
+      t.damagedFlash = false;
+      if (t.critFlash) {
+        t.critFlash = false;
+      }
+    });
+    
+    render();
+    return;
+  }
+  
+  // ОРИГИНАЛЬНАЯ ЛОГИКА: один таргет
   if (!target.damagedFlash) return;  // Если нет анимации - не ждём
   
   // Вычисляем длительность анимации на основе кадров
