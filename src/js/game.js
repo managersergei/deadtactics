@@ -704,9 +704,15 @@ async function waitForDamageAnimation(target) {
     // Находим максимальную длительность анимации среди всех целей
     const delays = target.map(t => {
       if (!t.damagedFlash) return 0;
-      const frames = t.kind === UNIT_TYPES.ZOMBIE 
-        ? (window.ZOMBIE_FRAMES?.damaged || 3) 
-        : (window.SURVIVOR_FRAMES?.damaged || 5);
+      // Для зомби: если critFlash - используем cr_damaged (5 кадров), иначе damaged (3 кадра)
+      let frames;
+      if (t.kind === UNIT_TYPES.ZOMBIE) {
+        frames = t.critFlash 
+          ? (window.ZOMBIE_FRAMES?.cr_damaged || 5) 
+          : (window.ZOMBIE_FRAMES?.damaged || 3);
+      } else {
+        frames = window.SURVIVOR_FRAMES?.damaged || 5;
+      }
       return frames * ANIMATION_SPEED;
     });
     
@@ -731,9 +737,15 @@ async function waitForDamageAnimation(target) {
   if (!target.damagedFlash) return;  // Если нет анимации - не ждём
   
   // Вычисляем длительность анимации на основе кадров
-  const frames = target.kind === UNIT_TYPES.ZOMBIE 
-    ? (window.ZOMBIE_FRAMES?.damaged || 3) 
-    : (window.SURVIVOR_FRAMES?.damaged || 5);
+  // Для зомби: если critFlash - используем cr_damaged (5 кадров), иначе damaged (3 кадра)
+  let frames;
+  if (target.kind === UNIT_TYPES.ZOMBIE) {
+    frames = target.critFlash 
+      ? (window.ZOMBIE_FRAMES?.cr_damaged || 5) 
+      : (window.ZOMBIE_FRAMES?.damaged || 3);
+  } else {
+    frames = window.SURVIVOR_FRAMES?.damaged || 5;
+  }
   const delay = frames * ANIMATION_SPEED;
   
   await sleep(delay);
