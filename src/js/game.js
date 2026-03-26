@@ -140,91 +140,110 @@ function activateGrenade(u) {
   if (modal) modal.remove();
 }
 
-// Бросок гранаты
-async function doGrenade(attacker, targetX, targetY) {
-  // Валидация: проверяем что attacker - это тот же survivor который активировал гранату
+// ── ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ ГРАНАТЫ ─────────────────────
+
+// Валидация броска — возвращает true если OK, false если ошибка
+// При ошибке сразу сбрасывает state
+function validateGrenadeThrow(attacker) {
   const grenadeAttackerId = state.getGrenadeAttackerId();
+  
   if (!attacker || attacker.kind !== UNIT_TYPES.SURVIVOR || attacker.id !== grenadeAttackerId) {
     log('Выбери юнита который бросает гранату', 'sys');
-    state.setGrenadeAttackerId(null);
-    state.setGrenadePreview(null);
-    state.clearHighlights();
-    state.setSelected(null);
-    render();
-    return;
+    resetGrenadeState();
+    return false;
   }
   
-  // Проверяем что граната есть в инвентаре
-  if (!attacker.inventory || !attacker.inventory.grenade || attacker.inventory.grenade <= 0) {
+  if (!attacker.inventory?.grenade || attacker.inventory.grenade <= 0) {
     log('Нет гранат!', 'sys');
-    state.setGrenadeAttackerId(null);
-    state.setGrenadePreview(null);
-    state.clearHighlights();
-    state.setSelected(null);
-    render();
+    resetGrenadeState();
+    return false;
+  }
+  
+  return true;
+}
+
+// Сбор всех целей в splash-радиусе (зомби + союзники)
+function collectGrenadeTargets(x, y) {
+  const grenade = ITEMS.grenade;
+  return [...aliveZombies(), ...alivePlayers()].filter(u => {
+    const dist = Math.max(Math.abs(x - u.x), Math.abs(y - u.y));
+    return dist <= grenade.splashRange;
+  });
+}
+
+// Логирование результатов гранаты для всех целей
+function logGrenadeResults(targets, damage) {
+  targets.forEach(u => {
+    const kindLabel = u.kind === UNIT_TYPES.ZOMBIE ? 'зомби' : 'союзник';
+    
+    if (u.kind === UNIT_TYPES.ZOMBIE) {
+      log(`💣 Граната → ${kindLabel} [${u.x+1},${u.y+1}] −${damage}HP`, 'dmg');
+      if (!u.alive) {
+        state.recordKill();
+        log(`💀 Зомби уничтожен!`, 'dmg');
+      }
+    } else {
+      log(`💣 Граната → ${kindLabel} [${u.x+1},${u.y+1}] −${damage}HP`, 'dmg');
+      if (!u.alive) {
+        log(`💀 ${u.name} погиб от гранаты!`, 'dmg');
+      }
+    }
+  });
+}
+
+// Сброс state после броска/отмены гранаты
+function resetGrenadeState() {
+  state.setGrenadeAttackerId(null);
+  state.setGrenadePreview(null);
+  state.clearHighlights();
+  state.setSelected(null);
+  render();
+}
+
+// Бросок гранаты
+async function doGrenade(attacker, targetX, targetY) {
+  // Валидация — если не прошла, функция уже сбросила state и вышла
+  if (!validateGrenadeThrow(attacker)) {
     return;
   }
   
   // Блокируем клики во время анимации и урона
   clicksBlocked = true;
   
-  // Анимация броска гранаты — устанавливаем направление
+  // Анимация броска гранаты
   attacker.direction = getDirection(attacker, {x: targetX, y: targetY});
   attacker.usingGrenade = true;
   attacker.target = { x: targetX, y: targetY };
   animationPaused = true;
   render();
   
-  // Ждём окончания анимации grenade (4 кадра × 150ms = 600ms)
+  // Ждём окончания анимации grenade
   await new Promise(resolve => setTimeout(resolve, SURVIVOR_FRAMES.grenade * ANIMATION_SPEED));
   attacker.usingGrenade = false;
   
   const grenade = ITEMS.grenade;
   
-  // Собираем ВСЕХ кто в радиусе взрыва (зомби + союзники)
-  const allTargets = [...aliveZombies(), ...alivePlayers()].filter(u => {
-    const dist = Math.max(Math.abs(targetX - u.x), Math.abs(targetY - u.y));
-    return dist <= grenade.splashRange;
-  });
+  // Собираем цели в splash-радиусе
+  const allTargets = collectGrenadeTargets(targetX, targetY);
   
   // Запускаем урон для всех сразу (Правило группового урона из RENDERING.md)
-  allTargets.forEach(u => {
-    takeDamage(u, grenade.damage, 'grenade');
-  });
+  allTargets.forEach(u => takeDamage(u, grenade.damage, 'grenade'));
   
-  // Ждём окончания анимаций для ВСЕХ (overload для массива)
+  // Ждём окончания анимаций для ВСЕХ
   if (allTargets.length > 0) {
     await waitForDamageAnimation(allTargets);
   }
   
-  // Логи для всех целей
-  allTargets.forEach(u => {
-    const dist = Math.max(Math.abs(targetX - u.x), Math.abs(targetY - u.y));
-    const kindLabel = u.kind === UNIT_TYPES.ZOMBIE ? 'зомби' : 'союзник';
-    
-    if (u.kind === UNIT_TYPES.ZOMBIE) {
-      log(`💣 Граната → ${kindLabel} [${u.x+1},${u.y+1}] −${grenade.damage}HP`, 'dmg');
-      if (!u.alive) {
-        state.recordKill();
-        log(`💀 Зомби уничтожен!`, 'dmg');
-      }
-    } else {
-      log(`💣 Граната → ${kindLabel} [${u.x+1},${u.y+1}] −${grenade.damage}HP`, 'dmg');
-      if (!u.alive) {
-        log(`💀 ${u.name} погиб от гранаты!`, 'dmg');
-      }
-    }
-  });
+  // Логирование результатов
+  logGrenadeResults(allTargets, grenade.damage);
   
   attacker.inventory.grenade--;
   attacker.attacked = true;
-  clicksBlocked = false;  // Разблокируем клики
+  clicksBlocked = false;
   animationPaused = false;
-  state.setGrenadeAttackerId(null); // Сбрасываем ID после использования
-  state.setGrenadePreview(null);
-  state.clearHighlights();
-  state.setSelected(null);
-  render();
+  
+  // Финальный сброс state
+  resetGrenadeState();
   checkEnd();
 }
 
@@ -235,86 +254,64 @@ function handlePlayer(c, r) {
   const key = `${c},${r}`;
   const selected = state.getSelected();
   const highlights = state.getHighlights();
-  const grenadeAttackerId = state.getGrenadeAttackerId(); // ID юнита который активировал гранату
+  const grenadeAttackerId = state.getGrenadeAttackerId();
 
   // === РЕЖИМ ГРАНАТЫ АКТИВЕН ===
   if (grenadeAttackerId) {
     // 0. Бросок на подсвеченную клетку (throw-зона)
     if (highlights.throw.has(key)) {
-      // Проверяем что выбран правильный survivor
       if (!selected || selected.id !== grenadeAttackerId) {
         log('Выбери юнита который бросает гранату', 'sys');
-        state.setGrenadeAttackerId(null);
-        state.setGrenadePreview(null);
-        state.clearHighlights();
-        state.setSelected(null);
-        render();
+        resetGrenadeState();
         return;
       }
       
       // НЕЛЬЗЯ бросать на СЕБЯ - это отмена
       if (clicked && clicked.kind === UNIT_TYPES.SURVIVOR && clicked.id === grenadeAttackerId) {
-        state.setGrenadeAttackerId(null);
-        state.setGrenadePreview(null);
-        state.clearHighlights();
-        state.setSelected(null);
         log('Бросок гранаты отменён', 'sys');
-        render();
+        resetGrenadeState();
         return;
       }
       
       // Блокировка броска в союзников (только лог, НЕ блокируем)
       if (clicked && clicked.kind === 'survivor') {
         log('⚠️ Опасно! Бросок прямо в союзника!', 'sys');
-        // НЕ return — позволяем doGrenade выполниться!
       }
       
       doGrenade(selected, c, r);
       return;
     }
 
-    // 1. Клик на СВОЕГО (того же) survivor → ОТМЕНА гранаты
+    // 1. Клик на СВОЕГО survivor → ОТМЕНА гранаты
     if (clicked && clicked.kind === 'survivor' && clicked.id === grenadeAttackerId) {
-      state.setGrenadeAttackerId(null);
-      state.setGrenadePreview(null);
-      state.clearHighlights();
-      state.setSelected(null);
       log('Бросок гранаты отменён', 'sys');
-      render();
+      resetGrenadeState();
       return;
     }
 
     // 2. Клик на ДРУГОГО survivor → ОТМЕНА + выбор нового
     if (clicked && clicked.kind === 'survivor' && clicked.id !== grenadeAttackerId) {
-      state.setGrenadeAttackerId(null);
-      state.setGrenadePreview(null);
-      state.clearHighlights();
+      log('Бросок гранаты отменён', 'sys');
+      resetGrenadeState();
       state.setSelected(clicked);
       recalcHighlights();
-      log('Бросок гранаты отменён', 'sys');
       render();
       return;
     }
 
-    // 3. Клик на ЗОМБИ (вне throw-зоны) → ОТМЕНА + выбрать зомби (инфа в сайдбар)
+    // 3. Клик на ЗОМБИ (вне throw-зоны) → ОТМЕНА + выбрать зомби
     if (clicked && clicked.kind === 'zombie') {
-      state.setGrenadeAttackerId(null);
-      state.setGrenadePreview(null);
-      state.clearHighlights();
-      state.setSelected(clicked);
       log('Бросок гранаты отменён', 'sys');
+      resetGrenadeState();
+      state.setSelected(clicked);
       render();
       return;
     }
 
     // 4. Клик на ПУСТУЮ клетку (вне throw-зоны) → ОТМЕНА
     if (!clicked) {
-      state.setGrenadeAttackerId(null);
-      state.setGrenadePreview(null);
-      state.clearHighlights();
-      state.setSelected(null);
       log('Бросок гранаты отменён', 'sys');
-      render();
+      resetGrenadeState();
       return;
     }
   }
