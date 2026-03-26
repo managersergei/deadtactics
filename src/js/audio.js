@@ -46,6 +46,62 @@ function playVictory() {
   // TODO: добавить звук победы
 }
 
+// ════════════════════════════════════════════════════════
+// ФОНОВАЯ МУЗЫКА
+// ════════════════════════════════════════════════════════
+
+let bgMusic = null; // Текущий Audio-объект фоновой музыки
+
+// Запустить фоновую музыку (loop)
+function playBgMusic(filename, volume = 1.0) {
+  stopBgMusic();
+  bgMusic = new Audio(`src/sounds/${filename}`);
+  bgMusic.loop = true;
+  bgMusic.volume = volume;
+  bgMusic.play().catch(() => {});
+}
+
+// Остановить фоновую музыку
+function stopBgMusic() {
+  if (bgMusic) {
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
+    bgMusic = null;
+  }
+}
+
+// Фоновые мелодии для разных экранов
+function startMenuMusic() {
+  playBgMusic('system/menu.mp3', 1.0);
+}
+
+function startGameMusic() {
+  playBgMusic('system/game.mp3', 0.35); // Тише чем меню
+}
+
+function startBattleMusic() {
+  playBgMusic('system/battle.mp3', 0.35); // Тише чем меню
+}
+
+// Остановить любую фоновую музыку
+function stopMusic() {
+  stopBgMusic();
+}
+
+// ════════════════════════════════════════════════════════
+// СИСТЕМНЫЕ ЗВУКИ
+// ════════════════════════════════════════════════════════
+
+// Звук наведения на кнопки меню
+function playMenuSelect() {
+  playSound('system/menu_select.mp3');
+}
+
+// Звук любых кликов
+function playClick() {
+  playSound('system/click.mp3');
+}
+
 // Поражение (пока пусто, можно добавить позже)
 function playDefeat() {
   // TODO: добавить звук поражения

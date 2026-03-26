@@ -16,9 +16,19 @@ const MENU_ANIMATION_SPEED = 250; // ms per frame
 let menuAnimationInterval = null;
 let currentMenuFrame = 0;
 
+// Добавить звук наведения на кнопки меню
+function addMenuHoverSound() {
+  document.querySelectorAll('.menu-btn').forEach(btn => {
+    btn.addEventListener('mouseenter', playMenuSelect);
+  });
+}
+
 function startMenuBackgroundAnimation() {
   const container = document.getElementById('menu-background');
   if (!container) return;
+  
+  // Добавить звук наведения на кнопки
+  addMenuHoverSound();
   
   // Создать img элементы для каждого кадра
   container.innerHTML = '';

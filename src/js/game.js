@@ -853,5 +853,14 @@ window.addEventListener('load', () => {
   showScreen(SCREENS.START);
 });
 
+// Глобальный звук кликов (исключаем клики на поле боя)
+document.addEventListener('click', (e) => {
+  // Не играть звук клика на поле боя
+  if (e.target.closest('#grid')) return;
+  // Не играть на пустых клетках
+  if (e.target.classList.contains('cell') && !e.target.closest('.unit')) return;
+  playClick();
+});
+
 buildGrid();
 render();

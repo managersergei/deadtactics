@@ -47,6 +47,18 @@ function showScreen(screenName) {
   if (screenName === SCREENS.START) {
     startMenuBackgroundAnimation();
   }
+  
+  // Управление фоновой музыкой
+  if (screenName === SCREENS.START) {
+    // Главное меню — своя музыка
+    startMenuMusic();
+  } else if (screenName === SCREENS.BATTLE) {
+    // Битва — своя музыка (тише)
+    startBattleMusic();
+  } else if ([SCREENS.INTRO, SCREENS.MAP, SCREENS.SQUAD, SCREENS.SHOP, SCREENS.LEVEL_START, SCREENS.UNIT_DETAIL].includes(screenName)) {
+    // Остальные экраны игры — своя музыка (тише)
+    startGameMusic();
+  }
 }
 
 // Скрыть все экраны
