@@ -37,18 +37,26 @@ const EFFECTS = {
 // Функции обработки эффектов
 const EFFECT_HANDLERS = {
   // Применение урона в начале хода
+  // ВАЖНО: используем window.takeDamage который определён в game.js (загружается позже)
+  // Сама функция вызывается в runtime, когда все скрипты уже загружены
   applyDamage: (unit, effect) => {
     const effectDef = EFFECTS[effect.id];
     if (!effectDef) return 0;
     
     const damage = effectDef.damagePerTurn || 1;
-    unit.hp -= damage;
     
-    // Записываем урон
+    // Используем централизованную функцию нанесения урона
+    // source='effect' чтобы корректно записать статистику
+    if (typeof window.takeDamage === 'function') {
+      return window.takeDamage(unit, damage, 'effect');
+    }
+    
+    // Fallback если takeDamage ещё не доступна (не должно происходить в runtime)
+    console.warn('takeDamage не доступна, используем fallback');
+    unit.hp -= damage;
     if (typeof state !== 'undefined' && state.recordPoisonDamage) {
       state.recordPoisonDamage(damage);
     }
-    
     return damage;
   },
   

@@ -66,9 +66,8 @@ function stopMenuBackgroundAnimation() {
 // ── ОБРАБОТЧИКИ КНОПОК МЕНЮ ───────────────────────────
 
 function newGame() {
-  // Сбросить данные игры
+  // Сбросить данные игры (resetGameData уже вызывает initializeNewGame)
   resetGameData();
-  initializeNewGame();
   // Перейти к вводу имени
   goToIntro();
 }

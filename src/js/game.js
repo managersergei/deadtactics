@@ -547,26 +547,10 @@ function startPlayerTurn() {
     
     affectedUnits.forEach(u => {
       const oldHp = u.hp;
-      // Обрабатываем все эффекты
-      for (const effectId in u.effects) {
-        const effect = u.effects[effectId];
-        const effectDef = EFFECTS[effectId];
-        
-        if (!effectDef || !effectDef.onTurnStart) continue;
-        
-        const handler = EFFECT_HANDLERS[effectDef.onTurnStart];
-        if (handler) {
-          handler(u, effect);
-        }
-        
-        // Уменьшаем длительность
-        if (effect.duration !== null) {
-          effect.duration--;
-          if (effect.duration <= 0) {
-            delete u.effects[effectId];
-          }
-        }
-      }
+      
+      // Используем централизованную функцию обработки эффектов из effects.js
+      // Она сама вызывает EFFECT_HANDLERS.applyDamage который через takeDamage наносит урон
+      processEffectsOnTurnStart(u);
       
       // Проверяем изменился ли HP (был нанесён урон)
       if (u.hp < oldHp) {
