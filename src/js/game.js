@@ -583,6 +583,7 @@ function startPlayerTurn() {
       setTimeout(() => {
         unitsWithDamage.forEach(u => {
           u.poisonFlash = false;
+          u.damagedFlash = false; // снимаем флаг повреждения от takeDamage()
         });
         animationPaused = false;
         state.setPhase('player');
