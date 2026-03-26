@@ -51,9 +51,24 @@ function playVictory() {
 // ════════════════════════════════════════════════════════
 
 let bgMusic = null; // Текущий Audio-объект фоновой музыки
+let currentMusicType = null; // 'menu' | 'game' | 'battle' | null
+let musicUnlocked = false; // Блокировка до первого взаимодействия пользователя
+
+// Разблокировать музыку (вызывать после первого взаимодействия пользователя)
+function unlockMusic() {
+  if (musicUnlocked) return;
+  musicUnlocked = true;
+  // Если музыка уже была запрошена — запустить её
+  if (currentMusicType && bgMusic) {
+    bgMusic.play().catch(() => {});
+  }
+}
 
 // Запустить фоновую музыку (loop)
 function playBgMusic(filename, volume = 1.0) {
+  // Не запускать пока музыка не разблокирована
+  if (!musicUnlocked) return;
+  
   stopBgMusic();
   bgMusic = new Audio(`src/sounds/${filename}`);
   bgMusic.loop = true;
@@ -72,20 +87,27 @@ function stopBgMusic() {
 
 // Фоновые мелодии для разных экранов
 function startMenuMusic() {
+  if (currentMusicType === 'menu') return; // Уже играет меню — не перезапускать
+  currentMusicType = 'menu';
   playBgMusic('system/menu.mp3', 1.0);
 }
 
 function startGameMusic() {
+  if (currentMusicType === 'game') return; // Уже играет game — не перезапускать
+  currentMusicType = 'game';
   playBgMusic('system/game.mp3', 0.35); // Тише чем меню
 }
 
 function startBattleMusic() {
+  if (currentMusicType === 'battle') return; // Уже играет battle — не перезапускать
+  currentMusicType = 'battle';
   playBgMusic('system/battle.mp3', 0.35); // Тише чем меню
 }
 
 // Остановить любую фоновую музыку
 function stopMusic() {
   stopBgMusic();
+  currentMusicType = null;
 }
 
 // ════════════════════════════════════════════════════════

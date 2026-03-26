@@ -266,3 +266,124 @@ node src/js/tests/helpers.test.js
 2. **Удаление трупов:** мёртвые юниты удаляются из squad
 3. **Старт боя:** `mkPlayer()` берёт `squadUnit.hp` для нового боевого юнита
 4. **maxHp:** вычисляется через `getEffectiveStat()` — не хранится в БД
+
+---
+
+## 13. Аудио система
+
+### Структура файлов
+
+```
+src/sounds/
+├── man_gun_pistol_shot_01.mp3    ← звуки выстрелов
+├── man_move_01.mp3               ← шаги человека
+├── man_effects_poisoned_01.mp3   ← звуки отравления
+├── zombie_bite_01.mp3             ← укус зомби
+├── zombie_move_01.mp3             ← движение зомби
+└── system/                       ← системные звуки и музыка
+    ├── menu.mp3                   ← фоновая музыка меню (100%)
+    ├── game.mp3                   ← фоновая музыка игры (35%)
+    ├── battle.mp3                 ← фоновая музыка битвы (35%)
+    ├── menu_select.mp3            ← звук наведения на кнопки
+    └── click.mp3                  ← звук кликов
+```
+
+### Фоновые мелодии
+
+| Функция | Файл | Громкость | Когда играет |
+|---------|------|-----------|--------------|
+| `startMenuMusic()` | `system/menu.mp3` | 100% | Главное меню |
+| `startGameMusic()` | `system/game.mp3` | 35% | Карта, отряд, магазин, интро |
+| `startBattleMusic()` | `system/battle.mp3` | 35% | Битва |
+
+### Функции audio.js
+
+| Функция | Назначение |
+|---------|-----------|
+| `playSound(filename)` | Воспроизвести одноразовый звук |
+| `playShot()` | Выстрел из пистолета |
+| `playBite()` | Укус зомби |
+| `playFootstep()` | Шаги человека |
+| `playPoison()` | Эффект отравления |
+| `playZombieMove()` | Движение зомби |
+| `playMenuSelect()` | Звук наведения на кнопки меню |
+| `playClick()` | Звук кликов |
+| `startMenuMusic()` | Запустить музыку меню |
+| `startGameMusic()` | Запустить музыку игры |
+| `startBattleMusic()` | Запустить музыку битвы |
+| `stopMusic()` | Остановить любую фоновую музыку |
+
+### Управление музыкой
+
+Музыка переключается в `showScreen()` в `screens.js`:
+- Переход на START → `startMenuMusic()`
+- Переход на BATTLE → `startBattleMusic()`
+- Переход на другие экраны → `startGameMusic()`
+
+### Звук наведения на кнопки
+
+Добавляется через `addMenuHoverSound()` в `screenIntro.js`. Вызывается автоматически в `startMenuBackgroundAnimation()`.
+
+### Глобальный звук кликов
+
+Добавляется в `game.js` через `document.addEventListener('click')`. Исключаются клики на `#grid` (поле боя).
+---
+
+## 13. Аудио система
+
+### Структура файлов
+
+```
+src/sounds/
+├── man_gun_pistol_shot_01.mp3    ← звуки выстрелов
+├── man_move_01.mp3               ← шаги человека
+├── man_effects_poisoned_01.mp3   ← звуки отравления
+├── zombie_bite_01.mp3             ← укус зомби
+├── zombie_move_01.mp3             ← движение зомби
+└── system/                       ← системные звуки и музыка
+    ├── menu.mp3                   ← фоновая музыка меню (100%)
+    ├── game.mp3                   ← фоновая музыка игры (35%)
+    ├── battle.mp3                 ← фоновая музыка битвы (35%)
+    ├── menu_select.mp3            ← звук наведения на кнопки
+    └── click.mp3                  ← звук кликов
+```
+
+### Фоновые мелодии
+
+| Функция | Файл | Громкость | Когда играет |
+|---------|------|-----------|--------------|
+| `startMenuMusic()` | `system/menu.mp3` | 100% | Главное меню |
+| `startGameMusic()` | `system/game.mp3` | 35% | Карта, отряд, магазин, интро |
+| `startBattleMusic()` | `system/battle.mp3` | 35% | Битва |
+
+### Функции audio.js
+
+| Функция | Назначение |
+|---------|-----------|
+| `playSound(filename)` | Воспроизвести одноразовый звук |
+| `playShot()` | Выстрел из пистолета |
+| `playBite()` | Укус зомби |
+| `playFootstep()` | Шаги человека |
+| `playPoison()` | Эффект отравления |
+| `playZombieMove()` | Движение зомби |
+| `playMenuSelect()` | Звук наведения на кнопки меню |
+| `playClick()` | Звук кликов |
+| `startMenuMusic()` | Запустить музыку меню |
+| `startGameMusic()` | Запустить музыку игры |
+| `startBattleMusic()` | Запустить музыку битвы |
+| `stopMusic()` | Остановить любую фоновую музыку |
+
+### Управление музыкой
+
+Музыка переключается в `showScreen()` в `screens.js`:
+- Переход на START → `startMenuMusic()`
+- Переход на BATTLE → `startBattleMusic()`
+- Переход на другие экраны → `startGameMusic()`
+
+### Звук наведения на кнопки
+
+Добавляется через `addMenuHoverSound()` в `screenIntro.js`. Вызывается автоматически в `startMenuBackgroundAnimation()`.
+
+### Глобальный звук кликов
+
+Добавляется в `game.js` через `document.addEventListener('click')`. Исключаются клики на `#grid` (поле боя).
