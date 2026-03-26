@@ -8,11 +8,6 @@
 // Задержка между шагами движения (мс)
 const ZOMBIE_STEP_DELAY = ZOMBIE_FRAMES.move * ANIMATION_SPEED; // 6 * 150 = 900
 
-// Функция ожидания
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 // Запустить ход всех зомби (с анимационными задержками)
 async function runZombies() {
   const zs = aliveZombies();

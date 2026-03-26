@@ -3,6 +3,11 @@
 // Не должны изменять стейт, только вычислять и возвращать
 // ════════════════════════════════════════════════════════
 
+// Функция ожидания (для async/await анимаций)
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // Получаем units из state (глобальная функция)
 function getAllUnits() {
   return typeof getUnits === 'function' ? getUnits() : window.state?.units || [];
@@ -213,6 +218,7 @@ function getDirection(unit, target) {
 // экспорт для тестов (Node environment)
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
+    sleep,
     manhattan,
     unitAt,
     reachable,

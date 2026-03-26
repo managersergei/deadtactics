@@ -33,7 +33,7 @@ dead-tactics/
         │   └── generate-frames.js    ← генерация кадров спрайтов
         ├── core/
         │   ├── state.js              ← стейт боя (единственный источник правды)
-        │   └── helpers.js            ← чистые утилиты, экспортируются для тестов
+        │   ├── helpers.js            ← чистые утилиты (sleep, manhattan, unitAt, etc.), экспортируются для тестов
         │   └── effects.js            ← система эффектов
         ├── render/
         │   ├── render.js             ← построение грида, функция cell()

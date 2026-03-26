@@ -407,11 +407,6 @@ function recalcHighlights() {
 // Задержка между шагами движения (мс)
 const SURVIVOR_STEP_DELAY = SURVIVOR_FRAMES.move * ANIMATION_SPEED; // 6 * 150 = 900
 
-// Функция ожидания
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 // Плавное перемещение выжившего по клеткам
 async function doMove(u, c, r) {
   const oldX = u.x, oldY = u.y;
@@ -625,11 +620,6 @@ function startPlayerTurn() {
 }
 
 // ── ЦЕНТРАЛИЗОВАННАЯ СИСТЕМА УРОНА ─────────────────────
-
-// Функция ожидания для анимации
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
 
 // Единая функция для нанесения урона — ставит флаги анимаций сама
 // Включает damagedFlash, но НЕ ждёт окончания анимации
