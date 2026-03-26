@@ -88,19 +88,22 @@ function stopBgMusic() {
 
 // Фоновые мелодии для разных экранов
 function startMenuMusic() {
-  if (currentMusicType === 'menu') return; // Уже играет меню — не перезапускать
+  // Не перезапускать если уже играет меню И музыка создана
+  if (currentMusicType === 'menu' && bgMusic) return;
   currentMusicType = 'menu';
   playBgMusic('system/menu.mp3', 1.0);
 }
 
 function startGameMusic() {
-  if (currentMusicType === 'game') return; // Уже играет game — не перезапускать
+  // Не перезапускать если уже играет game И музыка создана
+  if (currentMusicType === 'game' && bgMusic) return;
   currentMusicType = 'game';
   playBgMusic('system/game.mp3', 0.35); // Тише чем меню
 }
 
 function startBattleMusic() {
-  if (currentMusicType === 'battle') return; // Уже играет battle — не перезапускать
+  // Не перезапускать если уже играет battle И музыка создана
+  if (currentMusicType === 'battle' && bgMusic) return;
   currentMusicType = 'battle';
   playBgMusic('system/battle.mp3', 0.35); // Тише чем меню
 }
