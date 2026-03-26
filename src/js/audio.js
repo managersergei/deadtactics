@@ -58,10 +58,11 @@ let musicUnlocked = false; // Блокировка до первого взаи�
 function unlockMusic() {
   if (musicUnlocked) return;
   musicUnlocked = true;
-  // Если музыка уже была запрошена — запустить её
-  if (currentMusicType && bgMusic) {
-    bgMusic.play().catch(() => {});
-  }
+  
+  // Перезапустить нужный трек
+  if (currentMusicType === 'menu') startMenuMusic();
+  else if (currentMusicType === 'game') startGameMusic();
+  else if (currentMusicType === 'battle') startBattleMusic();
 }
 
 // Запустить фоновую музыку (loop)
