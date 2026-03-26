@@ -165,6 +165,9 @@ async function doGrenade(attacker, targetX, targetY) {
     return;
   }
   
+  // Блокируем клики во время анимации и урона
+  clicksBlocked = true;
+  
   // Анимация броска гранаты — устанавливаем направление
   attacker.direction = getDirection(attacker, {x: targetX, y: targetY});
   attacker.usingGrenade = true;
@@ -178,37 +181,44 @@ async function doGrenade(attacker, targetX, targetY) {
   
   const grenade = ITEMS.grenade;
   
-  // АТАКА ПО ЗОМБИ (chessboard distance)
-  for (const z of aliveZombies()) {
-    const dist = Math.max(Math.abs(targetX - z.x), Math.abs(targetY - z.y));
-    if (dist <= grenade.splashRange) {
-      const result = takeDamage(z, grenade.damage, 'grenade');
-      await waitForDamageAnimation(z);
-      
-      log(`💣 Граната → зомби [${z.x+1},${z.y+1}] −${grenade.damage}HP`, 'dmg');
-      if (result.died) {
+  // Собираем ВСЕХ кто в радиусе взрыва (зомби + союзники)
+  const allTargets = [...aliveZombies(), ...alivePlayers()].filter(u => {
+    const dist = Math.max(Math.abs(targetX - u.x), Math.abs(targetY - u.y));
+    return dist <= grenade.splashRange;
+  });
+  
+  // Запускаем урон для всех сразу (Правило группового урона из RENDERING.md)
+  allTargets.forEach(u => {
+    takeDamage(u, grenade.damage, 'grenade');
+  });
+  
+  // Ждём окончания ОДНОЙ анимации (а не каждого)
+  if (allTargets.length > 0) {
+    await waitForDamageAnimation(allTargets[0]);
+  }
+  
+  // Логи для всех целей
+  allTargets.forEach(u => {
+    const dist = Math.max(Math.abs(targetX - u.x), Math.abs(targetY - u.y));
+    const kindLabel = u.kind === UNIT_TYPES.ZOMBIE ? 'зомби' : 'союзник';
+    
+    if (u.kind === UNIT_TYPES.ZOMBIE) {
+      log(`💣 Граната → ${kindLabel} [${u.x+1},${u.y+1}] −${grenade.damage}HP`, 'dmg');
+      if (!u.alive) {
         state.recordKill();
         log(`💀 Зомби уничтожен!`, 'dmg');
       }
-    }
-  }
-  
-  // FRIENDLY FIRE — атака по союзникам (без исключений, chessboard distance)
-  for (const p of alivePlayers()) {
-    const dist = Math.max(Math.abs(targetX - p.x), Math.abs(targetY - p.y));
-    if (dist <= grenade.splashRange) {
-      const result = takeDamage(p, grenade.damage, 'grenade');
-      await waitForDamageAnimation(p);
-      
-      log(`💣 Граната → союзник [${p.x+1},${p.y+1}] −${grenade.damage}HP`, 'dmg');
-      if (result.died) {
-        log(`💀 ${p.name} погиб от гранаты!`, 'dmg');
+    } else {
+      log(`💣 Граната → ${kindLabel} [${u.x+1},${u.y+1}] −${grenade.damage}HP`, 'dmg');
+      if (!u.alive) {
+        log(`💀 ${u.name} погиб от гранаты!`, 'dmg');
       }
     }
-  }
+  });
   
   attacker.inventory.grenade--;
   attacker.attacked = true;
+  clicksBlocked = false;  // Разблокируем клики
   animationPaused = false;
   state.setGrenadeAttackerId(null); // Сбрасываем ID после использования
   state.setGrenadePreview(null);
