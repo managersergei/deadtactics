@@ -520,6 +520,9 @@ await waitForDamageAnimation(target);    // 2. Ожидание окончани
 
 ### Функция waitForDamageAnimation()
 
+Функция имеет **overload** для поддержки группового урона:
+
+**Один таргет:**
 ```js
 async function waitForDamageAnimation(target) {
   if (!target.damagedFlash) return;  // Если нет анимации - не ждём
@@ -532,7 +535,39 @@ async function waitForDamageAnimation(target) {
   await sleep(delay);
   
   target.damagedFlash = false;
+  if (target.critFlash) target.critFlash = false;
   render();
+}
+```
+
+**Массив таргетов (для группового урона):**
+```js
+async function waitForDamageAnimation(targets) {
+  if (Array.isArray(targets)) {
+    // 1. Находим максимальную длительность среди всех целей
+    const delays = targets.map(t => {
+      if (!t.damagedFlash) return 0;
+      const frames = t.kind === UNIT_TYPES.ZOMBIE 
+        ? ZOMBIE_FRAMES.damaged 
+        : SURVIVOR_FRAMES.damaged;
+      return frames * ANIMATION_SPEED;
+    });
+    const maxDelay = Math.max(...delays);
+    if (maxDelay === 0) return;
+    
+    // 2. Ждём максимальную длительность
+    await sleep(maxDelay);
+    
+    // 3. Снимаем флаги у ВСЕХ
+    targets.forEach(t => {
+      t.damagedFlash = false;
+      if (t.critFlash) t.critFlash = false;
+    });
+    
+    render();
+    return;
+  }
+  // ... логика для одного таргета ...
 }
 ```
 
@@ -553,7 +588,7 @@ for (const z of targets) {
 for (const z of targets) {
   takeDamage(z, dmg, 'grenade');  // Запускаем для всех сразу
 }
-await waitForDamageAnimation(target[0]); // Ждём одну анимацию
+await waitForDamageAnimation(targets); // Передаём массив — overload снимет флаги у ВСЕХ
 ```
 
 ---
