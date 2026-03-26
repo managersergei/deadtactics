@@ -606,22 +606,55 @@ function startPlayerTurn() {
 
 // ── ЦЕНТРАЛИЗОВАННАЯ СИСТЕМА УРОНА ─────────────────────
 
-// Единая функция для нанесения урона — ставит флаги анимаций сама
-// Включает damagedFlash, но НЕ ждёт окончания анимации
-// target: юнит которому наносим урон
-// amount: количество урона
-// source: 'player' | 'zombie' | 'grenade' | 'effect'
-// returns: { died: boolean }
-function takeDamage(target, amount, source) {
-  const oldHp = target.hp;
-  target.hp -= amount;
-  
-  // Записываем урон в статистику
+// Запись статистики урона — вынесена из takeDamage()
+function recordDamageForSource(source, amount) {
   if (source === 'player' || source === 'grenade') {
     state.recordDamageDealt(amount);
   } else if (source === 'zombie') {
     recordDamageTaken(amount);
   }
+}
+
+// Обработка смерти юнита — вынесена из takeDamage()
+function handleUnitDeath(target) {
+  if (target.kind === UNIT_TYPES.SURVIVOR) {
+    target.dyingAnim = true;
+    setTimeout(() => {
+      target.alive = false;
+      target.dyingAnim = false;
+      render();
+      checkEnd();
+    }, 600);
+  } else {
+    target.dying = true;
+    setTimeout(() => {
+      target.alive = false;
+      target.dying = false;
+      resetAnimCounter(target.id);
+      render();
+      checkEnd();
+    }, 600);
+  }
+}
+
+// Проверка и применение ярости зомби — вынесена из takeDamage()
+function checkAndApplyRage(target) {
+  if (target.kind === UNIT_TYPES.ZOMBIE && target.hp === 1 && !target.raged) {
+    target.raged = true;
+    log(`⚡ Зомби в ярости!`, 'zombie-act');
+  }
+}
+
+// Единая функция для нанесения урона — ставит флаги анимаций сама
+// target: юнит которому наносим урон
+// amount: количество урона
+// source: 'player' | 'zombie' | 'grenade' | 'effect'
+// returns: { died: boolean }
+function takeDamage(target, amount, source) {
+  target.hp -= amount;
+  
+  // Запись статистики урона
+  recordDamageForSource(source, amount);
   
   // Анимация повреждения (только если юнит выжил)
   if (target.hp > 0) {
@@ -634,36 +667,14 @@ function takeDamage(target, amount, source) {
     }
   }
   
-  // Проверка смерти
+  // Обработка смерти
   if (target.hp <= 0) {
-    if (target.kind === UNIT_TYPES.SURVIVOR) {
-      // Survivor — анимация падения (killed)
-      target.dyingAnim = true;
-      setTimeout(() => {
-        target.alive = false;
-        target.dyingAnim = false;
-        render();
-        checkEnd();
-      }, 600);
-    } else {
-      // Zombie — анимация смерти
-      target.dying = true;
-      setTimeout(() => {
-        target.alive = false;
-        target.dying = false;
-        resetAnimCounter(target.id);
-        render();
-        checkEnd();
-      }, 600);
-    }
+    handleUnitDeath(target);
     return { died: true };
   }
   
-  // Проверка ярости для зомби (HP = 1)
-  if (target.kind === UNIT_TYPES.ZOMBIE && target.hp === 1 && !target.raged) {
-    target.raged = true;
-    log(`⚡ Зомби в ярости!`, 'zombie-act');
-  }
+  // Проверка ярости для зомби
+  checkAndApplyRage(target);
   
   return { died: false };
 }
