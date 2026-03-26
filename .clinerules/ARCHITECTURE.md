@@ -15,16 +15,17 @@ dead-tactics/
 └── src/
     ├── assets/
     │   ├── battlefield/road/         ← фоновые изображения боя
+    │   ├── menu/                     ← спрайты главного меню (4 кадра анимации)
     │   ├── items/                    ← иконки предметов
     │   └── units/
-    │       ├── survivor/{оружие}/    ← спрайты survivor по оружию
+    │       ├── survivor/{оружия}/     ← спрайты survivor по оружию
     │       └── zombie/               ← спрайты зомби
     ├── css/
     │   ├── base.css                  ← сброс, типографика, CSS-переменные
     │   ├── game.css                  ← поле боя, клетки, юниты
-    │   ├── ui.css                    ← сайдбар, кнопки, лог
+    │   ├── ui.css                   ← сайдбар, кнопки, лог
     │   ├── components.css            ← переиспользуемые компоненты
-    │   └── screens.css               ← экраны (карта, отряд, магазин)
+    │   └── screens.css               ← экраны (карта, отряд, магазин, меню)
     ├── sounds/
     └── js/
         ├── config/
@@ -39,11 +40,11 @@ dead-tactics/
         │   ├── render.js             ← построение грида, функция cell()
         │   └── battle.js             ← рендер боя, анимация, syncUnitsWithDOM
         ├── screens/
+        │   ├── screenIntro.js        ← главное меню + интро и ввод имени
         │   ├── screens.js            ← роутинг между экранами, showScreen()
         │   ├── screenMap.js          ← карта мира
         │   ├── screenSquad.js        ← экран отряда
         │   ├── screenShop.js         ← магазин
-        │   ├── screenIntro.js        ← интро и ввод имени
         │   ├── screenLevel.js        ← экран перед боем
         │   └── screenDetail.js       ← детали юнита
         ├── ai.js                     ← ИИ зомби
@@ -69,11 +70,11 @@ core/effects.js     ← EFFECTS, addEffect, removeEffect
 state.js            ← state, uid()
 data.js             ← gameData, buyItem, recruitUnit
 
-screens.js          ← showScreen(), SCREENS
+screenIntro.js      ← функции меню (startMenuBackgroundAnimation, newGame, etc.)
+screens.js          ← showScreen(), SCREENS (зависит от screenIntro.js!)
 screenMap.js
 screenSquad.js
 screenShop.js
-screenIntro.js
 screenLevel.js
 screenDetail.js
 
@@ -89,11 +90,60 @@ ai.js               ← runZombies(), zombieMove()
 game.js             ← onCellClick(), doMove(), doAttack()
 ```
 
-Новый скрипт всегда добавляется в конец своей группы. Нарушение порядка = "функция не определена" в консоли.
+**Важно:** `screenIntro.js` должен быть загружен до `screens.js`, так как `showScreen()` вызывает `startMenuBackgroundAnimation()`.
 
 ---
 
-## 3. Разделение стейта
+## 3. Главное меню
+
+### Структура HTML
+```html
+<div id="screen-start" class="screen">
+  <div id="menu-background" class="menu-background"></div>
+  <div class="menu-container">
+    <h1 class="menu-title">☣ DEAD TACTICS</h1>
+    <div class="menu-buttons">
+      <button onclick="newGame()" class="menu-btn">▶ НОВАЯ ИГРА</button>
+      <button onclick="continueGame()" class="menu-btn">▶ ПРОДОЛЖИТЬ</button>
+      <button onclick="openSettings()" class="menu-btn">⚙ НАСТРОЙКИ</button>
+    </div>
+  </div>
+</div>
+```
+
+### CSS классы
+| Класс | Назначение |
+|-------|-----------|
+| `.menu-background` | Контейнер для анимированного фона |
+| `.menu-container` | Центрированный контент |
+| `.menu-title` | Заголовок игры |
+| `.menu-subtitle` | Подзаголовок |
+| `.menu-buttons` | Контейнер кнопок |
+| `.menu-btn` | Кнопка меню |
+
+### JavaScript функции (screenIntro.js)
+| Функция | Назначение |
+|---------|-----------|
+| `startMenuBackgroundAnimation()` | Запустить анимацию фона (4 кадра) |
+| `stopMenuBackgroundAnimation()` | Остановить анимацию |
+| `newGame()` | Сбросить данные и перейти к вводу имени |
+| `continueGame()` | Заглушка для продолжения |
+| `openSettings()` | Заглушка для настроек |
+
+### Параметры анимации
+```javascript
+const MENU_BACKGROUND_FRAMES = [
+  'src/assets/menu/back-menu1.png',
+  'src/assets/menu/back-menu2.png',
+  'src/assets/menu/back-menu3.png',
+  'src/assets/menu/back-menu4.png'
+];
+const MENU_ANIMATION_SPEED = 250; // ms per frame
+```
+
+---
+
+## 4. Разделение стейта
 
 **Стейт боя** — только в `state.js`:
 - юниты на поле, фаза, ход, подсветка, выбранный юнит, статистика боя
@@ -105,13 +155,29 @@ game.js             ← onCellClick(), doMove(), doAttack()
 
 ---
 
-## 4. CSS-переменные
+## 5. CSS-переменные и специфичность
 
-Все CSS-переменные определены в `base.css`. Файл `styles.css` существует в папке но **не подключён** в `index.html` — не использовать его. При добавлении новой переменной — добавлять в `base.css`.
+### CSS-переменные
+Все CSS-переменные определены в `base.css`. Файл `styles.css` существует в папке но **не подключён** в `index.html` — не использовать его.
+
+### CSS Specificity для кнопок
+Глобальные стили кнопок определены в `ui.css`:
+```css
+button:hover:not(:disabled) {
+  background: #102210;
+  border-color: var(--green);
+  box-shadow: 0 0 10px rgba(57,255,20,0.15);
+}
+```
+
+**При добавлении новых кнопок** с кастомными стилями:
+1. Используйте более специфичный селектор: `#screen-start .menu-btn:hover`
+2. Добавьте `!important` для перебития глобальных стилей
+3. Обнулите `box-shadow` если не нужен
 
 ---
 
-## 5. Как добавить новый экран
+## 6. Как добавить новый экран
 
 1. Добавить `<div id="screen-{name}">` в `index.html`
 2. Добавить константу в `SCREENS` в `screens.js`
@@ -122,7 +188,7 @@ game.js             ← onCellClick(), doMove(), doAttack()
 
 ---
 
-## 6. Как добавить новый тип юнита
+## 7. Как добавить новый тип юнита
 
 1. Добавить константу в `UNIT_TYPES` в `game-config.js`
 2. Добавить параметры в `game-config.js` (по аналогии с `PLAYER_STATS`, `ZOMBIE_STATS`)
@@ -134,7 +200,7 @@ game.js             ← onCellClick(), doMove(), doAttack()
 
 ---
 
-## 7. Именование
+## 8. Именование
 
 **Файлы:** camelCase — `screenShop.js`, `gameConfig.js`
 
@@ -148,7 +214,7 @@ game.js             ← onCellClick(), doMove(), doAttack()
 
 ---
 
-## 8. Тесты
+## 9. Тесты
 
 ```bash
 node src/js/tests/helpers.test.js
@@ -161,7 +227,7 @@ node src/js/tests/helpers.test.js
 
 ---
 
-## 9. Side Effects функций data.js
+## 10. Side Effects функций data.js
 
 | Функция | Side Effects |
 |---------|--------------|
@@ -172,7 +238,7 @@ node src/js/tests/helpers.test.js
 
 ---
 
-## 10. Важное правило: maxHp — только для чтения
+## 11. Важное правило: maxHp — только для чтения
 
 **ЗАПРЕЩЕНО** записывать бонусы от предметов в `unit.maxHp`.
 
@@ -184,7 +250,7 @@ node src/js/tests/helpers.test.js
 
 ---
 
-## 11. Сохранение прогресса между боями
+## 12. Сохранение прогресса между боями
 
 ### Функции
 

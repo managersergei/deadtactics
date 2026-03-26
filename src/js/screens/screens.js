@@ -10,30 +10,42 @@ const SCREENS = {
   SHOP: 'screen-shop',
   UNIT_DETAIL: 'screen-unit-detail',
   LEVEL_START: 'screen-level-start',
-  BATTLE: 'screen-battle'
+  BATTLE: 'screen-battle',
+  SETTINGS: 'screen-settings'
 };
 
 // Тип display для каждого экрана
 // screen-battle должен быть block, иначе flex-контекст ломает grid
 const SCREEN_DISPLAY = {
-  'screen-start':       'flex',
-  'screen-intro':      'flex',
-  'screen-map':        'flex',
-  'screen-squad':      'block',
-  'screen-unit-detail':'flex',
-  'screen-level-start':'block',
-  'screen-battle':     'block',   // КЛЮЧЕВОЕ: block, не flex
+  'screen-start':        'flex',
+  'screen-intro':       'flex',
+  'screen-map':         'flex',
+  'screen-squad':       'block',
+  'screen-unit-detail': 'flex',
+  'screen-level-start': 'block',
+  'screen-battle':      'block',   // КЛЮЧЕВОЕ: block, не flex
+  'screen-settings':    'flex'
 };
 
 let currentScreen = SCREENS.START;
 
 // Показать экран
 function showScreen(screenName) {
+  // Управление анимацией меню
+  if (currentScreen === SCREENS.START && screenName !== SCREENS.START) {
+    stopMenuBackgroundAnimation();
+  }
+  
   hideAllScreens();
   const el = document.getElementById(screenName);
   if (el) {
     el.style.display = SCREEN_DISPLAY[screenName] || 'flex';
     currentScreen = screenName;
+  }
+  
+  // Запустить анимацию меню при показе главного экрана
+  if (screenName === SCREENS.START) {
+    startMenuBackgroundAnimation();
   }
 }
 

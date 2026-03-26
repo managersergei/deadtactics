@@ -22,50 +22,95 @@
   min-height: 0;
 }
 
-/* ── ЭКРАН СТАРТА ── */
+/* ════════════════════════════════════════════════════════
+   ГЛАВНОЕ МЕНЮ
+   ════════════════════════════════════════════════════════ */
+
 #screen-start {
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── ФОН МЕНЮ ── */
+.menu-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: #0a0a0a;
+  overflow: hidden;
+}
+
+.menu-background img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.menu-background img.active {
+  opacity: 1;
+}
+
+/* ── КОНТЕЙНЕР МЕНЮ ── */
+.menu-container {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
+  min-height: 100vh;
   padding: 2rem;
 }
 
-.screen-start-title {
+.menu-title {
+  font-size: 48px;
+  color: #F0C060;
+  text-shadow: 0 0 20px rgba(240, 192, 96, 0.5);
+  margin-bottom: 0.5rem;
   text-align: center;
 }
 
-.screen-start-subtitle {
-  color: #3a6a34;
-  letter-spacing: 2px;
-  font-size: 13px;
-  margin-top: 1rem;
-}
-
-.screen-start-desc {
-  max-width: 600px;
+.menu-subtitle {
+  font-size: 14px;
+  color: #A89078;
+  letter-spacing: 3px;
+  margin-bottom: 4rem;
   text-align: center;
-  color: var(--text);
-  line-height: 1.6;
-  margin-bottom: 1rem;
 }
 
-.screen-start-tagline {
-  margin-top: 1rem;
-  color: #5a8a54;
-}
-
-/* Кнопка "Старт" */
-.btn-start {
-  width: auto;
-  min-width: 200px;
+/* ── КНОПКИ МЕНЮ ── */
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
   max-width: 280px;
-  padding: 12px 24px;
 }
 
-.btn-start:hover {
-  opacity: 0.9;
+.menu-btn {
+  padding: 16px 32px;
+  font-size: 16px;
+  font-family: 'Share Tech Mono', monospace;
+  background: rgba(40, 35, 30, 0.9);
+  color: #A89078;
+  border: 2px solid #5a5045;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+/* Более специфичный селектор для перебития глобального button:hover из ui.css */
+#screen-start .menu-btn:hover {
+  background: rgba(50, 45, 35, 0.95) !important;
+  border-color: #F0C060 !important;
+  color: #F0C060 !important;
+  box-shadow: none !important;
+  transform: translateX(4px);
 }
 
 /* ── ЭКРАН ИНТРО ── */

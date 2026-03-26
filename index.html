@@ -14,20 +14,23 @@
 <body>
 
 <!-- ═══════════════════════════════════════════════════ -->
-<!-- ЭКРАН 1: СТАРТ -->
+<!-- ЭКРАН 1: ГЛАВНОЕ МЕНЮ -->
 <!-- ═══════════════════════════════════════════════════ -->
 <div id="screen-start" class="screen">
-  <div class="screen-start-title">
-    <div class="overlay-title green">☣ DEAD TACTICS</div>
-    <p class="screen-start-subtitle">ZOMBIE APOCALYPSE · TURN-BASED STRATEGY</p>
+  <!-- Фон с анимацией -->
+  <div id="menu-background" class="menu-background"></div>
+  
+  <!-- Центрированный контент -->
+  <div class="menu-container">
+    <h1 class="menu-title">☣ DEAD TACTICS</h1>
+    <p class="menu-subtitle">ZOMBIE APOCALYPSE · TURN-BASED STRATEGY</p>
+    
+    <div class="menu-buttons">
+      <button onclick="newGame()" class="menu-btn">▶ НОВАЯ ИГРА</button>
+      <button onclick="continueGame()" class="menu-btn">▶ ПРОДОЛЖИТЬ</button>
+      <button onclick="openSettings()" class="menu-btn">⚙ НАСТРОЙКИ</button>
+    </div>
   </div>
-
-  <div class="overlay-box screen-start-desc">
-    <p><b>Собери отряд выживших</b> и противостань волнам зомби-апокалипсиса. Прокачивай боевые навыки, покупай оружие и доказывай, что человечество ещё не потеряно.</p>
-    <p class="screen-start-tagline">Стратегия • Тактика • Выживание</p>
-  </div>
-
-  <button onclick="goToIntro()" class="btn-start">▶ НАЧАТЬ ИГРУ</button>
 </div>
 
 <!-- ═══════════════════════════════════════════════════ -->
@@ -213,13 +216,13 @@
 <script src="src/js/core/state.js"></script>
 <script src="src/js/data.js"></script>
 
-<!-- SCREENS: роутинг -->
-<script src="src/js/screens/screens.js"></script>
 <!-- SCREENS: рендеры -->
+<script src="src/js/screens/screenIntro.js"></script>
+<!-- SCREENS: роутинг (зависит от screenIntro.js для startMenuBackgroundAnimation) -->
+<script src="src/js/screens/screens.js"></script>
 <script src="src/js/screens/screenMap.js"></script>
 <script src="src/js/screens/screenSquad.js"></script>
 <script src="src/js/screens/screenShop.js"></script>
-<script src="src/js/screens/screenIntro.js"></script>
 <script src="src/js/screens/screenLevel.js"></script>
 <script src="src/js/screens/screenDetail.js"></script>
 

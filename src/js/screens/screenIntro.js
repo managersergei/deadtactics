@@ -2,6 +2,79 @@
 // SCREEN INTRO — рендер экрана интро (ЛОР + имя)
 // ════════════════════════════════════════════════════════
 
+// ── ГЛАВНОЕ МЕНЮ ──────────────────────────────────────
+
+const MENU_BACKGROUND_FRAMES = [
+  'src/assets/menu/back-menu1.png',
+  'src/assets/menu/back-menu2.png',
+  'src/assets/menu/back-menu3.png',
+  'src/assets/menu/back-menu4.png'
+];
+
+const MENU_ANIMATION_SPEED = 250; // ms per frame
+
+let menuAnimationInterval = null;
+let currentMenuFrame = 0;
+
+function startMenuBackgroundAnimation() {
+  const container = document.getElementById('menu-background');
+  if (!container) return;
+  
+  // Создать img элементы для каждого кадра
+  container.innerHTML = '';
+  MENU_BACKGROUND_FRAMES.forEach((src, index) => {
+    const img = document.createElement('img');
+    img.src = src;
+    img.className = index === 0 ? 'active' : '';
+    container.appendChild(img);
+  });
+  
+  // Запустить цикл анимации
+  menuAnimationInterval = setInterval(() => {
+    const images = container.querySelectorAll('img');
+    if (images.length === 0) return;
+    
+    // Скрыть текущий кадр
+    images[currentMenuFrame].classList.remove('active');
+    
+    // Перейти к следующему
+    currentMenuFrame = (currentMenuFrame + 1) % MENU_BACKGROUND_FRAMES.length;
+    
+    // Показать следующий кадр
+    images[currentMenuFrame].classList.add('active');
+  }, MENU_ANIMATION_SPEED);
+}
+
+function stopMenuBackgroundAnimation() {
+  if (menuAnimationInterval) {
+    clearInterval(menuAnimationInterval);
+    menuAnimationInterval = null;
+  }
+  currentMenuFrame = 0;
+}
+
+// ── ОБРАБОТЧИКИ КНОПОК МЕНЮ ───────────────────────────
+
+function newGame() {
+  // Сбросить данные игры
+  resetGameData();
+  initializeNewGame();
+  // Перейти к вводу имени
+  goToIntro();
+}
+
+function continueGame() {
+  // Пока не реализовано — остаёмся на месте
+  console.log('Continue: not implemented yet');
+}
+
+function openSettings() {
+  // Пока не реализовано
+  console.log('Settings: not implemented yet');
+}
+
+// ── ЭКРАН ИНТРО (ЛОР + ИМЯ) ───────────────────────────
+
 let currentLoreIndex = 0;
 
 function renderIntroScreen() {
